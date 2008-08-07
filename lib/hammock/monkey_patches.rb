@@ -19,5 +19,9 @@ module ActiveRecord
       self.class.base_model
     end
     
+    # TODO acts_as_paranoid or similar.
+    def deleted?
+      false
+    end
   end
 end
