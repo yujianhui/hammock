@@ -8,7 +8,9 @@ module Hammock
     Hammock.constants.unshift('Callbacks').uniq.map {|const|
       Hammock.const_get const
     }.each {|const|
-      base.send(:include, const) if const.is_a? Module
+      mix_target = const.constants.include?('MixInto') ? const::MixInto : base
+      mix_target.send(:include, const) if const.is_a? Module
+      puts "Mixed #{const} into #{mix_target}"
     }
   end
 end

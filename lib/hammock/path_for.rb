@@ -81,7 +81,7 @@ module Hammock
           args_for_send.concat record_list
           args_for_send << opts unless opts.empty?
 
-          debug "Generated path #{path}(#{args_for_send.map(&:inspect).join(', ')})."
+          dlog "Generated path #{path}(#{args_for_send.map(&:inspect).join(', ')})."
           send path, *args_for_send
         else
           raise "Neither #{path} nor #{path_builder} are valid routes."

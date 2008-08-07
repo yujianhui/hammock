@@ -6,7 +6,7 @@ module Hammock
 
       base.class_eval {
         before_modify :set_editing
-        helper_method :mdl, :mdl_name, :table_name, :editing?
+        helper_method :mdl, :mdl_name, :table_name, :editing?, :log, :dlog
       }
     end
 
@@ -24,18 +24,35 @@ module Hammock
       def table_name
         @_cached_table_name ||= self.class.to_s.sub('Controller', '').downcase
       end
-
-
+      
       def make_new_record
-        assign_named_record_instances mdl.new_with params_for mdl.symbolize
+        # TODO hyperactive_record required for this.
+        # assign_resource mdl.new_with params_for mdl.symbolize
+        assign_resource mdl.new params_for mdl.symbolize
       end
 
-      def assign_named_record_instances generic_instance
-        if generic_instance.is_a? Array
-          instance_variable_set "@#{table_name}", (@records = generic_instance)
+      def assign_resource record_or_records
+        if record_or_records.nil?
+          # Fail
+        elsif record_or_records.is_a? ActiveRecord::Base
+          log "assigned @record and @#{mdl_name}"
+          instance_variable_set "@#{mdl_name}", (@record = record_or_records)
+        # elsif record_or_records.is_a? Ambition::Context
+        #   log "Unkicked query: #{record_or_records.to_s}"
+        elsif record_or_records.is_a? Array
+          log "assigned @records and @#{table_name}"
+          instance_variable_set "@#{table_name}", (@records = record_or_records)
         else
-          instance_variable_set "@#{mdl_name}", (@record = generic_instance)
+          raise "Unknown record(s) type #{record_or_records.class}."
         end
+      end
+
+      def idempotent_action_and_implication? action
+        request.get? && %w{ index show }.include?(action.to_s)
+      end
+
+      def action_requires_record? action
+        %{ show edit update delete }.include?(action.to_s)
       end
 
       def set_editing
@@ -49,15 +66,18 @@ module Hammock
       def params_for key
         params[key] || {}
       end
-
+      
       def log message
         logger.info message
       end
-
-      def debug message
-        logger.info message if 'development' == ENV['RAILS_ENV']
+      
+      def dlog message
+        logger.info message if development?
       end
-
+      
+      def development?
+        'development' == ENV['RAILS_ENV']
+      end
     end
   end
 end
