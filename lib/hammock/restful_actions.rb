@@ -84,7 +84,7 @@ module Hammock
         if request.xhr?
           render :partial => "#{table_name}/index_entry", :locals => { :record => @record }
         else
-          redirect_to opts[:redirect_path] || path_for(@record.class)
+          redirect_to opts[:redirect_path] || postdestroy_redirect || path_for(@record.class)
         end
       end
 

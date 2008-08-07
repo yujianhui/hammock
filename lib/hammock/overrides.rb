@@ -29,6 +29,10 @@ module Hammock
       def postsave_redirect
         nil
       end
+      
+      def postdestroy_redirect
+        nil
+      end
 
     end
   end
