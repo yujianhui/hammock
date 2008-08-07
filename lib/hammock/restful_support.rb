@@ -26,8 +26,6 @@ module Hammock
       end
       
       def make_new_record
-        # TODO hyperactive_record required for this.
-        # assign_resource mdl.new_with params_for mdl.symbolize
         assign_resource mdl.new params_for mdl.symbolize
       end
 

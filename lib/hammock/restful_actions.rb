@@ -10,10 +10,7 @@ module Hammock
 
     module InstanceMethods
 
-      # TODO implement filtering of records based on named routes, e.g. transfers to a single account:
-      # /accounts/481/transfers (check)
       def index
-        #retrieve_records
         assign_resource index_finder
         @title = mdl.to_s.pluralize
 
@@ -70,13 +67,6 @@ module Hammock
         end
       end
 
-      # def undestroy
-      #   if find_record(:deleted_ok => true) {|record| @current_account.can_undestroy? record }
-      #     result = callback(:before_undestroy) and @record.undestroy and callback(:after_undestroy)
-      #     render_for_delete result, :undelete => true
-      #   end
-      # end
-
       def render_or_redirect_after result
         if request.xhr?
           do_render :editable => true, :edit => false
@@ -85,7 +75,6 @@ module Hammock
             redirect_to postsave_redirect || path_for(mdl)
           else
             referring_action = inline_edit ? :index : (@record.new_record? ? :new : :edit)
-            # send referring_action
             render :template => "#{table_name}/#{referring_action}"
           end
         end

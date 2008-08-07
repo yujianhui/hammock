@@ -20,7 +20,6 @@ module Hammock
             render :partial => "#{table_name}/#{mdl_name}#{'_edit' if opts[:edit]}"
           end
         end
-        # TODO performed? - check if already rendered
       end
 
       def render_attribute opts = {}
