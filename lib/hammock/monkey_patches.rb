@@ -1,4 +1,5 @@
-# TODO Oh dear lord these probably shouldn't be here. But that's OK for now.
+# TODO Oh dear lord these probably shouldn't be here. But that's OK for now. Because it's a spike!
+# Yes, a spike. Nothing to see here.
 
 class Object
 
@@ -7,6 +8,8 @@ class Object
   end
 
 end
+
+# No, no, I swear, it was like this when I got here.
 
 module ActiveRecord
   class Base
