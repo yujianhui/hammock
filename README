@@ -1,0 +1,7 @@
+Hammock is a Rails plugin that eliminates redundant code. String up Hammock and specify how your controllers should behave, instead of repetitively repeating the specifics of REST redundantly.
+
+Hammock enforces and abstracts RESTful resource access from the controller in favour of a clean callback system
+
+Lots of functionality is planned that will take this much, much further—in particular, proper nested route support with routing table traversal, and a resource-centric scoping security model.
+
+A short HOWTO along with a sample Rails app is on the way. Get knee-deep in the code and enjoy! :)
