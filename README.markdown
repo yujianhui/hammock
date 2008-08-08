@@ -1,8 +1,10 @@
-= Hammock
+Hammock
+-------
 
 Hammock is a Rails plugin that eliminates redundant code. Specify how your controllers should behave, instead of repetitively repeating the specifics of REST redundantly. Hammock enforces RESTful resource access by abstracting it away from the controller in favour of a clean, model-like callback system.
 
-== Now
+Now
+---
 
 At the moment, you can do this with Hammock:
 
@@ -35,7 +37,8 @@ At the moment, you can do this with Hammock:
 That's the whole app. It's not ideal yet, because the index lookup and record checks are implemented separately and hence have duplicate logic in them. But...
 
 
-== The Master Plan
+The Master Plan
+---------------
 
 Lots of functionality is planned that will take this much, much further.
 
@@ -46,8 +49,8 @@ Secondly, the current design -- using Model.index_for, Model#editable_by?, etc -
 
 == Installation
 
-cd RAILS_ROOT/vendor/plugins
-git clone git://github.com/benhoskings/hammock.git
+	cd RAILS_ROOT/vendor/plugins
+	git clone git://github.com/benhoskings/hammock.git
 
 ... and include Hammock in ApplicationController, or just in specific controllers if you like.
 
