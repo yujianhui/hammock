@@ -14,6 +14,10 @@ end
 module ActiveRecord
   class Base
 
+    def concise_inspect
+      "#{self.class}<#{self.id || 'new'}>"
+    end
+
     def self.base_model
       to_s.downcase
     end

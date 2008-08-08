@@ -10,7 +10,7 @@ module Hammock
     }.each {|const|
       mix_target = const.constants.include?('MixInto') ? const::MixInto : base
       mix_target.send(:include, const) if const.is_a? Module
-      puts "Mixed #{const} into #{mix_target}"
+      # puts "Mixed #{const} into #{mix_target}"
     }
   end
 end
