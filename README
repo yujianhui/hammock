@@ -1,7 +1,53 @@
-Hammock is a Rails plugin that eliminates redundant code. String up Hammock and specify how your controllers should behave, instead of repetitively repeating the specifics of REST redundantly.
+= Hammock
 
-Hammock enforces and abstracts RESTful resource access from the controller in favour of a clean callback system.
+Hammock is a Rails plugin that eliminates redundant code. Specify how your controllers should behave, instead of repetitively repeating the specifics of REST redundantly. Hammock enforces RESTful resource access by abstracting it away from the controller in favour of a clean, model-like callback system.
 
-Lots of functionality is planned that will take this much, much further --- in particular, proper nested route support with routing table traversal, and a resource-centric scoping security model.
+== Now
 
-A short HOWTO along with a sample Rails app is on the way. Get knee-deep in the code and enjoy! :)
+At the moment, you can do this with Hammock:
+
+	class ApplicationController < ActionController::Base
+	  include Hammock
+	end
+
+	class BeersController < ApplicationController
+	  before_create :set_creator_id
+	  def set_creator_id
+	    @beer.creator_id = @current_account.id
+	  end
+	end
+
+	class Beer < ActiveRecord::Base
+	  belongs_to :creator, :class_name => 'Person'
+	  belongs_to :recipient, :class_name => 'Person'
+
+	  def editable_by? account
+	    creator_id == account.id
+	  end
+	  def self.index_for account
+	    find :all, :conditions => ["creator_id = ? OR recipient_id = ?", account.id, account.id]
+	  end
+	end
+	
+	<%= link_to_if_allowed :edit, @beer %>
+
+
+That's the whole app. It's not ideal yet, because the index lookup and record checks are implemented separately and hence have duplicate logic in them. But...
+
+
+== The Master Plan
+
+Lots of functionality is planned that will take this much, much further.
+
+Proper nested route support is a priority. At the moment, nested routes have to be generated the old way, which means you can't get security checks for free like you can with link_to_if_allowed.
+
+Secondly, the current design -- using Model.index_for, Model#editable_by?, etc -- involves some duplication, because record checks are implemented as methods, whereas index lookups are ActiveRecord finds. That's just a stepping stone.
+
+
+== Installation
+
+cd RAILS_ROOT/vendor/plugins
+git clone git://github.com/benhoskings/hammock.git
+
+... and include Hammock in ApplicationController, or just in specific controllers if you like.
+
