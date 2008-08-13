@@ -22,7 +22,7 @@ module Hammock
         @_cached_mdl_name ||= table_name.singularize
       end
       def table_name
-        @_cached_table_name ||= self.class.to_s.sub('Controller', '').downcase
+        @_cached_table_name ||= self.class.to_s.sub('Controller', '').underscore
       end
       
       def make_new_record
