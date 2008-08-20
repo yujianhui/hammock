@@ -19,7 +19,7 @@ module ActiveRecord
     end
 
     def self.base_model
-      to_s.underscore
+      base_class.to_s.underscore
     end
 
     def base_model
