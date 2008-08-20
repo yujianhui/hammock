@@ -35,8 +35,9 @@ module Hammock
         elsif record_or_records.is_a? ActiveRecord::Base
           log "assigned @record and @#{mdl_name}"
           instance_variable_set "@#{mdl_name}", (@record = record_or_records)
-        # elsif record_or_records.is_a? Ambition::Context
-        #   log "Unkicked query: #{record_or_records.to_s}"
+        elsif record_or_records.is_a? Ambition::Context
+          log "Unkicked query: #{record_or_records.to_s}"
+          instance_variable_set "@#{table_name}", (@records = record_or_records)
         elsif record_or_records.is_a? Array
           log "assigned @records and @#{table_name}"
           instance_variable_set "@#{table_name}", (@records = record_or_records)
