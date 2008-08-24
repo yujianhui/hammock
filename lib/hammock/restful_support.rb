@@ -22,7 +22,7 @@ module Hammock
         @_cached_mdl_name ||= table_name.singularize
       end
       def table_name
-        @_cached_table_name ||= self.class.to_s.sub('Controller', '').underscore
+        mdl.table_name
       end
       
       def make_new_record
@@ -46,8 +46,8 @@ module Hammock
         end
       end
 
-      def idempotent_action_and_implication? action
-        request.get? && %w{ index show }.include?(action.to_s)
+      def safe_action_and_implication? action = nil
+        request.get? && %w{ index show }.include?((action || action_name).to_s)
       end
 
       def action_requires_record? action
@@ -65,18 +65,11 @@ module Hammock
       def params_for key
         params[key] || {}
       end
-      
-      def log message
-        logger.info message
-      end
-      
-      def dlog message
-        logger.info message if development?
-      end
-      
+
       def development?
         'development' == ENV['RAILS_ENV']
       end
+
     end
   end
 end
