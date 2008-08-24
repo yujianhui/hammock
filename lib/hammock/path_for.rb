@@ -63,7 +63,11 @@ module Hammock
         verb = verb_for requested_verb, record
         path = RouteTemplates[verb].sub('records', model_name.pluralize).sub('record', model_name)
 
-        unless respond_to? path
+        if respond_to? path
+          # Already succeeded
+        elsif resources.empty?
+          log "Failed to generate path: #{path.inspect}"
+        else
           # Base path didn't exist; let's try traversing the route heirachy.
           path_builder = path
 
