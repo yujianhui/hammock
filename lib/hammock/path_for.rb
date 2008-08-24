@@ -66,7 +66,7 @@ module Hammock
         if respond_to? path
           # Already succeeded
         elsif resources.empty?
-          log "Failed to generate path: #{path.inspect}"
+          log "Failed to generate path: '#{path}'"
         else
           # Base path didn't exist; let's try traversing the route heirachy.
           path_builder = path
@@ -88,7 +88,7 @@ module Hammock
           dlog "Generated path #{path}(#{args_for_send.map(&:concise_inspect).join(', ')})."
           send path, *args_for_send
         else
-          raise "Neither #{path} nor #{path_builder} are valid routes."
+          raise "Neither '#{path}' nor '#{path_builder}' are valid routes."
         end
       end
 
