@@ -22,14 +22,14 @@ module ActiveRecord
     end
 
     def self.editable_by account
-      select write_scope_for(account)
+      select &write_scope_for(account)
     end
     def editable_by? account
       self.class.write_scope_for(account).call(self)
     end
     
     def self.indexable_by account
-      select index_scope_for(account)
+      select &index_scope_for(account)
     end
     def indexable_by? account
       self.class.index_scope_for(account).call(self)
