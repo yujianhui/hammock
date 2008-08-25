@@ -14,8 +14,9 @@ module Hammock
     end
 
     module InstanceMethods
-      RouteTemplates = Hash.new {|hsh, k| "#{k}_record_path" }
-      RouteTemplates.update(
+      RouteTemplates = Hash.new {|hsh, k|
+        "#{k}_record_path"
+      }.update(
         :index => 'records_path',
         :create => 'records_path',
         :show => 'record_path',
@@ -23,16 +24,18 @@ module Hammock
         :destroy => 'record_path'
       )
 
-      HTTPMethods = Hash.new :get
-      HTTPMethods.update(
+      HTTPMethods = Hash.new(
+        :get
+      ).update(
         :create => :post,
         :update => :put,
         :destroy => :delete,
-        :undelete => :post,
-        :suggest => :get
+        :undelete => :post
       )
 
       def verb_for requested_verb, record
+        requested_verb ||= :show
+        
         if (:show == requested_verb) && record.is_a?(Class)
           :index
         elsif :modify == requested_verb
@@ -48,18 +51,17 @@ module Hammock
         HTTPMethods[verb_for(requested_verb, record)]
       end
 
-      def path_for *args
-        opts = args.last.is_a?(Hash) ? args.pop : {}
-        requested_verb = args.first.is_a?(Symbol) ? args.shift : :show
-        resources = args
-        record, record_list = resources.shift, [ ]
+      def path_for *resources
+        opts = resources.last.is_a?(Hash) ? resources.pop.symbolize_keys! : {}
 
         [ :controller, :action, :id ].each {|key|
           raise ArgumentError, "path_for() infers :#{key} from the resources you provided, so you don't need to specify it manually." if opts.delete key
         }
 
+        requested_verb = resources.shift if resources.first.is_a?(Symbol)
+        record, parent_records = resources.shift, [ ]
+
         model_name = record.base_model
-        recordless_paths = [ :index, :create, :new ].freeze
         verb = verb_for requested_verb, record
         path = RouteTemplates[verb].sub('records', model_name.pluralize).sub('record', model_name)
 
@@ -72,8 +74,8 @@ module Hammock
           path_builder = path
 
           path = resources.each {|resource|
-            path_builder = "#{record_list.first.parent.base_model}_#{path_builder}"
-            record_list.unshift resource
+            path_builder = "#{parent_records.first.parent.base_model}_#{path_builder}"
+            parent_records.unshift resource
             log "building: #{nested_path}"
             break path_builder if respond_to? path_builder
           }
@@ -81,8 +83,8 @@ module Hammock
 
         if respond_to? path
           args_for_send = []
-          args_for_send << record unless recordless_paths.include? verb
-          args_for_send.concat record_list
+          args_for_send << record unless recordless_verb? verb
+          args_for_send.concat parent_records
           args_for_send << opts unless opts.empty?
 
           dlog "Generated path #{path}(#{args_for_send.map(&:concise_inspect).join(', ')})."
@@ -97,6 +99,12 @@ module Hammock
       def create_path_for  *args; path_for :create,  *args end
       def update_path_for  *args; path_for :update,  *args end
       def destroy_path_for *args; path_for :destroy, *args end
+      
+      private
+      
+      def recordless_verb? verb
+        [ :index, :create, :new ].include? verb.to_sym
+      end
 
     end
   end
