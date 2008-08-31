@@ -14,25 +14,35 @@ end
 module ActiveRecord
   class Base
 
-    def self.visible_to record
-      select &read_scope_for(record)
+    def self.read_scope_for account
+      raise "#{name}.read_scope_for isn't defined."
     end
-    def visible_to? record
-      self.class.read_scope_for(record).call(self)
+    def self.index_scope_for account
+      raise "#{name}.index_scope_for isn't defined."
+    end
+    def self.write_scope_for account
+      raise "#{name}.write_scope_for isn't defined."
     end
 
-    def self.editable_by record
-      select &write_scope_for(record)
+    def self.visible_to account
+      select &read_scope_for(account)
     end
-    def editable_by? record
-      self.class.write_scope_for(record).call(self)
+    def visible_to? account
+      self.class.read_scope_for(account).call(self)
+    end
+
+    def self.editable_by account
+      select &write_scope_for(account)
+    end
+    def editable_by? account
+      self.class.write_scope_for(account).call(self)
     end
     
-    def self.indexable_by record
-      select &index_scope_for(record)
+    def self.indexable_by account
+      select &index_scope_for(account)
     end
-    def indexable_by? record
-      self.class.index_scope_for(record).call(self)
+    def indexable_by? account
+      self.class.index_scope_for(account).call(self)
     end
     
     def concise_inspect
