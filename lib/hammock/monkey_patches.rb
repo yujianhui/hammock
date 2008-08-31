@@ -14,25 +14,25 @@ end
 module ActiveRecord
   class Base
 
-    def self.visible_to account
-      select &read_scope_for(account)
+    def self.visible_to record
+      select &read_scope_for(record)
     end
-    def visible_to? account
-      self.class.read_scope_for(account).call(self)
+    def visible_to? record
+      self.class.read_scope_for(record).call(self)
     end
 
-    def self.editable_by account
-      select &write_scope_for(account)
+    def self.editable_by record
+      select &write_scope_for(record)
     end
-    def editable_by? account
-      self.class.write_scope_for(account).call(self)
+    def editable_by? record
+      self.class.write_scope_for(record).call(self)
     end
     
-    def self.indexable_by account
-      select &index_scope_for(account)
+    def self.indexable_by record
+      select &index_scope_for(record)
     end
-    def indexable_by? account
-      self.class.index_scope_for(account).call(self)
+    def indexable_by? record
+      self.class.index_scope_for(record).call(self)
     end
     
     def concise_inspect
