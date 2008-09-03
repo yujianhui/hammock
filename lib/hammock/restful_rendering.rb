@@ -23,10 +23,11 @@ module Hammock
       end
 
       def render_attribute opts = {}
-        render :partial => "restful/attribute#{'_edit' if editing?(@record)}", :locals => {
+        render :partial => "restful/attribute", :locals => {
           :record => @record,
           :attribute => params[:attribute],
-          :editable => opts[:editable]
+          :editable => opts[:editable],
+          :editing => editing?(@record)
         }
       end
 
