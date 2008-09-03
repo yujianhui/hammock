@@ -3,7 +3,7 @@ module Hammock
     def self.included base
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods
-      
+
       base.class_eval {
         helper_method :current_account_can_verb_record?
       }
@@ -13,7 +13,7 @@ module Hammock
     end
 
     module InstanceMethods
-      
+
       def current_account_can_verb_record? verb, record
         if !record.visible_to?(@current_account)
           log "#{@current_account.class}<#{@current_account.id}> can't see #{record.class}<#{record.id}>."
@@ -40,25 +40,26 @@ module Hammock
         else
           :ok
         end
-        
+
         if :ok == result
           assign_resource record
         else
           escort result
         end
       end
-      
-      def verb_scope
-        safe_action_and_implication? ? mdl.visible_to(@current_account) : mdl.editable_by(@current_account)
-      end
-      
+
+      # def verb_scope
+      #   safe_action_and_implication? ? mdl.visible_to(@current_account) : mdl.editable_by(@current_account)
+      # end
+
       def retrieve_record opts = {}
         finder = opts[:column] || :id
         val = opts[finder] || params[finder]
 
         # record = mdl.send finder, val
         # TODO Hax Ambition so the eval isn't required to supply finder.
-        record = eval "verb_scope.select {|r| r.#{finder} == val }.first"
+        # record = mdl.visible_to(@current_account).select {|r| r.__send__(finder) == val }.first
+        record = eval "mdl.visible_to(@current_account).select {|r| r.#{finder} == val }.first"
 
         if record.nil?
           # not found
@@ -68,13 +69,14 @@ module Hammock
           record
         end
       end
-      
+
       def escort reason
         redirect_to({
-          :read_only => {:action => :show}
+          :read_only => {:action => :show},
+          :unauthed => (authed_as ? root_path : login_path)
         }[reason] || root_path)
       end
-      
+
     end
   end
 end
