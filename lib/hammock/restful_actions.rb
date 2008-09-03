@@ -67,6 +67,41 @@ module Hammock
         end
       end
 
+      def suggest
+        @results = []
+
+        if params[:keys].blank? || (@keys = params[:keys].split(',')).empty?
+          log "No keys specified."
+        else
+          @queries = (params[:q] || '').downcase.split(/\s+/)
+
+          # She may not look like much, but she's got it where it counts, kid
+
+          table_name = mdl.to_s.downcase.pluralize
+
+          match_counter_sql_array = [
+            @keys.map {|k| ([ "CASE WHEN LOWER(#{table_name}.#{k.sanitise_column_name}) LIKE ? THEN 1 ELSE 0 END" ] * @queries.length).join(' + ') }.join(' + '),
+          ].concat(@queries.map{|q| "%#{q}%" } * @keys.length)
+
+          match_counter_sql = mdl.send :sanitize_sql_array, match_counter_sql_array
+
+          @results = mdl.base_class.find(:all,
+            :select => "*, #{match_counter_sql} AS suggestion_matches",
+            :conditions => [
+              @keys.map {|k| ([ "LOWER(#{table_name}.#{k.sanitise_column_name}) LIKE ?" ] * @queries.length).join(' OR ') }.join(' OR '),
+            ].concat(@queries.map{|q| "%#{q}%" } * @keys.length),
+
+            :order => @keys.map {|k| "#{k} ASC" }.join(", "),
+            :limit => 15
+          ).sort_by {|record| record.suggestion_matches }.reverse
+        end
+
+        render :action => "suggest_#{@keys.join(',')}", :layout => false
+      end
+
+
+      private
+
       def render_or_redirect_after result
         if request.xhr?
           do_render :editable => true, :edit => false
