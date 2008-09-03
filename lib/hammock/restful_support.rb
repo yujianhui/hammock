@@ -33,13 +33,11 @@ module Hammock
         if record_or_records.nil?
           # Fail
         elsif record_or_records.is_a? ActiveRecord::Base
-          log "assigned @record and @#{mdl_name}"
           instance_variable_set "@#{mdl_name}", (@record = record_or_records)
         elsif record_or_records.is_a? Ambition::Context
           log "Unkicked query: #{record_or_records.to_s}"
           instance_variable_set "@#{table_name}", (@records = record_or_records)
         elsif record_or_records.is_a? Array
-          log "assigned @records and @#{table_name}"
           instance_variable_set "@#{table_name}", (@records = record_or_records)
         else
           raise "Unknown record(s) type #{record_or_records.class}."
@@ -56,6 +54,10 @@ module Hammock
 
       def set_editing
         @editing = @record.class.symbolize
+      end
+
+      def partial_exists? name, extension = nil
+        File.exists? File.join(RAILS_ROOT, 'app/views', controller.controller_name, "_#{name}.#{extension || '.html.erb'}")
       end
 
       def editing? record
