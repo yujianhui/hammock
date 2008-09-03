@@ -1,5 +1,7 @@
 module Hammock
-  module
+  module Lol
+    MixInto = Lol::Lul
+    
     def self.included base
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods
