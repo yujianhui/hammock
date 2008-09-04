@@ -6,7 +6,7 @@ module Hammock
 
       base.class_eval {
         before_modify :set_editing
-        helper_method :mdl, :mdl_name, :table_name, :editing?, :log, :dlog
+        helper_method :mdl, :mdl_name, :table_name, :editing?, :partial_exists?, :log, :dlog
       }
     end
 
@@ -57,7 +57,7 @@ module Hammock
       end
 
       def partial_exists? name, extension = nil
-        File.exists? File.join(RAILS_ROOT, 'app/views', controller.controller_name, "_#{name}.#{extension || '.html.erb'}")
+        !Dir.glob(File.join(RAILS_ROOT, 'app/views', controller_name, "_#{name}.html.#{extension || '*'}")).empty?
       end
 
       def editing? record
