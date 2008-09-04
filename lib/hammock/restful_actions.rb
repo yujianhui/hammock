@@ -11,11 +11,10 @@ module Hammock
     module InstanceMethods
 
       def index
-        assign_resource verb_scope
-        @title = mdl.to_s.pluralize
-
-        callback :before_index
-        send(:new) if inline_edit
+        if retrieve_resource
+          callback :before_index
+          send(:new) if inline_edit
+        end
       end
 
       def new
