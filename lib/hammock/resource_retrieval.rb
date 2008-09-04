@@ -15,10 +15,10 @@ module Hammock
     module InstanceMethods
 
       def current_account_can_verb_record? verb, record
-        if !record.visible_to?(@current_account)
+        if !record.readable_by?(@current_account)
           log "#{@current_account.class}<#{@current_account.id}> can't see #{record.class}<#{record.id}>."
           :unauthed
-        elsif !safe_action_and_implication?(verb) && !record.editable_by?(@current_account)
+        elsif !safe_action_and_implication?(verb) && !record.writeable_by?(@current_account)
           log "#{@current_account.class}<#{@current_account.id}> can't #{verb} #{record.class}<#{record.id}>."
           :read_only
         else
@@ -48,9 +48,21 @@ module Hammock
         end
       end
 
-      # def verb_scope
-      #   safe_action_and_implication? ? mdl.visible_to(@current_account) : mdl.editable_by(@current_account)
-      # end
+      def verb_scope
+        able = if 'index' == action_name
+          'indexable'
+        elsif safe_action_and_implication?
+          'readable'
+        else
+          'writeable'
+        end
+
+        if @current_account && mdl.respond_to?("#{able}_by")
+          mdl.send("#{able}_by", @current_account)
+        else
+          mdl.send able
+        end
+      end
 
       def retrieve_record opts = {}
         finder = opts[:column] || :id
@@ -58,8 +70,8 @@ module Hammock
 
         # record = mdl.send finder, val
         # TODO Hax Ambition so the eval isn't required to supply finder.
-        # record = mdl.visible_to(@current_account).select {|r| r.__send__(finder) == val }.first
-        record = eval "mdl.visible_to(@current_account).select {|r| r.#{finder} == val }.first"
+        # record = mdl.readable_by(@current_account).select {|r| r.__send__(finder) == val }.first
+        record = eval "verb_scope.select {|r| r.#{finder} == val }.first"
 
         if record.nil?
           # not found
