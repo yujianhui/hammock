@@ -13,37 +13,31 @@ module Hammock
 
     module ClassMethods
 
-      def export_scope scope_name, opts = {}
-        as = opts[:as] || scope_name
+      def export_scope verb, as = nil
+        verbable_by = "#{as || verb}able_by"
 
-        if !(respond_to?("#{scope_name}_scope_for") ^ respond_to?("#{scope_name}_scope"))
-          raise "You have to define either #{name}.#{scope_name}_scope or #{name}.#{scope_name}_scope_for(account), but not both, to export the '#{scope_name}' scope."
-        elsif respond_to?("#{scope_name}_scope_for")
+        if !(respond_to?("#{verb}_scope_for") ^ respond_to?("#{verb}_scope"))
+          raise "You have to define either #{name}.#{verb}_scope or #{name}.#{verb}_scope_for(account), but not both, to export the '#{verb}' scope."
+        elsif respond_to?("#{verb}_scope_for")
           class << self; self end.instance_eval {
-            define_method as do |account|
-              select &send("#{scope_name}_scope_for", account)
+            define_method verbable_by do |account|
+              select &send("#{verb}_scope_for", account)
             end
           }
-          define_method "#{as}?" do |account|
-            self.class.send("#{scope_name}_scope_for", account).call(self)
+          define_method "#{verbable_by}?" do |account|
+            self.class.send("#{verb}_scope_for", account).call(self)
           end
         else
           class << self; self end.instance_eval {
-            define_method as do |account|
-              select &send("#{scope_name}_scope")
+            define_method verbable_by do |account|
+              select &send("#{verb}_scope")
             end
           }
-          define_method "#{as}?" do |account|
-            self.class.send("#{scope_name}_scope").call(self)
+          define_method "#{verbable_by}?" do |account|
+            self.class.send("#{verb}_scope").call(self)
           end
         end
       end
-      
-      # def export_scopes base
-      #   log "LOL EXPORTING SCOPES"
-      #   log base.methods.grep(/extent/).inspect
-      # end
-
     end
 
     module InstanceMethods
