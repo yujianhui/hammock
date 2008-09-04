@@ -26,10 +26,14 @@ module Hammock
         false
       end
 
+      def postsave_render result
+        nil
+      end
+
       def postsave_redirect
         nil
       end
-      
+
       def postdestroy_redirect
         nil
       end
