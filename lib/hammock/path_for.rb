@@ -74,9 +74,9 @@ module Hammock
           path_builder = path
 
           path = resources.each {|resource|
-            path_builder = "#{parent_records.first.parent.base_model}_#{path_builder}"
+            path_builder = "#{resources.first.base_model}_#{path_builder}"
             parent_records.unshift resource
-            log "building: #{nested_path}"
+            log "building: #{path_builder}"
             break path_builder if respond_to? path_builder
           }
         end
