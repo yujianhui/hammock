@@ -11,7 +11,7 @@ module Hammock
     module InstanceMethods
 
       def index
-        assign_resource mdl.indexable_by(@current_account)
+        assign_resource verb_scope
         @title = mdl.to_s.pluralize
 
         callback :before_index
