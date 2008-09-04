@@ -17,7 +17,7 @@ module Hammock
       def current_account_can_verb_record? verb, record
         if !record.readable_by?(@current_account)
           log "#{@current_account.class}<#{@current_account.id}> can't see #{record.class}<#{record.id}>."
-          :unauthed
+          :not_found
         elsif !safe_action_and_implication?(verb) && !record.writeable_by?(@current_account)
           log "#{@current_account.class}<#{@current_account.id}> can't #{verb} #{record.class}<#{record.id}>."
           :read_only
@@ -36,7 +36,7 @@ module Hammock
           verbability
         elsif !callback(:during_find, record, opts)
           # callbacks failed
-          :unauthed
+          :not_found
         else
           :ok
         end
@@ -59,8 +59,19 @@ module Hammock
 
         if @current_account && mdl.respond_to?("#{able}_by")
           mdl.send("#{able}_by", @current_account)
+        elsif !mdl.respond_to? able
+          log "#{mdl}.#{able} isn't defined - no scope available."
+          nil
         else
           mdl.send able
+        end
+      end
+
+      def retrieve_resource
+        if (scope = verb_scope).nil?
+          escort :not_found
+        else
+          assign_resource scope
         end
       end
 
@@ -68,25 +79,30 @@ module Hammock
         finder = opts[:column] || :id
         val = opts[finder] || params[finder]
 
-        # record = mdl.send finder, val
-        # TODO Hax Ambition so the eval isn't required to supply finder.
-        # record = mdl.readable_by(@current_account).select {|r| r.__send__(finder) == val }.first
-        record = eval "verb_scope.select {|r| r.#{finder} == val }.first"
-
-        if record.nil?
-          # not found
-        elsif !opts[:deleted_ok] && record.deleted?
-          log "#{record.class}<#{record.id}> has been deleted."
+        if (scope = verb_scope).nil?
+          nil
         else
-          record
+          # record = mdl.send finder, val
+          # TODO Hax Ambition so the eval isn't required to supply finder.
+          # record = mdl.readable_by(@current_account).select {|r| r.__send__(finder) == val }.first
+          record = eval "scope.select {|r| r.#{finder} == val }.first"
+
+          if record.nil?
+            # not found
+          elsif !opts[:deleted_ok] && record.deleted?
+            log "#{record.class}<#{record.id}> has been deleted."
+          else
+            record
+          end
         end
       end
 
       def escort reason
         redirect_to({
           :read_only => {:action => :show},
-          :unauthed => (@current_account ? root_path : login_path)
+          :not_found => (@current_account ? root_path : returning_login_path)
         }[reason] || root_path)
+        nil
       end
 
     end
