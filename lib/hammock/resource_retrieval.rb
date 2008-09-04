@@ -85,7 +85,7 @@ module Hammock
       def escort reason
         redirect_to({
           :read_only => {:action => :show},
-          :unauthed => (authed_as ? root_path : login_path)
+          :unauthed => (@current_account ? root_path : login_path)
         }[reason] || root_path)
       end
 
