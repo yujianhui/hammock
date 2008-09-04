@@ -106,8 +106,10 @@ module Hammock
         if request.xhr?
           do_render :editable => true, :edit => false
         else
-          if result
-            redirect_to postsave_redirect || path_for(mdl)
+          if postsave_render result
+            # rendered - no redirect
+          elsif result
+             redirect_to postsave_redirect || path_for(@record || mdl)
           else
             referring_action = inline_edit ? :index : (@record.new_record? ? :new : :edit)
             render :template => "#{table_name}/#{referring_action}"
