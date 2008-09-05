@@ -4,7 +4,7 @@ module Hammock
     
     def self.included base
       base.send :include, InstanceMethods
-      base.send :extend, ClassMethods
+      base.send :extend, ClassMethods # TODO maybe include in the metaclass instead of extending the class?
       
       # base.class_eval {
       #   export_scopes base
@@ -37,6 +37,12 @@ module Hammock
             self.class.send("#{verb}_scope").call(self)
           end
         end
+      end
+
+      def reset_cached_column_info
+        reset_column_information
+        reset_inheritable_attributes
+        reset_column_information_and_inheritable_attributes_for_all_subclasses
       end
     end
 
