@@ -74,7 +74,7 @@ module Hammock
       
       # TODO move to authentication when that's included in hammock.
       def returning_login_path
-        session[:redirect_to_after_login] = request.request_uri
+        session[:path_after_login] = request.request_uri
         login_path
       end
 
