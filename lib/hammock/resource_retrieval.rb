@@ -49,21 +49,15 @@ module Hammock
       end
 
       def verb_scope
-        able = if 'index' == action_name
-          'indexable'
-        elsif safe_action_and_implication?
-          'readable'
-        else
-          'writeable'
-        end
-
-        if @current_account && mdl.respond_to?("#{able}_by")
-          mdl.send("#{able}_by", @current_account)
-        elsif !mdl.respond_to? able
-          log "#{mdl}.#{able} isn't defined - no scope available."
+        if @current_account && (scope_name = account_verb_scope?)
+          log "got an account_verb_scope #{scope_name}."
+          mdl.send(scope_name, @current_account)
+        elsif !(scope_name = public_verb_scope?)
+          log "No #{@current_account.nil? ? 'public' : 'account'} scope available for #{mdl}.#{' May be available after login.' if account_verb_scope?}"
           nil
         else
-          mdl.send able
+          log "got a public_verb_scope #{scope_name}."
+          mdl.send scope_name
         end
       end
 
@@ -109,11 +103,59 @@ module Hammock
       end
 
       def escort reason
-        redirect_to({
-          :read_only => {:action => :show},
-          :not_found => (@current_account ? root_path : returning_login_path)
-        }[reason] || root_path)
+        if request.xhr?
+          escort_for_bad_request
+        elsif :readonly == reason
+          escort_for_read_only
+        elsif @current_account.nil? && account_verb_scope?
+          escort_for_login
+        else
+          escort_for_404
+        end
         nil
+      end
+
+      private
+
+      def returning_login_path
+        session[:path_after_login] = request.request_uri
+        login_path
+      end
+
+      def verb_scope_name
+        if 'index' == action_name
+          'indexable'
+        elsif safe_action_and_implication?
+          'readable'
+        else
+          'writeable'
+        end
+      end
+
+      def account_verb_scope?
+        able = "#{verb_scope_name}_by"
+        able if mdl.respond_to?(able)
+      end
+      def public_verb_scope?
+        able = verb_scope_name
+        able if mdl.respond_to?(able)
+      end
+      def escort_for_bad_request
+        log
+        render :nothing => true, :status => 400
+      end
+      def escort_for_read_only
+        log
+        redirect_to :action => :show
+      end
+      def escort_for_login
+        log
+        # render :partial => 'login/account', :status => 401 # unauthorized
+        redirect_to returning_login_path
+      end
+      def escort_for_404
+        log
+        render :file => File.join(RAILS_ROOT, 'public/404.html'), :status => 404 # not found
       end
 
     end

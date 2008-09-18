@@ -77,12 +77,6 @@ module Hammock
       def development?
         'development' == ENV['RAILS_ENV']
       end
-      
-      # TODO move to authentication when that's included in hammock.
-      def returning_login_path
-        session[:path_after_login] = request.request_uri
-        login_path
-      end
 
     end
   end
