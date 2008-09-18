@@ -30,7 +30,7 @@ module Hammock
         :create => :post,
         :update => :put,
         :destroy => :delete,
-        :undelete => :post
+        :undestroy => :post
       )
 
       def verb_for requested_verb, record
@@ -76,7 +76,7 @@ module Hammock
           path = resources.each {|resource|
             path_builder = "#{resources.first.base_model}_#{path_builder}"
             parent_records.unshift resource
-            log "building: #{path_builder}"
+            # log "building: #{path_builder}"
             break path_builder if respond_to? path_builder
           }
         end
@@ -87,7 +87,7 @@ module Hammock
           args_for_send.concat parent_records
           args_for_send << opts unless opts.empty?
 
-          dlog "Generated path #{path}(#{args_for_send.map(&:concise_inspect).join(', ')})."
+          # dlog "Generated path #{path}(#{args_for_send.map(&:concise_inspect).join(', ')})."
           send path, *args_for_send
         else
           raise "Neither '#{path}' nor '#{path_builder}' are valid routes."
