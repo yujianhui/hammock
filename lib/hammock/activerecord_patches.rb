@@ -60,9 +60,18 @@ module Hammock
         self.class.base_model
       end
 
-      # TODO acts_as_paranoid or similar.
-      def deleted?
-        false
+      def undestroy
+        unless new_record?
+          if frozen?
+            self.class.find_with_deleted(self.id).undestroy # Re-fetch ourselves and undestroy the thawed copy
+          else
+            # We can undestroy
+            return false if callback(:before_undestroy) == false
+            result = self.class.update_all ['deleted_at = ?', (self.deleted_at = nil)], ['id = ?', self.id]
+            callback(:after_undestroy)
+            self if result != false
+          end
+        end
       end
 
       private
