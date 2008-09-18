@@ -67,8 +67,19 @@ module Hammock
         end
       end
 
+      def nest_scope
+        params.symbolize_keys.dragnet(*self.class.nestable_resources).inject(mdl.ambition_context) {|acc,(k,v)|
+          # TODO this would be more ductile if it used AR assocs instead of explicit FK
+          eval "acc.select {|r| r.#{k} == #{v.to_decl} }"
+        }
+      end
+      
+      def current_scope
+        nest_scope.chain verb_scope
+      end
+
       def retrieve_resource
-        if (scope = verb_scope).nil?
+        if (scope = current_scope).nil?
           escort :not_found
         else
           assign_resource scope
@@ -79,7 +90,7 @@ module Hammock
         finder = opts[:column] || :id
         val = opts[finder] || params[finder]
 
-        if (scope = verb_scope).nil?
+        if (scope = current_scope).nil?
           nil
         else
           # record = mdl.send finder, val
