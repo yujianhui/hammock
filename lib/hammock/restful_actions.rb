@@ -66,11 +66,20 @@ module Hammock
         end
       end
 
+      def undestroy
+        if find_record(:deleted_ok => true) {|record| @current_account.can_destroy? record }
+          result = callback(:before_undestroy) and @record.undestroy and callback(:after_undestroy)
+          render_for_delete result
+        end
+      end
+
       def suggest
         @results = []
 
         if params[:keys].blank? || (@keys = params[:keys].split(',')).empty?
           log "No keys specified."
+        elsif !callback(:before_suggest)
+          # fail
         else
           @queries = (params[:q] || '').downcase.split(/\s+/)
 
@@ -90,6 +99,7 @@ module Hammock
               @keys.map {|k| ([ "LOWER(#{table_name}.#{k.sanitise_column_name}) LIKE ?" ] * @queries.length).join(' OR ') }.join(' OR '),
             ].concat(@queries.map{|q| "%#{q}%" } * @keys.length),
 
+            # TODO SQL injection
             :order => @keys.map {|k| "#{k} ASC" }.join(", "),
             :limit => 15
           ).sort_by {|record| record.suggestion_matches }.reverse
