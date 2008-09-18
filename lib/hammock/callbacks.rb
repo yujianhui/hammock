@@ -18,6 +18,8 @@ module Hammock
           before_update    after_update
           before_destroy   after_destroy
           before_undestroy after_undestroy
+          
+          before_suggest
         }
       }
     end
