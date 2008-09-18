@@ -11,6 +11,12 @@ module Hammock
     end
 
     module ClassMethods
+      def nestable_by *resources
+        write_inheritable_attribute :nestable_by, resources.map(&:to_sym)
+      end
+      def nestable_resources
+        read_inheritable_attribute(:nestable_by) || []
+      end
     end
 
     module InstanceMethods
