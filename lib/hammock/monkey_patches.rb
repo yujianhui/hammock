@@ -8,3 +8,14 @@ class Object
   end
 
 end
+
+class Hash
+
+  def dragnet *keys
+    keys.inject({}) {|acc,key|
+      acc[key] = self[key] if self.has_key?(key)
+      acc
+    }
+  end
+
+end
