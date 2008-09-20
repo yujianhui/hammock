@@ -5,7 +5,7 @@ module Hammock
       base.send :extend, ClassMethods
 
       base.class_eval {
-        helper_method :current_account_can_verb_record?
+        helper_method :can_verb_record?
       }
     end
 
@@ -14,15 +14,15 @@ module Hammock
 
     module InstanceMethods
 
-      def current_account_can_verb_record? verb, record
-        if !record.readable_by?(@current_account)
-          log "#{@current_account.class}<#{@current_account.id}> can't see #{record.class}<#{record.id}>."
+      def can_verb_record? verb, record
+        if !can_read_record?(record)
+          log "#{requester_name} can't see #{record.class}<#{record.id}>."
           :not_found
-        elsif !safe_action_and_implication?(verb) && !record.writeable_by?(@current_account)
-          log "#{@current_account.class}<#{@current_account.id}> can't #{verb} #{record.class}<#{record.id}>."
+        elsif !safe_action_and_implication?(verb) && !can_write_record?(record)
+          log "#{requester_name} can't #{verb} #{record.class}<#{record.id}>."
           :read_only
         else
-          log "#{@current_account.class}<#{@current_account.id}> can #{verb} #{record.class}<#{record.id}>."
+          log "#{requester_name} can #{verb} #{record.class}<#{record.id}>."
           :ok
         end
       end
@@ -32,7 +32,7 @@ module Hammock
           # callbacks failed
         elsif (record = retrieve_record(opts)).nil?
           :not_found
-        elsif :ok != (verbability = current_account_can_verb_record?(action_name, record))
+        elsif :ok != (verbability = can_verb_record?(action_name, record))
           verbability
         elsif !callback(:during_find, record, opts)
           # callbacks failed
@@ -53,7 +53,7 @@ module Hammock
           log "got an account_verb_scope #{scope_name}."
           mdl.send(scope_name, @current_account)
         elsif !(scope_name = public_verb_scope?)
-          log "No #{@current_account.nil? ? 'public' : 'account'} scope available for #{mdl}.#{' May be available after login.' if account_verb_scope?}"
+          log "No #{@current_account.nil? ? 'public' : 'account'} #{verb_scope_name} scope available for #{mdl}.#{' May be available after login.' if account_verb_scope?}"
           nil
         else
           log "got a public_verb_scope #{scope_name}."
@@ -129,6 +129,26 @@ module Hammock
           'readable'
         else
           'writeable'
+        end
+      end
+      
+      def requester_name
+        @current_account.nil? ? 'Anonymous' : "#{@current_account.class}<#{@current_account.id}>"
+      end
+
+      def can_read_record? record
+        if @current_account.nil?
+          record.readable?
+        else
+          record.readable_by? @current_account
+        end
+      end
+
+      def can_write_record? record
+        if @current_account.nil?
+          record.writeable?
+        else
+          record.writeable_by? @current_account
         end
       end
 
