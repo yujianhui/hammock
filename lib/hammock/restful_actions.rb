@@ -14,12 +14,17 @@ module Hammock
         if retrieve_resource
           callback :before_index
           send(:new) if inline_edit
+          
+          respond_to do |format|
+            format.html # index.html.erb
+            format.xml  { render :xml => @records.kick }
+          end
         end
       end
 
       def new
         make_new_record
-        do_render(:edit => true) if callback(:before_modify) and callback(:before_new)
+        do_render || standard_render if callback(:before_modify) and callback(:before_new)
       end
 
       def create
@@ -29,13 +34,13 @@ module Hammock
 
       def show
         if find_record
-          do_render if callback(:before_show)
+          do_render || standard_render if callback(:before_show)
         end
       end
 
       def edit
         if find_record
-          do_render(:edit => true) if callback(:before_modify) and callback(:before_edit)
+          do_render if callback(:before_modify) and callback(:before_edit)
         end
       end
 
@@ -62,14 +67,14 @@ module Hammock
       def destroy
         if find_record(:deleted_ok => true) {|record| @current_account.can_destroy? record }
           result = callback(:before_destroy) and @record.destroy and callback(:after_destroy)
-          render_for_delete result
+          render_for_destroy result
         end
       end
 
       def undestroy
         if find_record(:deleted_ok => true) {|record| @current_account.can_destroy? record }
           result = callback(:before_undestroy) and @record.undestroy and callback(:after_undestroy)
-          render_for_delete result
+          render_for_destroy result
         end
       end
 
@@ -117,20 +122,36 @@ module Hammock
         else
           if postsave_render result
             # rendered - no redirect
-          elsif result
-             redirect_to postsave_redirect || path_for(@record || mdl)
           else
-            referring_action = inline_edit ? :index : (@record.new_record? ? :new : :edit)
-            render :template => "#{table_name}/#{referring_action}"
+            respond_to do |format|
+              if @record.save
+                flash[:notice] = "Page was successfully #{'create' == action_name ? 'created' : 'updated'}."
+                format.html { redirect_to(postsave_redirect || path_for(@record || mdl)) }
+                format.xml  {
+                  if 'create' == action_name
+                    render :xml => @record, :status => :created, :location => @record
+                  else # update
+                    head :ok
+                  end
+                }
+              else
+                format.html { render :action => (inline_edit ? :index : (@record.new_record? ? 'new' : 'edit')) }
+                format.xml  { render :xml => @record.errors, :status => :unprocessable_entity }
+              end
+            end
           end
         end
       end
 
-      def render_for_delete success, opts = {}
+      def render_for_destroy success, opts = {}
         if request.xhr?
           render :partial => "#{table_name}/index_entry", :locals => { :record => @record }
         else
-          redirect_to opts[:redirect_path] || postdestroy_redirect || path_for(@record.class)
+          flash[:error] = "#{@record.name} was removed."
+          respond_to do |format|
+            format.html { redirect_to(opts[:redirect_path] || postdestroy_redirect || path_for(@record.class)) }
+            format.xml  { head :ok }
+          end
         end
       end
 
