@@ -13,30 +13,34 @@ module Hammock
 
     module ClassMethods
 
-      def export_scope verb, as = nil
-        verbable_by = "#{as || verb}able_by"
+      def export_scope verb, opts = {}
+        verbable = "#{opts[:as] || verb}able"
 
         if !(respond_to?("#{verb}_scope_for") ^ respond_to?("#{verb}_scope"))
           raise "You have to define either #{name}.#{verb}_scope or #{name}.#{verb}_scope_for(account), but not both, to export the '#{verb}' scope."
         elsif respond_to?("#{verb}_scope_for")
           class << self; self end.instance_eval {
-            define_method verbable_by do |account|
+            define_method "#{verbable}_by" do |account|
               select &send("#{verb}_scope_for", account)
             end
           }
-          define_method "#{verbable_by}?" do |account|
+          define_method "#{verbable}_by?" do |account|
             self.class.send("#{verb}_scope_for", account).call(self)
           end
         else
           class << self; self end.instance_eval {
-            define_method verbable_by do |account|
+            define_method verbable do
               select &send("#{verb}_scope")
             end
           }
-          define_method "#{verbable_by}?" do |account|
+          define_method "#{verbable}?" do
             self.class.send("#{verb}_scope").call(self)
           end
         end
+      end
+
+      def base_model
+        base_class.to_s.underscore
       end
 
       def reset_cached_column_info
@@ -52,12 +56,8 @@ module Hammock
         "#{self.class}<#{self.id || 'new'}>"
       end
 
-      def self.base_model
-        base_class.to_s.underscore
-      end
-
       def base_model
-        self.class.base_model
+        self.class.base_class.to_s.downcase
       end
 
       def undestroy
