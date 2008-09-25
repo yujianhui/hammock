@@ -13,18 +13,17 @@ module Hammock
       def index
         if retrieve_resource
           callback :before_index
-          send(:new) if inline_edit
-          
+          tasks_for_new if inline_edit
+
           respond_to do |format|
             format.html # index.html.erb
-            format.xml  { render :xml => @records.kick }
+            format.xml { render :xml => @records.kick }
           end
         end
       end
 
       def new
-        make_new_record
-        do_render || standard_render if callback(:before_modify) and callback(:before_new)
+        do_render || standard_render if tasks_for_new
       end
 
       def create
@@ -116,6 +115,10 @@ module Hammock
 
       private
 
+      def tasks_for_new
+        make_new_record and callback(:before_modify) and callback(:before_new)
+      end
+
       def render_or_redirect_after result
         if request.xhr?
           do_render :editable => true, :edit => false
@@ -124,10 +127,10 @@ module Hammock
             # rendered - no redirect
           else
             respond_to do |format|
-              if @record.save
+              if result
                 flash[:notice] = "Page was successfully #{'create' == action_name ? 'created' : 'updated'}."
                 format.html { redirect_to(postsave_redirect || path_for(@record || mdl)) }
-                format.xml  {
+                format.xml {
                   if 'create' == action_name
                     render :xml => @record, :status => :created, :location => @record
                   else # update
@@ -135,8 +138,15 @@ module Hammock
                   end
                 }
               else
-                format.html { render :action => (inline_edit ? :index : (@record.new_record? ? 'new' : 'edit')) }
-                format.xml  { render :xml => @record.errors, :status => :unprocessable_entity }
+                format.html {
+                  if inline_edit
+                    index
+                    render :action => :index
+                  else
+                    render :action => (@record.new_record? ? 'new' : 'edit')
+                  end
+                }
+                format.xml { render :xml => @record.errors, :status => :unprocessable_entity }
               end
             end
           end
