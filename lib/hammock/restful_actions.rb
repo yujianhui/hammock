@@ -56,13 +56,6 @@ module Hammock
         end
       end
 
-      def save_record
-        verb = @record.new_record? ? 'create' : 'update'
-        callback("before_#{verb}") and callback(:before_save) and
-        @record.save and
-        callback("after_#{verb}") and callback(:after_save)
-      end
-
       def destroy
         if find_record(:deleted_ok => true) {|record| @current_account.can_destroy? record }
           result = callback(:before_destroy) and @record.destroy and callback(:after_destroy)
@@ -119,6 +112,17 @@ module Hammock
         make_new_record and callback(:before_modify) and callback(:before_new)
       end
 
+      def save_record
+        verb = @record.new_record? ? 'create' : 'update'
+        callback("before_#{verb}") and callback(:before_save) and
+        save and
+        callback("after_#{verb}") and callback(:after_save)
+      end
+      
+      def save
+        @record.save
+      end
+
       def render_or_redirect_after result
         if request.xhr?
           do_render :editable => true, :edit => false
@@ -126,9 +130,9 @@ module Hammock
           if postsave_render result
             # rendered - no redirect
           else
-            respond_to do |format|
-              if result
-                flash[:notice] = "Page was successfully #{'create' == action_name ? 'created' : 'updated'}."
+            if result
+              flash[:notice] = "Page was successfully #{'create' == action_name ? 'created' : 'updated'}."
+              respond_to do |format|
                 format.html { redirect_to(postsave_redirect || path_for(@record || mdl)) }
                 format.xml {
                   if 'create' == action_name
@@ -137,7 +141,10 @@ module Hammock
                     head :ok
                   end
                 }
-              else
+              end
+            else
+              log @record.errors.full_messages.join(', ')
+              respond_to do |format|
                 format.html {
                   if inline_edit
                     index
