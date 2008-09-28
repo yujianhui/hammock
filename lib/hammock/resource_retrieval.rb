@@ -56,7 +56,7 @@ module Hammock
           log "No #{@current_account.nil? ? 'public' : 'account'} #{verb_scope_name} scope available for #{mdl}.#{' May be available after login.' if account_verb_scope?}"
           nil
         else
-          log "got a public_verb_scope #{scope_name}."
+          log "got a #{scope_name} public_verb_scope."
           mdl.send scope_name
         end
       end
