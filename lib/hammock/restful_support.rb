@@ -17,6 +17,13 @@ module Hammock
       def nestable_resources
         read_inheritable_attribute(:nestable_by) || []
       end
+
+      def find_column column_name
+        write_inheritable_attribute :find_column, column_name
+      end
+      def find_column_name
+        read_inheritable_attribute(:find_column) || :id
+      end
     end
 
     module InstanceMethods
