@@ -81,8 +81,7 @@ module Hammock
       end
 
       def retrieve_record opts = {}
-        finder = opts[:column] || :id
-        val = opts[finder] || params[finder]
+        val = params[:id]
 
         if (scope = current_scope).nil?
           nil
@@ -90,7 +89,7 @@ module Hammock
           # record = mdl.send finder, val
           # TODO Hax Ambition so the eval isn't required to supply finder.
           # record = mdl.readable_by(@current_account).select {|r| r.__send__(finder) == val }.first
-          record = eval "scope.select {|r| r.#{finder} == val }.first"
+          record = eval "scope.select {|r| r.#{self.class.find_column_name} == val }.first"
 
           if record.nil?
             # not found
