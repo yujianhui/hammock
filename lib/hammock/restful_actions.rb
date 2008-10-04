@@ -133,7 +133,7 @@ module Hammock
             if result
               flash[:notice] = "Page was successfully #{'create' == action_name ? 'created' : 'updated'}."
               respond_to do |format|
-                format.html { redirect_to(postsave_redirect || path_for(@record || mdl)) }
+                format.html { redirect_to(postsave_redirect || nested_path_for(@record || mdl)) }
                 format.xml {
                   if 'create' == action_name
                     render :xml => @record, :status => :created, :location => @record
@@ -166,7 +166,7 @@ module Hammock
         else
           flash[:error] = "#{@record.name} was removed."
           respond_to do |format|
-            format.html { redirect_to(opts[:redirect_path] || postdestroy_redirect || path_for(@record.class)) }
+            format.html { redirect_to(opts[:redirect_path] || postdestroy_redirect || nested_path_for(@record.class)) }
             format.xml  { head :ok }
           end
         end
