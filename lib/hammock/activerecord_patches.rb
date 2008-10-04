@@ -23,18 +23,30 @@ module Hammock
             define_method "#{verbable}_by" do |account|
               select &send("#{verb}_scope_for", account)
             end
+            define_method verbable do
+              false
+            end
           }
           define_method "#{verbable}_by?" do |account|
             self.class.send("#{verb}_scope_for", account).call(self)
+          end
+          define_method "#{verbable}?" do
+            false
           end
         else
           class << self; self end.instance_eval {
             define_method verbable do
               select &send("#{verb}_scope")
             end
+            define_method "#{verbable}_by" do |account|
+              send verbable
+            end
           }
           define_method "#{verbable}?" do
             self.class.send("#{verb}_scope").call(self)
+          end
+          define_method "#{verbable}_by?" do |account|
+            send "#{verbable}?"
           end
         end
       end
