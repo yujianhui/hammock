@@ -59,38 +59,29 @@ module Hammock
         }
 
         requested_verb = resources.shift if resources.first.is_a?(Symbol)
-        record, parent_records = resources.shift, [ ]
+        resources.flatten!
+        record_or_resource = resources.pop
 
-        model_name = record.base_model
-        verb = verb_for requested_verb, record
-        path = RouteTemplates[verb].sub('records', model_name.pluralize).sub('record', model_name)
+        model_name = record_or_resource.base_model
+        verb = verb_for requested_verb, record_or_resource
+        path_tip = "record#{'s' if plural_verb?(verb)}_path".sub('records', model_name.pluralize).sub('record', model_name)
 
-        if respond_to? path
-          # Already succeeded
-        elsif resources.empty?
-          log "Failed to generate path: '#{path}'"
-        else
-          # Base path didn't exist; let's try traversing the route heirachy.
-          path_builder = path
-
-          path = resources.each {|resource|
-            path_builder = "#{resources.first.base_model}_#{path_builder}"
-            parent_records.unshift resource
-            # log "building: #{path_builder}"
-            break path_builder if respond_to? path_builder
-          }
-        end
+        path = [
+          (verb unless implied_verb?(verb)),
+          resources.map(&:base_model),
+          path_tip
+        ].flatten.compact.join('_')
 
         if respond_to? path
           args_for_send = []
-          args_for_send << record unless recordless_verb? verb
-          args_for_send.concat parent_records
+          args_for_send << record_or_resource unless recordless_verb? verb
+          args_for_send.concat resources
           args_for_send << opts unless opts.empty?
 
           # dlog "Generated path #{path}(#{args_for_send.map(&:concise_inspect).join(', ')})."
           send path, *args_for_send
         else
-          raise "Neither '#{path}' nor '#{path_builder}' are valid routes."
+          raise "'#{path}' is not a valid route."
         end
       end
 
@@ -99,11 +90,19 @@ module Hammock
       def create_path_for  *args; path_for :create,  *args end
       def update_path_for  *args; path_for :update,  *args end
       def destroy_path_for *args; path_for :destroy, *args end
-      
+
       private
-      
+
       def recordless_verb? verb
         [ :index, :create, :new ].include? verb.to_sym
+      end
+
+      def plural_verb? verb
+        [ :index, :create ].include? verb.to_sym
+      end
+
+      def implied_verb? verb
+        [ :index, :create, :show, :update, :destroy ].include? verb.to_sym
       end
 
     end
