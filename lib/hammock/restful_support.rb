@@ -11,11 +11,11 @@ module Hammock
     end
 
     module ClassMethods
-      def nestable_by *resources
-        write_inheritable_attribute :nestable_by, resources.map(&:to_sym)
+      def nestable_by resources
+        write_inheritable_attribute :nestable_by, resources
       end
       def nestable_resources
-        read_inheritable_attribute(:nestable_by) || []
+        read_inheritable_attribute(:nestable_by) || {}
       end
 
       def find_column column_name
