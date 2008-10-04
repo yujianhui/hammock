@@ -74,8 +74,8 @@ module Hammock
 
         if respond_to? path
           args_for_send = []
-          args_for_send << record_or_resource unless recordless_verb? verb
           args_for_send.concat resources
+          args_for_send << record_or_resource unless recordless_verb? verb
           args_for_send << opts unless opts.empty?
 
           # dlog "Generated path #{path}(#{args_for_send.map(&:concise_inspect).join(', ')})."
