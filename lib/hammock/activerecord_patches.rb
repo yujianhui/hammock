@@ -16,38 +16,40 @@ module Hammock
       def export_scope verb, opts = {}
         verbable = "#{opts[:as] || verb}able"
 
-        if !(respond_to?("#{verb}_scope_for") ^ respond_to?("#{verb}_scope"))
-          raise "You have to define either #{name}.#{verb}_scope or #{name}.#{verb}_scope_for(account), but not both, to export the '#{verb}' scope."
-        elsif respond_to?("#{verb}_scope_for")
-          class << self; self end.instance_eval {
-            define_method "#{verbable}_by" do |account|
+        class << self; self end.instance_eval {
+          # Model.verbable_by: returns all records that are verbable by account.
+          define_method "#{verbable}_by" do |account|
+            if !account.nil? && respond_to?("#{verb}_scope_for")
               select &send("#{verb}_scope_for", account)
+            elsif respond_to?("#{verb}_scope")
+              select &send("#{verb}_scope")
+            else
+              log "No #{verb} scopes available, returning empty scope."
+              select {|record| false }
             end
-            define_method verbable do
-              false
-            end
-          }
-          define_method "#{verbable}_by?" do |account|
-            self.class.send("#{verb}_scope_for", account).call(self)
           end
-          define_method "#{verbable}?" do
+          
+          # Model.verbable: returns all records that are verbable by anonymous users.
+          define_method verbable do
+            send "#{verbable}_by", nil
+          end
+        }
+
+        # Model#verbable_by?: returns whether this record is verbable by account.
+        define_method "#{verbable}_by?" do |account|
+          if !account.nil? && self.class.respond_to?("#{verb}_scope_for")
+            self.class.send("#{verb}_scope_for", account).call(self)
+          elsif self.class.respond_to?("#{verb}_scope")
+            self.class.send("#{verb}_scope").call(self)
+          else
+            log "No #{verb} scopes available, returning false."
             false
           end
-        else
-          class << self; self end.instance_eval {
-            define_method verbable do
-              select &send("#{verb}_scope")
-            end
-            define_method "#{verbable}_by" do |account|
-              send verbable
-            end
-          }
-          define_method "#{verbable}?" do
-            self.class.send("#{verb}_scope").call(self)
-          end
-          define_method "#{verbable}_by?" do |account|
-            send "#{verbable}?"
-          end
+        end
+        
+        # Model#verbable?: returns whether this record is verbable by anonymous users.
+        define_method "#{verbable}?" do
+          send "#{verbable}_by?", nil
         end
       end
 
