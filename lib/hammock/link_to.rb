@@ -1,7 +1,7 @@
 module Hammock
   module LinkTo
     MixInto = ActionView::Base
-    
+
     def self.included base
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods
@@ -11,9 +11,15 @@ module Hammock
     end
 
     module InstanceMethods
-      def link_to_if_allowed verb, record, opts = {}
-        if :ok == can_verb_record?(verb, record)
-          link_to opts[:text] || verb.to_s.capitalize, path_for(verb, record, opts), :method => method_for(verb, record)
+      def link_to_if_allowed verb, record_or_resource, opts = {}
+        allowed = if record_or_resource.is_a?(ActiveRecord::Base)
+          can_verb_record?(verb, record_or_resource)
+        else
+          can_verb_resource?(verb, record_or_resource)
+        end
+
+        if :ok == allowed
+          link_to opts[:text] || verb.to_s.capitalize, path_for(verb, record_or_resource, opts), :method => method_for(verb, record_or_resource)
         end
       end
     end
