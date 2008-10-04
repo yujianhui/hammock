@@ -13,9 +13,9 @@ module Hammock
     module InstanceMethods
       def link_to_if_allowed verb, record_or_resource, opts = {}
         allowed = if record_or_resource.is_a?(ActiveRecord::Base)
-          can_verb_record?(verb, record_or_resource)
+          can_verb_record? verb, record_or_resource
         else
-          can_verb_resource?(verb, record_or_resource)
+          can_verb_resource? verb, record_or_resource
         end
 
         if :ok == allowed
