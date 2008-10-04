@@ -52,8 +52,8 @@ module Hammock
               '#{link_path}',
               jQuery.extend(
                 jQuery.extend(
-                  #{link_params.to_flattened_json},
-                  #{form_elements_hash}
+                  #{form_elements_hash},
+                  #{link_params.to_flattened_json}
                 ),
                 #{forgery_key_json(request_method)}
               ),
