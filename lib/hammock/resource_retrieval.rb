@@ -15,10 +15,10 @@ module Hammock
     module InstanceMethods
 
       def can_verb_record? verb, record
-        if !can_read_record?(record)
+        if !record.readable_by?(@current_account)
           log "#{requester_name} can't see #{record.class}<#{record.id}>."
           :not_found
-        elsif !safe_action_and_implication?(verb) && !can_write_record?(record)
+        elsif !safe_action_and_implication?(verb) && !record.writeable_by?(@current_account)
           log "#{requester_name} can't #{verb} #{record.class}<#{record.id}>."
           :read_only
         else
@@ -134,22 +134,6 @@ module Hammock
       
       def requester_name
         @current_account.nil? ? 'Anonymous' : "#{@current_account.class}<#{@current_account.id}>"
-      end
-
-      def can_read_record? record
-        if @current_account.nil?
-          record.readable?
-        else
-          record.readable_by? @current_account
-        end
-      end
-
-      def can_write_record? record
-        if @current_account.nil?
-          record.writeable?
-        else
-          record.writeable_by? @current_account
-        end
       end
 
       def account_verb_scope?
