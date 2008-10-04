@@ -85,6 +85,10 @@ module Hammock
         end
       end
 
+      def nested_path_for record_or_resource
+        path_for @current_nested_records.dup.push(record_or_resource)
+      end
+
       def new_path_for     *args; path_for :new,     *args end
       def edit_path_for    *args; path_for :edit,    *args end
       def create_path_for  *args; path_for :create,  *args end
