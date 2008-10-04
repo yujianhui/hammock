@@ -19,7 +19,7 @@ module Hammock
         end
 
         if :ok == allowed
-          link_to opts[:text] || verb.to_s.capitalize, path_for(verb, record_or_resource, opts), :method => method_for(verb, record_or_resource)
+          link_to opts.delete(:text) || verb.to_s.capitalize, path_for(verb, record_or_resource, opts), :method => method_for(verb, record_or_resource)
         end
       end
     end
