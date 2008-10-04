@@ -5,7 +5,7 @@ module Hammock
       base.send :extend, ClassMethods
 
       base.class_eval {
-        helper_method :can_verb_record?
+        helper_method :can_verb_resource?, :can_verb_record?
       }
     end
 
@@ -13,6 +13,19 @@ module Hammock
     end
 
     module InstanceMethods
+
+      def can_verb_resource? verb, resource
+        if !resource.indexable_by(@current_account)
+          log "#{requester_name} can't index #{resource.name.pluralize}."
+          :not_found
+        elsif !safe_action_and_implication?(verb) && !resource.createable_by(@current_account)
+          log "#{requester_name} can't #{verb} #{resource.name.pluralize}."
+          :read_only
+        else
+          log "#{requester_name} can #{verb} #{resource.name.pluralize}."
+          :ok
+        end
+      end
 
       def can_verb_record? verb, record
         if !record.readable_by?(@current_account)
