@@ -5,7 +5,7 @@ module Hammock
       base.send :extend, ClassMethods
 
       base.class_eval {
-        helper_method :can_verb_resource?, :can_verb_record?
+        helper_method :can_verb_entity?, :can_verb_resource?, :can_verb_record?
       }
     end
 
@@ -13,6 +13,14 @@ module Hammock
     end
 
     module InstanceMethods
+
+      def can_verb_entity? verb, entity
+        if entity.is_a? ActiveRecord::Base
+          can_verb_record? verb, entity
+        else
+          can_verb_resource? verb, entity
+        end
+      end
 
       def can_verb_resource? verb, resource
         if !resource.indexable_by(@current_account)
