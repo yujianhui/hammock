@@ -72,6 +72,16 @@ module Hammock
         link_path
       end
 
+      private
+
+      def forgery_key_json request_method = nil
+        if !protect_against_forgery? || (:get == (request_method || request.method))
+          '{ }'
+        else
+          "{ '#{request_forgery_protection_token}': encodeURIComponent('#{escape_javascript(form_authenticity_token)}') }"
+        end
+      end
+
     end
   end
 end
