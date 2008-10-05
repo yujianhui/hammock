@@ -17,16 +17,18 @@ module Hammock
       end
 
       def ajax_link verb, record, opts = {}
-        link_id = opts[:link_id] || "#{verb}_#{record.base_model}_#{record.id}"
-        link_path = ajaxinate link_id, verb, record, opts
+        if :ok == can_verb_entity?(verb, record)
+          link_id = opts[:link_id] || "#{verb}_#{record.base_model}_#{record.id}"
+          link_path = ajaxinate link_id, verb, record, opts
 
-        content_tag :a,
-          opts[:text] || verb.to_s.capitalize,
-          :id => link_id,
-          :class => opts[:class],
-          :href => link_path,
-          :onclick => 'return false;',
-          :style => opts[:style]
+          content_tag :a,
+            opts[:text] || verb.to_s.capitalize,
+            :id => link_id,
+            :class => opts[:class],
+            :href => link_path,
+            :onclick => 'return false;',
+            :style => opts[:style]
+        end
       end
 
       def ajaxinate elem_id, verb, record, opts = {}
