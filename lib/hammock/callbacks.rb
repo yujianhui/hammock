@@ -36,18 +36,12 @@ module Hammock
       def callback kind, *args
         chain = self.class.send "#{kind}_callback_chain"
 
-        if chain.empty?
-          # dlog "No #{kind} callbacks to run."
-          true
-        else
-          # dlog "Running #{kind} callbacks."
-          chain.all? {|cb|
-            dlog "Calling #{kind} callback #{cb.method}"
-            result = cb.call(self, *args) != false
-            log "#{self.class}.#{cb.kind} callback '#{cb.method}' failed." unless result
-            result
-          }
-        end
+        chain.all? {|cb|
+          dlog "Calling #{kind} callback #{cb.method}"
+          result = cb.call(self, *args) != false
+          log "#{self.class}.#{cb.kind} callback '#{cb.method}' failed." unless result
+          result
+        }
       end
 
     end
