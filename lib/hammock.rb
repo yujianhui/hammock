@@ -1,5 +1,5 @@
-Dir.glob("#{File.dirname __FILE__}/hammock/*.rb").each {|dep|
-  require "hammock/#{File.basename(dep)}"
+Dir.glob("#{File.dirname __FILE__}/hammock/**/*.rb").each {|dep|
+  require dep
 }
 
 module Hammock
