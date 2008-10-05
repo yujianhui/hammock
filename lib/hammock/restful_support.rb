@@ -91,7 +91,7 @@ module Hammock
       end
 
       def set_editing
-        @editing = @record.class.symbolize
+        @editing = @record
       end
 
       def partial_exists? name, extension = nil
@@ -99,7 +99,7 @@ module Hammock
       end
 
       def editing? record
-        record.class.symbolize == @editing
+        record == @editing
       end
 
       def params_for key
