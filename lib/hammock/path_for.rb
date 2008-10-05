@@ -6,7 +6,7 @@ module Hammock
 
       base.class_eval {
         helper_method :method_for, :update_path_for,
-          :path_for, :new_path_for, :edit_path_for, :create_path_for, :update_path_for, :destroy_path_for
+          :nested_path_for, :path_for, :new_path_for, :edit_path_for, :create_path_for, :update_path_for, :destroy_path_for
       }
     end
 
