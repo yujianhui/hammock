@@ -88,6 +88,13 @@ module Hammock
         end
       end
 
+      def unsaved_attributes
+        self.changed.inject({}) {|hsh,k|
+          hsh[k] = attributes[k]
+          hsh
+        }
+      end
+
       private
 
       # def self.collection_reader_method reflection, association_proxy_class
