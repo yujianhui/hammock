@@ -14,15 +14,6 @@ module Hammock
     end
 
     module InstanceMethods
-      RouteTemplates = Hash.new {|hsh, k|
-        "#{k}_record_path"
-      }.update(
-        :index => 'records_path',
-        :create => 'records_path',
-        :show => 'record_path',
-        :update => 'record_path',
-        :destroy => 'record_path'
-      )
 
       HTTPMethods = Hash.new(
         :get

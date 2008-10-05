@@ -33,7 +33,7 @@ module Hammock
       end
 
       def javascript_for_ajax_response
-        # TODO: this should be called from outside the partials somewhere, once only
+        # TODO this should be called from outside the partials somewhere, once only
         if request.xhr?
           js = javascript_for_page
           clear_js_caches

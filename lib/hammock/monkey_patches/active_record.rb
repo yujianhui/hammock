@@ -5,10 +5,6 @@ module Hammock
     def self.included base
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods # TODO maybe include in the metaclass instead of extending the class?
-      
-      # base.class_eval {
-      #   export_scopes base
-      # }
     end
 
     module ClassMethods
@@ -97,6 +93,7 @@ module Hammock
 
       private
 
+      # TODO Use ambition for association queries.
       # def self.collection_reader_method reflection, association_proxy_class
       #   define_method(reflection.name) do |*params|
       #     reflection.klass.ambition_context.select { |entity| entity.__send__(reflection.primary_key_name) == quoted_id }

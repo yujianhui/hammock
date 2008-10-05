@@ -11,6 +11,7 @@ module Hammock
     end
 
     module InstanceMethods
+
       def link_to_if_allowed verb, *resources
         opts = resources.last.is_a?(Hash) ? resources.pop.symbolize_keys! : {}
         record_or_resource = resources.last
@@ -27,6 +28,7 @@ module Hammock
             :method => method_for(verb, record_or_resource)
         end
       end
+
     end
   end
 end
