@@ -70,7 +70,7 @@ module Hammock
       end
 
       def current_scope
-        nest_scope.chain verb_scope
+        nest_scope.chain(verb_scope).sort_by &mdl.sorter
       end
 
 

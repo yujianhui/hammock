@@ -49,6 +49,11 @@ module Hammock
         end
       end
 
+      def sorter
+        # TODO updated_at DESC
+        proc {|record| record.id }
+      end
+
       def base_model
         base_class.to_s.underscore
       end
