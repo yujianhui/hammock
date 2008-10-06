@@ -65,15 +65,15 @@ module Hammock
 
       def assign_nestable_resources
         nestable_resources = self.class.nestable_resources
+        @current_nested_records = []
         params.symbolize_keys.dragnet(*nestable_resources.keys).all? {|param_name,column_name|
           constant = Object.const_get param_name.to_s.sub(/_id$/, '').camelize rescue nil
 
           if constant.nil?
             log "'#{param_name.sub(/_id$/, '').camelize}' is not available for #{param_name}."
           elsif (record = constant.find_by_id(params[param_name])).nil?
-            log "Tab<#{params[param_name]}> not found."
+            log "#{constant}<#{params[param_name]}> not found."
           else
-            @current_nested_records ||= []
             @current_nested_records << record
             @record.send "#{nestable_resources[param_name]}=", params[param_name] unless @record.nil?
             log "Assigning @#{constant.name.underscore} with #{record.inspect}."
