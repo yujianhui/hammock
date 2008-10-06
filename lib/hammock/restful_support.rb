@@ -106,6 +106,14 @@ module Hammock
         params[key] || {}
       end
 
+      def redirect_back_or path = nil
+        if request.referer.blank?
+          redirect_to path || root_path
+        else
+          redirect_to request.referer
+        end
+      end
+
       def development?
         'development' == ENV['RAILS_ENV']
       end
