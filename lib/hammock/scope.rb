@@ -30,7 +30,7 @@ module Hammock
           log "#{requester_name} can't #{verb} #{resource.name.pluralize}."
           :read_only
         else
-          log "#{requester_name} can #{verb} #{resource.name.pluralize}."
+          # log "#{requester_name} can #{verb} #{resource.name.pluralize}."
           :ok
         end
       end
@@ -43,7 +43,7 @@ module Hammock
           log "#{requester_name} can't #{verb} #{record.class}<#{record.id}>."
           :read_only
         else
-          log "#{requester_name} can #{verb} #{record.class}<#{record.id}>."
+          # log "#{requester_name} can #{verb} #{record.class}<#{record.id}>."
           :ok
         end
       end
