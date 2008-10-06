@@ -53,6 +53,11 @@ module Hammock
         base_class.to_s.underscore
       end
 
+      def update_statement set_clause, where_clause
+        statement = "UPDATE #{table_name} SET #{set_clause} WHERE #{send :sanitize_sql_array, where_clause}"
+        connection.update statement
+      end
+
       def reset_cached_column_info
         reset_column_information
         reset_inheritable_attributes
@@ -90,6 +95,7 @@ module Hammock
           hsh
         }
       end
+
 
       private
 
