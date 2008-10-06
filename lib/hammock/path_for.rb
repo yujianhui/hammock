@@ -42,6 +42,7 @@ module Hammock
         HTTPMethods[verb_for(requested_verb, record)]
       end
 
+      # TODO This is an abomination.
       def path_for *resources
         opts = resources.last.is_a?(Hash) ? resources.pop.symbolize_keys! : {}
 
@@ -76,8 +77,12 @@ module Hammock
         end
       end
 
-      def nested_path_for record_or_resource
-        path_for @current_nested_records.dup.push(record_or_resource)
+      def nested_path_for *resources
+        requested_verb = resources.shift if resources.first.is_a?(Symbol)
+        args = (resources.last.is_a?(mdl) ? @current_nested_records.dup : []).concat(resources)
+
+        args.unshift(requested_verb) unless requested_verb.nil?
+        path_for *args
       end
 
       def new_path_for     *args; path_for :new,     *args end
