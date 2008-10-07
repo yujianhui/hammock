@@ -1,5 +1,7 @@
 module Hammock
   module Callbacks
+    LoadFirst = true
+
     def self.included base
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods
