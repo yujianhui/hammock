@@ -1,16 +1,26 @@
 module Hammock
   module ObjectPatches
     MixInto = Object
-    
+
     def self.included base
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods
+
+      base.class_eval {
+        alias is_an? is_a?
+      }
     end
 
     module ClassMethods
     end
 
     module InstanceMethods
+
+      # TODO Remove for Ruby 1.9
+      def tap
+        yield self
+        self
+      end
 
       def symbolize
         self.to_s.underscore.to_sym
