@@ -48,7 +48,7 @@ module Hammock
         elsif record_or_records.is_a? ActiveRecord::Base
           instance_variable_set "@#{mdl_name}", (@record = record_or_records)
         elsif record_or_records.is_a? Ambition::Context
-          log "Unkicked query: #{record_or_records.to_s}"
+          # log "Unkicked query: #{record_or_records.to_s}"
           instance_variable_set "@#{table_name}", (@records = record_or_records)
         elsif record_or_records.is_a? Array
           instance_variable_set "@#{table_name}", (@records = record_or_records)
@@ -76,7 +76,7 @@ module Hammock
           else
             @current_nested_records << record
             @record.send "#{nestable_resources[param_name]}=", params[param_name] unless @record.nil?
-            log "Assigning @#{constant.name.underscore} with #{record.inspect}."
+            # log "Assigning @#{constant.name.underscore} with #{record.inspect}."
             instance_variable_set "@#{constant.name.underscore}", record
           end
         }

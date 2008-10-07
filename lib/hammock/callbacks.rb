@@ -39,7 +39,7 @@ module Hammock
         chain = self.class.send "#{kind}_callback_chain"
 
         chain.all? {|cb|
-          dlog "Calling #{kind} callback #{cb.method}"
+          # dlog "Calling #{kind} callback #{cb.method}"
           result = cb.call(self, *args) != false
           log "#{self.class}.#{cb.kind} callback '#{cb.method}' failed." unless result
           result

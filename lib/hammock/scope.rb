@@ -50,13 +50,13 @@ module Hammock
 
       def verb_scope
         if @current_account && (scope_name = account_verb_scope?)
-          log "got an account_verb_scope #{scope_name}."
+          # log "got an account_verb_scope #{scope_name}."
           mdl.send scope_name, @current_account
         elsif !(scope_name = public_verb_scope?)
           log "No #{@current_account.nil? ? 'public' : 'account'} #{verb_scope_name} scope available for #{mdl}.#{' May be available after login.' if account_verb_scope?}"
           nil
         else
-          log "got a #{scope_name} public_verb_scope."
+          # log "got a #{scope_name} public_verb_scope."
           mdl.send scope_name
         end
       end

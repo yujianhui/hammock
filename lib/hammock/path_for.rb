@@ -58,7 +58,7 @@ module Hammock
         path << resource.base_model.send_if(plural_verb?(verb), :pluralize) unless resource.nil?
         path << 'path'
 
-        log path.inspect
+        # log path.inspect
 
         send path.compact.join('_'), *resources
       end
