@@ -1,7 +1,7 @@
 module Hammock
   module ActiveRecordPatches
     MixInto = ActiveRecord::Base
-    
+
     def self.included base
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods # TODO maybe include in the metaclass instead of extending the class?
@@ -24,7 +24,7 @@ module Hammock
               select {|record| false }
             end
           end
-          
+
           # Model.verbable: returns all records that are verbable by anonymous users.
           define_method verbable do
             send "#{verbable}_by", nil
@@ -42,7 +42,7 @@ module Hammock
             false
           end
         end
-        
+
         # Model#verbable?: returns whether this record is verbable by anonymous users.
         define_method "#{verbable}?" do
           send "#{verbable}_by?", nil
