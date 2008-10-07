@@ -16,8 +16,8 @@ module Hammock
         self.to_s.underscore.to_sym
       end
 
-      def send_if condition, method_name
-        condition ? self.send(method_name) : self
+      def send_if condition, method_name, *args
+        condition ? self.send(method_name, *args) : self
       end
 
     end
