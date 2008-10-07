@@ -18,7 +18,7 @@ module Hammock
 
         if :ok == can_verb_entity?(verb, record_or_resource)
           link_to opts.delete(:text) || verb.to_s.capitalize,
-            path_for(verb, resources),
+            path_for(verb, *resources),
             opts.merge(:method => (opts.delete(:method) || method_for(verb, record_or_resource)))
         end
       end
