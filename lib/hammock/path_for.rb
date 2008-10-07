@@ -5,8 +5,7 @@ module Hammock
       base.send :extend, ClassMethods
 
       base.class_eval {
-        helper_method :method_for, :update_path_for,
-          :nested_path_for, :path_for, :new_path_for, :edit_path_for, :create_path_for, :update_path_for, :destroy_path_for
+        helper_method :method_for, :path_for, :nested_path_for
       }
     end
 
@@ -42,7 +41,6 @@ module Hammock
         HTTPMethods[verb_for(requested_verb, record)]
       end
 
-      # TODO This is an abomination.
       def path_for *resources
         opts = resources.last.is_a?(Hash) ? resources.pop.symbolize_keys! : {}
 
@@ -51,30 +49,18 @@ module Hammock
         }
 
         requested_verb = resources.shift if resources.first.is_a?(Symbol)
-        resources.flatten!
-        record_or_resource = resources.pop
+        resource = resources.pop unless resources.last.is_a?(ActiveRecord::Base)
+        verb = verb_for requested_verb, (resource || resources.last)
 
-        model_name = record_or_resource.base_model
-        verb = verb_for requested_verb, record_or_resource
-        path_tip = "record#{'s' if plural_verb?(verb)}_path".sub('records', model_name.pluralize).sub('record', model_name)
+        path = []
+        path << verb unless implied_verb?(verb)
+        path.concat resources.map(&:base_model)
+        path << resource.base_model.send_if(plural_verb?(verb), :pluralize) unless resource.nil?
+        path << 'path'
 
-        path = [
-          (verb unless implied_verb?(verb)),
-          resources.map(&:base_model),
-          path_tip
-        ].flatten.compact.join('_')
+        log path.inspect
 
-        if respond_to? path
-          args_for_send = []
-          args_for_send.concat resources
-          args_for_send << record_or_resource unless recordless_verb? verb
-          args_for_send << opts unless opts.empty?
-
-          # dlog "Generated path #{path}(#{args_for_send.map(&:concise_inspect).join(', ')})."
-          send path, *args_for_send
-        else
-          raise "'#{path}' is not a valid route."
-        end
+        send path.compact.join('_'), *resources
       end
 
       def nested_path_for *resources
@@ -85,11 +71,6 @@ module Hammock
         path_for *args
       end
 
-      def new_path_for     *args; path_for :new,     *args end
-      def edit_path_for    *args; path_for :edit,    *args end
-      def create_path_for  *args; path_for :create,  *args end
-      def update_path_for  *args; path_for :update,  *args end
-      def destroy_path_for *args; path_for :destroy, *args end
 
       private
 
