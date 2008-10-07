@@ -5,12 +5,15 @@ Dir.glob("#{File.dirname __FILE__}/hammock/**/*.rb").each {|dep|
 module Hammock
   def self.included base
     # Callbacks have to be loaded first since some modules register callbacks of their own.
-    Hammock.constants.unshift('Callbacks').uniq.map {|const|
-      Hammock.const_get const
-    }.each {|const|
-      mix_target = const.constants.include?('MixInto') ? const::MixInto : base
-      mix_target.send(:include, const) if const.is_a? Module
-      # puts "Mixed #{const} into #{mix_target}"
+    Hammock.constants.map {|constant_name|
+      Hammock.const_get constant_name
+    }.select {|constant|
+      constant.is_a? Module
+    }.partition {|mod|
+      mod.constants.include? 'LoadFirst'
+    }.flatten.each {|mod|
+      target = mod.constants.include?('MixInto') ? mod::MixInto : base
+      target.send :include, mod
     }
   end
 end
