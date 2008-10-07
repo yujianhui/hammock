@@ -71,38 +71,25 @@ module Hammock
       end
 
       def suggest
-        @results = []
-
-        if params[:keys].blank? || (@keys = params[:keys].split(',')).empty?
-          log "No keys specified."
+        @results = if params[:q].blank?
+          log 'No query specified.'
+        elsif params[:fields].blank?
+          log "No fields specified."
         elsif !callback(:before_suggest)
           # fail
         else
-          @queries = (params[:q] || '').downcase.split(/\s+/)
+          fields = params[:fields].split(',')
+          @queries = params[:q].downcase.split(/\s+/)
 
-          # She may not look like much, but she's got it where it counts, kid
-
-          table_name = mdl.to_s.downcase.pluralize
-
-          match_counter_sql_array = [
-            @keys.map {|k| ([ "CASE WHEN LOWER(#{table_name}.#{k.sanitise_column_name}) LIKE ? THEN 1 ELSE 0 END" ] * @queries.length).join(' + ') }.join(' + '),
-          ].concat(@queries.map{|q| "%#{q}%" } * @keys.length)
-
-          match_counter_sql = mdl.send :sanitize_sql_array, match_counter_sql_array
-
-          @results = mdl.base_class.find(:all,
-            :select => "*, #{match_counter_sql} AS suggestion_matches",
-            :conditions => [
-              @keys.map {|k| ([ "LOWER(#{table_name}.#{k.sanitise_column_name}) LIKE ?" ] * @queries.length).join(' OR ') }.join(' OR '),
-            ].concat(@queries.map{|q| "%#{q}%" } * @keys.length),
-
-            # TODO SQL injection
-            :order => @keys.map {|k| "#{k} ASC" }.join(", "),
-            :limit => 15
-          ).sort_by {|record| record.suggestion_matches }.reverse
+          mdl.suggest fields, @queries
         end
-
-        render :action => "suggest_#{@keys.join(',')}", :layout => false
+        
+        if @results.nil?
+          escort_for_bad_request
+        else
+          callback(:after_suggest)
+          render :action => "suggest_#{fields.join(',')}", :layout => false
+        end
       end
 
 
@@ -118,7 +105,7 @@ module Hammock
         save and
         callback("after_#{verb}") and callback(:after_save)
       end
-      
+
       def save
         @record.save
       end
