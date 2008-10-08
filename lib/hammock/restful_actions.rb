@@ -13,7 +13,7 @@ module Hammock
       def index
         if retrieve_resource
           callback :before_index
-          tasks_for_new if inline_edit
+          tasks_for_new if inline_create
 
           respond_to do |format|
             format.html # index.html.erb
@@ -133,7 +133,7 @@ module Hammock
               log @record.errors.full_messages.join(', ')
               respond_to do |format|
                 format.html {
-                  if inline_edit
+                  if inline_create
                     index
                     render :action => :index
                   else

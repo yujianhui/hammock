@@ -22,7 +22,7 @@ module Hammock
         end
       end
 
-      def inline_edit
+      def inline_create
         false
       end
 
