@@ -14,6 +14,12 @@ module Hammock
         write_inheritable_attribute :inline_create, true
       end
 
+      def find_on_create &proc
+        write_inheritable_attribute :find_on_create, true
+        write_inheritable_attribute :find_on_create_proc, proc
+      end
+
+
       def find_column column_name
         write_inheritable_attribute :find_column, column_name
       end
@@ -26,6 +32,13 @@ module Hammock
 
       def inline_createable_resource?
         self.class.read_inheritable_attribute :inline_create
+      end
+
+      def findable_on_create?
+        self.class.read_inheritable_attribute :find_on_create
+      end
+      def find_on_create_proc
+        self.class.read_inheritable_attribute :find_on_create_proc
       end
 
       def find_column_name
