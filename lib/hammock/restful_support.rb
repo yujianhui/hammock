@@ -11,26 +11,7 @@ module Hammock
     end
 
     module ClassMethods
-      def nestable_by resources
-        write_inheritable_attribute :nestable_by, resources
-      end
-      def nestable_resources
-        read_inheritable_attribute(:nestable_by) || {}
-      end
 
-      def inline_create
-        write_inheritable_attribute :inline_create, true
-      end
-      def inline_createable_resource?
-        read_inheritable_attribute :inline_create
-      end
-
-      def find_column column_name
-        write_inheritable_attribute :find_column, column_name
-      end
-      def find_column_name
-        read_inheritable_attribute(:find_column) || :id
-      end
     end
 
     module InstanceMethods
@@ -71,7 +52,6 @@ module Hammock
       end
 
       def assign_nestable_resources
-        nestable_resources = self.class.nestable_resources
         @current_nested_records = []
         params.symbolize_keys.dragnet(*nestable_resources.keys).all? {|param_name,column_name|
           constant = Object.const_get param_name.to_s.sub(/_id$/, '').camelize rescue nil

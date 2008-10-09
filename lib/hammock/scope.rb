@@ -62,7 +62,6 @@ module Hammock
       end
 
       def nest_scope
-        nestable_resources = self.class.nestable_resources
         params.symbolize_keys.dragnet(*nestable_resources.keys).inject(mdl.ambition_context) {|acc,(k,v)|
           # TODO this would be more ductile if it used AR assocs instead of explicit FK
           eval "acc.select {|r| r.#{nestable_resources[k]} == v }"
