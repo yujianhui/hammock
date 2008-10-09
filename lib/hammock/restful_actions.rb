@@ -11,10 +11,7 @@ module Hammock
     module InstanceMethods
 
       def index
-        if retrieve_resource
-          callback :before_index
-          tasks_for_new if inline_create
-
+        if tasks_for_index
           respond_to do |format|
             format.html # index.html.erb
             format.xml { render :xml => @records.kick }
@@ -95,6 +92,10 @@ module Hammock
 
       private
 
+      def tasks_for_index
+        retrieve_resource and callback(:before_index) and (!inline_createable_resource? || tasks_for_new)
+      end
+
       def tasks_for_new
         make_new_record and callback(:before_modify) and callback(:before_new)
       end
@@ -133,8 +134,8 @@ module Hammock
               log @record.errors.full_messages.join(', ')
               respond_to do |format|
                 format.html {
-                  if inline_create
-                    index
+                  if inline_createable_resource?
+                    tasks_for_index
                     render :action => :index
                   else
                     render :action => (@record.new_record? ? 'new' : 'edit')
