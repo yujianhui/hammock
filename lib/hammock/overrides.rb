@@ -22,10 +22,6 @@ module Hammock
         end
       end
 
-      def inline_create
-        false
-      end
-
       def postsave_render result
         nil
       end

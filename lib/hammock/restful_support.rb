@@ -18,6 +18,13 @@ module Hammock
         read_inheritable_attribute(:nestable_by) || {}
       end
 
+      def inline_create
+        write_inheritable_attribute :inline_create, true
+      end
+      def inline_createable_resource?
+        read_inheritable_attribute :inline_create
+      end
+
       def find_column column_name
         write_inheritable_attribute :find_column, column_name
       end
