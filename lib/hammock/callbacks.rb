@@ -15,9 +15,9 @@ module Hammock
           before_index     before_show
           before_modify    before_new      before_edit
 
-          before_save      after_save
-          before_create    after_create
-          before_update    after_update
+          before_save      after_save      after_failed_save
+          before_create    after_create    after_failed_create
+          before_update    after_update    after_failed_update
           before_destroy   after_destroy
           before_undestroy after_undestroy
 
