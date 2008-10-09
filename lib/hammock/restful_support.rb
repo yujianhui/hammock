@@ -6,7 +6,7 @@ module Hammock
 
       base.class_eval {
         before_modify :set_editing
-        helper_method :mdl, :mdl_name, :table_name, :editing?, :partial_exists?, :log, :dlog
+        helper_method :mdl, :mdl_name, :table_name, :editing?
       }
     end
 
@@ -81,28 +81,12 @@ module Hammock
         @editing = @record
       end
 
-      def partial_exists? name, extension = nil
-        !Dir.glob(File.join(RAILS_ROOT, 'app/views', controller_name, "_#{name}.html.#{extension || '*'}")).empty?
-      end
-
       def editing? record
         record == @editing
       end
 
       def params_for key
         params[key] || {}
-      end
-
-      def redirect_back_or path = nil
-        if request.referer.blank?
-          redirect_to path || root_path
-        else
-          redirect_to request.referer
-        end
-      end
-
-      def development?
-        'development' == ENV['RAILS_ENV']
       end
 
     end
