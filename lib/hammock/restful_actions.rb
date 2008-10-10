@@ -102,9 +102,12 @@ module Hammock
 
       def save_record
         verb = @record.new_record? ? 'create' : 'update'
-        callback("before_#{verb}") and callback(:before_save) and
-        save and
-        callback("after_#{verb}") and callback(:after_save)
+        if callback("before_#{verb}") and callback(:before_save) and save
+          callback("after_#{verb}") and callback(:after_save)
+        else
+          log @record.errors.full_messages.join(', ')
+          callback("after_failed_#{verb}") and callback(:after_failed_save) and false
+        end
       end
 
       def save
@@ -131,7 +134,6 @@ module Hammock
                 }
               end
             else
-              log @record.errors.full_messages.join(', ')
               respond_to do |format|
                 format.html {
                   if inline_createable_resource?
