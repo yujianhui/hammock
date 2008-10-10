@@ -25,7 +25,7 @@ module Hammock
 
       def create
         make_new_record
-        render_or_redirect_after save_record
+        render_or_redirect_after(find_record_on_create || save_record)
       end
 
       def show
@@ -98,6 +98,17 @@ module Hammock
 
       def tasks_for_new
         make_new_record and callback(:before_modify) and callback(:before_new)
+      end
+
+      def find_record_on_create
+        if findable_on_create?
+          if record = nest_scope.find(:first, :conditions => params_for(mdl.symbolize))
+            log "suitable record already exists: #{record}"
+            assign_resource record
+          else
+            log "couldn't find a suitable record, proceeding with creation."
+          end
+        end
       end
 
       def save_record
