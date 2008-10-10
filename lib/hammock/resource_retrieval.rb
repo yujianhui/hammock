@@ -45,10 +45,7 @@ module Hammock
         if (scope = current_scope).nil?
           nil
         else
-          # record = mdl.send finder, val
-          # TODO Hax Ambition so the eval isn't required to supply finder.
-          # record = mdl.readable_by(@current_account).select {|r| r.__send__(finder) == val }.first
-          record = eval "scope.select {|r| r.#{find_column_name} == val }.first"
+          record = scope.find :first, :conditions => {find_column_name => val}
 
           if record.nil?
             # not found
