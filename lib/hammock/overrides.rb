@@ -22,10 +22,6 @@ module Hammock
         end
       end
 
-      def inline_edit
-        false
-      end
-
       def postsave_render result
         nil
       end

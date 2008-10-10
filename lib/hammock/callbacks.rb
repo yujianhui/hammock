@@ -1,5 +1,7 @@
 module Hammock
   module Callbacks
+    LoadFirst = true
+
     def self.included base
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods
@@ -13,11 +15,13 @@ module Hammock
           before_index     before_show
           before_modify    before_new      before_edit
 
-          before_save      after_save
-          before_create    after_create
-          before_update    after_update
+          before_save      after_save      after_failed_save
+          before_create    after_create    after_failed_create
+          before_update    after_update    after_failed_update
           before_destroy   after_destroy
           before_undestroy after_undestroy
+
+          before_suggest   after_suggest
         }
       }
     end
@@ -34,18 +38,12 @@ module Hammock
       def callback kind, *args
         chain = self.class.send "#{kind}_callback_chain"
 
-        if chain.empty?
-          # dlog "No #{kind} callbacks to run."
-          true
-        else
-          # dlog "Running #{kind} callbacks."
-          chain.all? {|cb|
-            dlog "Calling #{kind} callback #{cb.method}"
-            result = cb.call(self, *args) != false
-            log "#{self.class}.#{cb.kind} callback '#{cb.method}' failed." unless result
-            result
-          }
-        end
+        chain.all? {|cb|
+          # dlog "Calling #{kind} callback #{cb.method}"
+          result = cb.call(self, *args) != false
+          log "#{self.class}.#{cb.kind} callback '#{cb.method}' failed." unless result
+          result
+        }
       end
 
     end

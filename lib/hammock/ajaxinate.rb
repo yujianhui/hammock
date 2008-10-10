@@ -17,16 +17,18 @@ module Hammock
       end
 
       def ajax_link verb, record, opts = {}
-        link_id = opts[:link_id] || "#{verb}_#{record.base_model}_#{record.id}"
-        link_path = ajaxinate link_id, verb, record, opts
+        if :ok == can_verb_entity?(verb, record)
+          link_id = opts[:link_id] || "#{verb}_#{record.base_model}_#{record.id}"
+          link_path = ajaxinate link_id, verb, record, opts
 
-        content_tag :a,
-          opts[:text] || verb.to_s.capitalize,
-          :id => link_id,
-          :class => opts[:class],
-          :href => link_path,
-          :onclick => 'return false;',
-          :style => opts[:style]
+          content_tag :a,
+            opts[:text] || verb.to_s.capitalize,
+            :id => link_id,
+            :class => opts[:class],
+            :href => link_path,
+            :onclick => 'return false;',
+            :style => opts[:style]
+        end
       end
 
       def ajaxinate elem_id, verb, record, opts = {}
@@ -52,8 +54,8 @@ module Hammock
               '#{link_path}',
               jQuery.extend(
                 jQuery.extend(
-                  #{link_params.to_flattened_json},
-                  #{form_elements_hash}
+                  #{form_elements_hash},
+                  #{link_params.to_flattened_json}
                 ),
                 #{forgery_key_json(request_method)}
               ),
@@ -70,6 +72,16 @@ module Hammock
 
         append_javascript js
         link_path
+      end
+
+      private
+
+      def forgery_key_json request_method = nil
+        if !protect_against_forgery? || (:get == (request_method || request.method))
+          '{ }'
+        else
+          "{ '#{request_forgery_protection_token}': encodeURIComponent('#{escape_javascript(form_authenticity_token)}') }"
+        end
       end
 
     end

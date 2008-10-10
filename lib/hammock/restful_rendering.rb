@@ -10,14 +10,19 @@ module Hammock
 
     module InstanceMethods
 
+      def standard_render
+        respond_to do |format|
+          format.html
+          format.xml { render :xml => @record }
+        end
+      end
+
       def do_render opts = {}
         if request.xhr?
           if params[:attribute]
             render_attribute opts
           elsif params[:display_as]
             render_as
-          else
-            render :partial => "#{table_name}/#{mdl_name}#{'_edit' if opts[:edit]}"
           end
         end
       end

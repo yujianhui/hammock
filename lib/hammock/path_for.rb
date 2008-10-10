@@ -5,8 +5,7 @@ module Hammock
       base.send :extend, ClassMethods
 
       base.class_eval {
-        helper_method :method_for, :update_path_for,
-          :path_for, :new_path_for, :edit_path_for, :create_path_for, :update_path_for, :destroy_path_for
+        helper_method :method_for, :path_for, :nested_path_for
       }
     end
 
@@ -14,15 +13,6 @@ module Hammock
     end
 
     module InstanceMethods
-      RouteTemplates = Hash.new {|hsh, k|
-        "#{k}_record_path"
-      }.update(
-        :index => 'records_path',
-        :create => 'records_path',
-        :show => 'record_path',
-        :update => 'record_path',
-        :destroy => 'record_path'
-      )
 
       HTTPMethods = Hash.new(
         :get
@@ -30,7 +20,7 @@ module Hammock
         :create => :post,
         :update => :put,
         :destroy => :delete,
-        :undelete => :post
+        :undestroy => :post
       )
 
       def verb_for requested_verb, record
@@ -59,51 +49,41 @@ module Hammock
         }
 
         requested_verb = resources.shift if resources.first.is_a?(Symbol)
-        record, parent_records = resources.shift, [ ]
+        resource = resources.pop unless resources.last.is_a?(ActiveRecord::Base)
+        verb = verb_for requested_verb, (resource || resources.last)
 
-        model_name = record.base_model
-        verb = verb_for requested_verb, record
-        path = RouteTemplates[verb].sub('records', model_name.pluralize).sub('record', model_name)
+        path = []
+        path << verb unless implied_verb?(verb)
+        path.concat resources.map(&:base_model)
+        path << resource.base_model.send_if(plural_verb?(verb), :pluralize) unless resource.nil?
+        path << 'path'
 
-        if respond_to? path
-          # Already succeeded
-        elsif resources.empty?
-          log "Failed to generate path: '#{path}'"
-        else
-          # Base path didn't exist; let's try traversing the route heirachy.
-          path_builder = path
+        # log path.inspect
 
-          path = resources.each {|resource|
-            path_builder = "#{resources.first.base_model}_#{path_builder}"
-            parent_records.unshift resource
-            log "building: #{path_builder}"
-            break path_builder if respond_to? path_builder
-          }
-        end
-
-        if respond_to? path
-          args_for_send = []
-          args_for_send << record unless recordless_verb? verb
-          args_for_send.concat parent_records
-          args_for_send << opts unless opts.empty?
-
-          dlog "Generated path #{path}(#{args_for_send.map(&:concise_inspect).join(', ')})."
-          send path, *args_for_send
-        else
-          raise "Neither '#{path}' nor '#{path_builder}' are valid routes."
-        end
+        send path.compact.join('_'), *resources
       end
 
-      def new_path_for     *args; path_for :new,     *args end
-      def edit_path_for    *args; path_for :edit,    *args end
-      def create_path_for  *args; path_for :create,  *args end
-      def update_path_for  *args; path_for :update,  *args end
-      def destroy_path_for *args; path_for :destroy, *args end
-      
+      def nested_path_for *resources
+        requested_verb = resources.shift if resources.first.is_a?(Symbol)
+        args = (resources.last.is_a?(mdl) ? @current_nested_records.dup : []).concat(resources)
+
+        args.unshift(requested_verb) unless requested_verb.nil?
+        path_for *args
+      end
+
+
       private
-      
+
       def recordless_verb? verb
         [ :index, :create, :new ].include? verb.to_sym
+      end
+
+      def plural_verb? verb
+        [ :index, :create ].include? verb.to_sym
+      end
+
+      def implied_verb? verb
+        [ :index, :create, :show, :update, :destroy ].include? verb.to_sym
       end
 
     end
