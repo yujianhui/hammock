@@ -13,6 +13,7 @@ module Hammock
     module InstanceMethods
 
       def append_javascript snippet
+        # TODO This should be an array of strings.
         @_domready_javascript ||= ''
         @_domready_javascript << snippet.strip.end_with(';') << "\n\n"
       end
