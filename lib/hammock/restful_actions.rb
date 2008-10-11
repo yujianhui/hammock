@@ -1,6 +1,6 @@
 module Hammock
   module RestfulActions
-    def self.included base
+    def self.included base # :nodoc:
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods
     end
