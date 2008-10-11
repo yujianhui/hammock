@@ -52,9 +52,9 @@ task :default => :test
 
 desc 'Generate RDoc documentation'
 Rake::RDocTask.new(:rdoc) do |rdoc|
-  files = ['README', 'LICENSE', 'lib/**/*.rb']
+  files = ['README.rdoc', 'LICENSE', 'lib/**/*.rb']
   rdoc.rdoc_files.add(files)
-  rdoc.main     = "README"
+  rdoc.main     = "README.rdoc"
   rdoc.title    = ProjectName
   rdoc.rdoc_dir = 'doc'
   rdoc.options << '--inline-source'
