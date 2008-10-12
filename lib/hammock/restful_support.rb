@@ -6,7 +6,7 @@ module Hammock
 
       base.class_eval {
         before_modify :set_editing
-        helper_method :mdl, :mdl_name, :table_name, :editing?
+        helper_method :mdl, :mdl_name, :editing?
       }
     end
 
@@ -20,10 +20,7 @@ module Hammock
         @_cached_mdl ||= Object.const_get self.class.to_s.sub('Controller', '').singularize
       end
       def mdl_name
-        @_cached_mdl_name ||= table_name.singularize
-      end
-      def table_name
-        mdl.table_name
+        @_cached_mdl_name ||= self.class.to_s.sub('Controller', '').singularize.underscore
       end
 
       def editing? record
@@ -47,9 +44,9 @@ module Hammock
           instance_variable_set "@#{mdl_name}", (@record = record_or_records)
         elsif record_or_records.is_a? Ambition::Context
           # log "Unkicked query: #{record_or_records.to_s}"
-          instance_variable_set "@#{table_name}", (@records = record_or_records)
+          instance_variable_set "@#{mdl_name.pluralize}", (@records = record_or_records)
         elsif record_or_records.is_a? Array
-          instance_variable_set "@#{table_name}", (@records = record_or_records)
+          instance_variable_set "@#{mdl_name.pluralize}", (@records = record_or_records)
         else
           raise "Unknown record(s) type #{record_or_records.class}."
         end
