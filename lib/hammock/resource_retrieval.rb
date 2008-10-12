@@ -19,15 +19,14 @@ module Hammock
           verbability
         elsif !callback(:during_find, record, opts)
           # callbacks failed
-          :not_found
         else
           :ok
         end
 
-        if :ok == result
-          assign_resource record
-        else
+        if :ok != result
           escort result
+        else
+          assign_resource record
         end
       end
 
