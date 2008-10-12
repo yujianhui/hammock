@@ -10,6 +10,8 @@ module Hammock
 
     module InstanceMethods
 
+      private
+
       def standard_render
         respond_to do |format|
           format.html
