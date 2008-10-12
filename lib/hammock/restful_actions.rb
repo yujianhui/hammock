@@ -10,6 +10,9 @@ module Hammock
 
     module InstanceMethods
 
+      # The +index+ action. (GET, safe, idempotent)
+      #
+      # Lists the current resource's records that are visible within the current index scope, defined by +index_scope+ and +index_scope_for+ on the current model.
       def index
         if tasks_for_index
           respond_to do |format|
@@ -19,27 +22,46 @@ module Hammock
         end
       end
 
+      # The +new+ action. (GET, safe, idempotent)
+      #
+      # Renders a form containing the required fields to create a new record.
+      #
+      # This action is available within the same scope as +create+, since it is only useful if a subsequent +create+ would be successful.
       def new
         do_render || standard_render if tasks_for_new
       end
 
+      # The +create+ action. (POST, unsafe, non-idempotent)
+      #
+      # Creates a new record with the supplied attributes. TODO
       def create
         make_new_record
         render_or_redirect_after(find_record_on_create || save_record)
       end
 
+      # The +show+ action. (GET, safe, idempotent)
+      #
+      # Displays the specified record if it is within the current read scope, defined by +read_scope+ and +read_scope_for+ on the current model.
       def show
         if find_record
           do_render || standard_render if callback(:before_show)
         end
       end
 
+      # The +edit+ action. (GET, safe, idempotent)
+      #
+      # Renders a form containing the fields populated with the current record's attributes.
+      #
+      # This action is available within the same scope as +update+, since it is only useful if a subsequent +update+ would be successful.
       def edit
         if find_record
           do_render if callback(:before_modify) and callback(:before_edit)
         end
       end
 
+      # The +update+ action. (PUT, unsafe, idempotent)
+      #
+      # Updates the specified record with the supplied attributes if it is within the current write scope, defined by +write_scope+ and +write_scope_for+ on the current model.
       def update
         if find_record
           # If params[:attribute] is given, update only that attribute. We mass-assign either way to filter through attr_accessible.
@@ -53,6 +75,9 @@ module Hammock
         end
       end
 
+      # The +destroy+ action. (DELETE, unsafe, non-idempotent)
+      #
+      # Destroys the specified record if it is within the current write scope, defined by +write_scope+ and +write_scope_for+ on the current model.
       def destroy
         if find_record(:deleted_ok => true) {|record| @current_account.can_destroy? record }
           result = callback(:before_destroy) and @record.destroy and callback(:after_destroy)
@@ -60,6 +85,9 @@ module Hammock
         end
       end
 
+      # The +undestroy+ action. (POST, unsafe, idempotent)
+      #
+      # Reverses a previous destroy on the specified record if it is within the current write scope, defined by +write_scope+ and +write_scope_for+ on the current model.
       def undestroy
         if find_record(:deleted_ok => true) {|record| @current_account.can_destroy? record }
           result = callback(:before_undestroy) and @record.undestroy and callback(:after_undestroy)
@@ -67,6 +95,9 @@ module Hammock
         end
       end
 
+      # The +suggest+ action. (GET, safe, idempotent)
+      #
+      # Lists the current resource's records that would be listed by an index, filtered to show only those where at least one of the specified keys matches each whitespace-separated term in the query.
       def suggest
         @results = if params[:q].blank?
           log 'No query specified.'
