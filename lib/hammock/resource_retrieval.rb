@@ -59,6 +59,7 @@ module Hammock
 
       def escort reason
         if request.xhr?
+          # TODO bad request might only be appropriate for invalid requests, as opposed to just an auth failure.
           escort_for_bad_request
         elsif :readonly == reason
           escort_for_read_only
