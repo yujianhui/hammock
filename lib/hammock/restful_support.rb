@@ -16,17 +16,29 @@ module Hammock
 
     module InstanceMethods
 
+      # The model this controller operates on. Defined as the singularized controller name. For example, for +GelatinousBlobsController+, this will return the +GelatinousBlob+ class.
       def mdl
         @_cached_mdl ||= Object.const_get self.class.to_s.sub('Controller', '').singularize
       end
+      # The lowercase name of the model this controller operates on. For example, for +GelatinousBlobsController+, this will return "gelatinous_blob".
       def mdl_name
         @_cached_mdl_name ||= self.class.to_s.sub('Controller', '').singularize.underscore
       end
 
+      # Returns true if the current action represents an edit on +record+.
+      #
+      # For example, consider the route <tt>/articles/3/comments/31/edit</tt>, which fires <tt>CommentsController#edit</tt>. The nested route handler would assign <tt>@comment</tt> and <tt>@article</tt> to the appropriate records, and then the following would be observed:
+      #   editing?(@comment) #=> true
+      #   editing?(@article) #=> false
       def editing? record
         record == @editing
       end
 
+      # Returns <tt>params[key]</tt>, defaulting to an empty Hash if <tt>params[key]</tt> can't receive :[].
+      #
+      # This is useful for concise nested parameter access. For example, if <tt>params[:account]</tt> is nil:
+      #   params[:account][:email]      #=> NoMethodError: undefined method `[]' for nil:NilClass
+      #   params_for(:account)[:email]  #=> nil
       def params_for key
         params[key] || {}
       end
