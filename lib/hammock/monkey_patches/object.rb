@@ -33,14 +33,14 @@ module Hammock
       #
       # Examples:
       #
-      #     Hash.symbolize #=> :hash
-      #     ActiveRecord::Base.symbolize #=> :"active_record/base"
-      #     "GetThisCamelOffMyCase".symbolize #=> :get_this_camel_off_my_case
+      #     Hash.symbolize                     #=> :hash
+      #     ActiveRecord::Base.symbolize       #=> :"active_record/base"
+      #     "GetThisCamelOffMyCase".symbolize  #=> :get_this_camel_off_my_case
       def symbolize
         self.to_s.underscore.to_sym
       end
 
-      # If +condition+ evaluates to true, return the result of sending +method_name+, +*args+ to +self+, otherwise, return +self+ as-is.
+      # If +condition+ evaluates to true, return the result of sending +method_name+, <tt>*args</tt> to +self+, otherwise, return +self+ as-is.
       def send_if condition, method_name, *args
         condition ? self.send(method_name, *args) : self
       end
