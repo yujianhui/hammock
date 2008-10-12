@@ -26,6 +26,16 @@ module Hammock
         mdl.table_name
       end
 
+      def editing? record
+        record == @editing
+      end
+
+      def params_for key
+        params[key] || {}
+      end
+
+      private
+
       def make_new_record
         assign_resource mdl.new params_for mdl.symbolize
       end
@@ -80,14 +90,6 @@ module Hammock
 
       def set_editing
         @editing = @record
-      end
-
-      def editing? record
-        record == @editing
-      end
-
-      def params_for key
-        params[key] || {}
       end
 
     end
