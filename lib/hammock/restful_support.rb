@@ -17,7 +17,7 @@ module Hammock
     module InstanceMethods
 
       def mdl
-        @_cached_mdl ||= self.class.to_s.sub('Controller', '').singularize
+        @_cached_mdl ||= Object.const_get self.class.to_s.sub('Controller', '').singularize
       end
       def mdl_name
         @_cached_mdl_name ||= self.class.to_s.sub('Controller', '').singularize.underscore
