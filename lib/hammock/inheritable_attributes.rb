@@ -25,6 +25,9 @@ module Hammock
     end
 
     module InstanceMethods
+
+      private
+
       def nestable_resources
         self.class.read_inheritable_attribute(:nestable_by) || {}
       end
