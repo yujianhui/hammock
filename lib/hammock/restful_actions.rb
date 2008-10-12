@@ -163,7 +163,7 @@ module Hammock
 
       def render_for_destroy success, opts = {}
         if request.xhr?
-          render :partial => "#{table_name}/index_entry", :locals => { :record => @record }
+          render :partial => "#{mdl.table_name}/index_entry", :locals => { :record => @record }
         else
           flash[:error] = "#{@record.name} was removed."
           respond_to do |format|

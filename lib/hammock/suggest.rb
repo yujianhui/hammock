@@ -18,7 +18,7 @@ module Hammock
             :order => fields.map {|f| "#{f} ASC" }.join(', '),
             :conditions => [
               fields.map {|f|
-                ([ "LOWER(#{table_name}.#{f}) LIKE ?" ] * queries.length).join(' AND ')
+                ([ "LOWER(#{mdl.table_name}.#{f}) LIKE ?" ] * queries.length).join(' AND ')
               }.map {|clause|
                 "(#{clause})"
               }.join(' OR ')
