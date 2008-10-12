@@ -28,9 +28,8 @@ module Hammock
       # When +find_on_create+ is specified for a controller, attempts to +create+ new records will first check to see if an identical record already exists. If such a record is found, it is returned and the create is never attempted.
       #
       # This is useful for the management of administrative records like memberships or friendships, where the user may attempt to create a new record using some unique identifier like an email address. For such a resource, a pre-existing record should not be considered a failure, as would otherwise be triggered by uniqueness checks on the model.
-      def find_on_create &proc
+      def find_on_create
         write_inheritable_attribute :find_on_create, true
-        write_inheritable_attribute :find_on_create_proc, proc
       end
 
       # Use +find_column+ to specify the name of an alternate column with which record lookups should be performed.
@@ -43,6 +42,9 @@ module Hammock
     end
 
     module InstanceMethods
+
+      private
+
       def nestable_resources
         self.class.read_inheritable_attribute(:nestable_by) || {}
       end
@@ -53,9 +55,6 @@ module Hammock
 
       def findable_on_create?
         self.class.read_inheritable_attribute :find_on_create
-      end
-      def find_on_create_proc
-        self.class.read_inheritable_attribute :find_on_create_proc
       end
 
       def find_column_name
