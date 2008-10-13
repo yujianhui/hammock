@@ -16,14 +16,17 @@ module Hammock
         ajax_link verb, record, opts.merge(:class => [opts[:class], 'button'].squash.join(' '))
       end
 
+      def link_id_for verb, record, attribute = nil
+        [verb, record.base_model, record.id_or_describer, attribute].compact.join('_')
+      end
+
       def ajax_link verb, record, opts = {}
         if :ok == can_verb_entity?(verb, record)
-          link_id = opts[:link_id] || "#{verb}_#{record.base_model}_#{record.id}"
-          link_path = ajaxinate link_id, verb, record, opts
+          link_path = ajaxinate verb, record, opts
 
           content_tag :a,
             opts[:text] || verb.to_s.capitalize,
-            :id => link_id,
+            :id => link_id_for(verb, record),
             :class => opts[:class],
             :href => link_path,
             :onclick => 'return false;',
@@ -31,12 +34,12 @@ module Hammock
         end
       end
 
-      def ajaxinate elem_id, verb, record, opts = {}
+      def ajaxinate verb, record, opts = {}
         link_params = { record.base_model => record.unsaved_attributes.merge(opts.delete(:record) || {}) }.merge(opts[:params] || {})
-        link_id = opts[:link_id] || elem_id
         request_method = method_for verb, record
         link_path = path_for verb, record
-        attribute = link_params[record.base_model][:attribute]
+        attribute = link_params[:attribute]
+        link_id = link_id_for verb, record, attribute
 
         request_method, link_params[:_method] = :post, request_method unless [ :get, :post ].include?(request_method)
 
@@ -48,6 +51,7 @@ module Hammock
           "{ '#{record.base_model}[#{attribute}]': $('##{link_id}').val() }"
         end
 
+        # TODO check the response code in the callback, and replace :after with :success and :failure.
         js = %Q{
           (jQuery)('##{link_id}').#{opts[:on] || 'click'}(function() {
             eval("#{(opts[:before] || '').gsub("\n", '\n').end_with(';')}");
