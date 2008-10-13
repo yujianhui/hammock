@@ -60,11 +60,8 @@ module Hammock
                 #{forgery_key_json(request_method)}
               ),
               function(response) {
-                if ('<' == response.substr(0, 1)) {
-                  (jQuery)('.#{opts[:target] || link_id + '_target'}').html(response);
-                } else {
-                  eval(response);
-                }
+                //(jQuery)('.#{opts[:target] || link_id + '_target'}').html(response);
+                (jQuery)('##{opts[:target] || link_id + '_target'}').before(response).remove();
               }
             );
           });
