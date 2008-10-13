@@ -50,6 +50,7 @@ module Hammock
 
         js = %Q{
           (jQuery)('##{link_id}').#{opts[:on] || 'click'}(function() {
+            eval("#{(opts[:before] || '').gsub("\n", '\n').end_with(';')}");
             jQuery.#{request_method}(
               '#{link_path}',
               jQuery.extend(
@@ -62,6 +63,7 @@ module Hammock
               function(response) {
                 //(jQuery)('.#{opts[:target] || link_id + '_target'}').html(response);
                 (jQuery)('##{opts[:target] || link_id + '_target'}').before(response).remove();
+                eval("#{(opts[:after] || '').gsub("\n", '\n').end_with(';')}");
               }
             );
           });
