@@ -14,12 +14,12 @@ module Hammock
 
       def append_javascript snippet
         @_domready_javascript ||= ''
-        @_domready_javascript << snippet.strip.end_with(';') << "\n\n"
+        @_domready_javascript << snippet.strip.end_with(';') << "\n\n" unless snippet.nil?
       end
 
       def append_toplevel_javascript snippet
         @_toplevel_javascript ||= ''
-        @_toplevel_javascript << snippet.strip.end_with(';') << "\n\n"
+        @_toplevel_javascript << snippet.strip.end_with(';') << "\n\n" unless snippet.nil?
       end
 
       def javascript_for_page
