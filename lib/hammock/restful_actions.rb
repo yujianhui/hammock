@@ -165,7 +165,6 @@ module Hammock
         if request.xhr?
           render :partial => "#{mdl.table_name}/index_entry", :locals => { :record => @record }
         else
-          flash[:error] = "#{@record.name} was removed."
           respond_to do |format|
             format.html { redirect_to postdestroy_redirect || nested_path_for(@record.class) }
             format.xml  { head :ok }
