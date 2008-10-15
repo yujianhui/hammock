@@ -9,6 +9,18 @@ module Hammock
 
     module ClassMethods
 
+      def has_public_scope? scope_name
+        "#{scope_name}able" if respond_to? "#{scope_name}_scope"
+      end
+      
+      def has_account_scope? scope_name
+        "#{scope_name}able_by" if respond_to? "#{scope_name}_scope_for"
+      end
+
+      def export_scopes *verbs
+        verbs.each {|verb| export_scope verb }
+      end
+
       def export_scope verb
         verbable = "#{verb}able"
 
