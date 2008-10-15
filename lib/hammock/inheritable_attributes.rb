@@ -18,7 +18,6 @@ module Hammock
         write_inheritable_attribute :find_on_create, true
       end
 
-
       def find_column column_name
         write_inheritable_attribute :find_column, column_name
       end
