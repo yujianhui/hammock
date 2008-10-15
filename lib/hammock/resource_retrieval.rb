@@ -10,14 +10,14 @@ module Hammock
 
     module InstanceMethods
 
-      def find_record opts = {}
+      def find_record
         result = if !callback(:before_find)
           # callbacks failed
-        elsif (record = retrieve_record(opts)).nil?
+        elsif (record = retrieve_record).nil?
           :not_found
         elsif :ok != (verbability = can_verb_record?(action_name, record))
           verbability
-        elsif !callback(:during_find, record, opts)
+        elsif !callback(:during_find, record)
           # callbacks failed
         else
           :ok
@@ -30,6 +30,10 @@ module Hammock
         end
       end
 
+      # def find_deleted_record
+      #   find_record 
+      # end
+
       def retrieve_resource
         if (scope = current_scope).nil?
           escort :not_found
@@ -38,22 +42,8 @@ module Hammock
         end
       end
 
-      def retrieve_record opts = {}
-        val = params[:id]
-
-        if (scope = current_scope).nil?
-          nil
-        else
-          record = scope.find :first, :conditions => {find_column_name => val}
-
-          if record.nil?
-            # not found
-          elsif !opts[:deleted_ok] && record.deleted?
-            log "#{record.class}<#{record.id}> has been deleted."
-          else
-            record
-          end
-        end
+      def retrieve_record
+        current_scope.find :first, :conditions => {find_column_name => params[:id]}
       end
 
       def escort reason

@@ -54,18 +54,18 @@ module Hammock
       end
 
       def destroy
-        if find_record(:deleted_ok => true) {|record| @current_account.can_destroy? record }
+        if find_record
           result = callback(:before_destroy) and @record.destroy and callback(:after_destroy)
           render_for_destroy result
         end
       end
 
-      def undestroy
-        if find_record(:deleted_ok => true) {|record| @current_account.can_destroy? record }
-          result = callback(:before_undestroy) and @record.undestroy and callback(:after_undestroy)
-          render_for_destroy result
-        end
-      end
+      # def undestroy
+      #   if find_deleted_record
+      #     result = callback(:before_undestroy) and @record.undestroy and callback(:after_undestroy)
+      #     render_for_destroy result
+      #   end
+      # end
 
       def suggest
         @results = if params[:q].blank?
