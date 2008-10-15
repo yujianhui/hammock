@@ -9,10 +9,10 @@ module Hammock
 
     module ClassMethods
 
-      def export_scope verb, opts = {}
-        verbable = "#{opts[:as] || verb}able"
+      def export_scope verb
+        verbable = "#{verb}able"
 
-        class << self; self end.instance_eval {
+        metaclass.instance_eval {
           # Model.verbable_by: returns all records that are verbable by account.
           define_method "#{verbable}_by" do |account|
             if !account.nil? && respond_to?("#{verb}_scope_for")
@@ -20,8 +20,8 @@ module Hammock
             elsif respond_to?("#{verb}_scope")
               select &send("#{verb}_scope")
             else
-              log "No #{verb} scopes available, returning empty scope."
-              select {|record| false }
+              log "No #{verb} scopes available."
+              nil
             end
           end
 
