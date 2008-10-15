@@ -69,7 +69,11 @@ module Hammock
       end
 
       def current_scope
-        nest_scope.chain(verb_scope).sort_by &mdl.sorter
+        if (resultant_scope = nest_scope.chain(verb_scope)).nil?
+          nil
+        else
+          resultant_scope.sort_by &mdl.sorter
+        end
       end
 
 
