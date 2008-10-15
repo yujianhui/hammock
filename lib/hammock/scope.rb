@@ -53,7 +53,7 @@ module Hammock
           # log "got an account_verb_scope #{scope_name}."
           mdl.send scope_name, @current_account
         elsif !(scope_name = public_verb_scope?)
-          log "No #{@current_account.nil? ? 'public' : 'account'} #{verb_scope_name} scope available for #{mdl}.#{' May be available after login.' if account_verb_scope?}"
+          log "No #{@current_account.nil? ? 'public' : 'account'} #{scope_name_for_action} scope available for #{mdl}.#{' May be available after login.' if account_verb_scope?}"
           nil
         else
           # log "got a #{scope_name} public_verb_scope."
@@ -79,13 +79,13 @@ module Hammock
 
       private
 
-      def verb_scope_name
+      def scope_name_for_action
         if 'index' == action_name
-          'indexable'
+          'index'
         elsif safe_action_and_implication?
-          'readable'
+          'read'
         else
-          'writeable'
+          'write'
         end
       end
 
@@ -94,12 +94,10 @@ module Hammock
       end
 
       def account_verb_scope?
-        able = "#{verb_scope_name}_by"
-        able if mdl.respond_to?(able)
+        mdl.has_account_scope? scope_name_for_action
       end
       def public_verb_scope?
-        able = verb_scope_name
-        able if mdl.respond_to?(able)
+        mdl.has_public_scope? scope_name_for_action
       end
 
     end
