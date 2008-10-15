@@ -127,7 +127,7 @@ module Hammock
 
       def render_or_redirect_after result
         if request.xhr?
-          do_render :editable => true, :edit => false
+          do_render result, :editable => true, :edit => false
         else
           if postsave_render result
             # rendered - no redirect

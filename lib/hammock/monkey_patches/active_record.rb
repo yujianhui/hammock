@@ -77,7 +77,7 @@ module Hammock
       end
 
       def base_model
-        self.class.base_class.to_s.downcase
+        self.class.base_class.to_s.underscore
       end
 
       def undestroy
