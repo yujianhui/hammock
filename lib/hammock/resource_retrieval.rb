@@ -30,10 +30,6 @@ module Hammock
         end
       end
 
-      # def find_deleted_record
-      #   find_record 
-      # end
-
       def retrieve_resource
         if (scope = current_scope).nil?
           escort :not_found
