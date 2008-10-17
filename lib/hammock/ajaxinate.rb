@@ -35,13 +35,14 @@ module Hammock
       end
 
       def ajaxinate verb, record, opts = {}
-        link_params = { record.base_model => record.unsaved_attributes.merge(opts.delete(:record) || {}) }.merge(opts[:params] || {})
+        record_attributes = {record.base_model => record.unsaved_attributes}
+        link_params = {record.base_model => (opts.delete(:record) || {}) }.merge(opts[:params] || {})
         request_method = method_for verb, record
         link_path = path_for verb, record
         attribute = link_params[:attribute]
         link_id = link_id_for verb, record, attribute
 
-        request_method, link_params[:_method] = :post, request_method unless [ :get, :post ].include?(request_method)
+        request_method, link_params[:_method] = :post, request_method unless [:get, :post].include?(request_method)
 
         form_elements_hash = if :get == request_method
           '{ }'
@@ -54,22 +55,27 @@ module Hammock
         # TODO check the response code in the callback, and replace :after with :success and :failure.
         js = %Q{
           (jQuery)('##{link_id}').#{opts[:on] || 'click'}(function() {
-            eval("#{(opts[:before] || '').gsub("\n", '\n').end_with(';')}");
-            jQuery.#{request_method}(
-              '#{link_path}',
-              jQuery.extend(
+            if (#{attribute.blank? ? 'false' : 'true'} && (jQuery('##{link_id}_target .original_value').html() == jQuery('##{link_id}_target .modify input').val())) {
+              eval("#{clean_snippet opts[:skipped]}");
+            } else if (!eval("#{clean_snippet opts[:before]}")) { // before callback failed
+              
+            } else { // fire the request
+              jQuery.#{request_method}(
+                '#{link_path}',
                 jQuery.extend(
+                  #{record_attributes.to_flattened_json},
                   #{form_elements_hash},
-                  #{link_params.to_flattened_json}
+                  #{link_params.to_flattened_json},
+                  #{forgery_key_json(request_method)}
                 ),
-                #{forgery_key_json(request_method)}
-              ),
-              function(response) {
-                //(jQuery)('.#{opts[:target] || link_id + '_target'}').html(response);
-                (jQuery)('##{opts[:target] || link_id + '_target'}').before(response).remove();
-                eval("#{(opts[:after] || '').gsub("\n", '\n').end_with(';')}");
-              }
-            );
+                function(response) {
+                  //log("response: " + response);
+                  //(jQuery)('.#{opts[:target] || link_id + '_target'}').html(response);
+                  (jQuery)('##{opts[:target] || link_id + '_target'}').before(response).remove();
+                  eval("#{clean_snippet opts[:after]}");
+                }
+              );
+            }
           });
         }
 
@@ -78,6 +84,11 @@ module Hammock
       end
 
       private
+
+      def clean_snippet snippet
+        report "Double quote detected in snippet '#{snippet}'" if snippet['"'] unless snippet.nil?
+        (snippet || '').gsub("\n", '\n').end_with(';')
+      end
 
       def forgery_key_json request_method = nil
         if !protect_against_forgery? || (:get == (request_method || request.method))
