@@ -43,7 +43,11 @@ module Hammock
       end
 
       def retrieve_record
-        current_scope.find :first, :conditions => {find_column_name => params[:id]}
+        if (scope = current_scope).nil?
+          
+        else
+          scope.find :first, :conditions => {find_column_name => params[:id]}
+        end
       end
 
       def escort reason
