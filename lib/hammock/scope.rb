@@ -3,6 +3,10 @@ module Hammock
     def self.included base
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods
+
+      base.class_eval {
+        helper_method :can_verb_entity?
+      }
     end
 
     module ClassMethods
