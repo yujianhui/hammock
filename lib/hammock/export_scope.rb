@@ -1,0 +1,58 @@
+module Hammock
+  module ExportScope
+    MixInto = ActiveRecord::Base
+
+    def self.included base
+      base.send :include, InstanceMethods
+      base.send :extend, ClassMethods
+    end
+
+    module ClassMethods
+
+      def export_scope verb, opts = {}
+        verbable = "#{opts[:as] || verb}able"
+
+        class << self; self end.instance_eval {
+          # Model.verbable_by: returns all records that are verbable by account.
+          define_method "#{verbable}_by" do |account|
+            if !account.nil? && respond_to?("#{verb}_scope_for")
+              select &send("#{verb}_scope_for", account)
+            elsif respond_to?("#{verb}_scope")
+              select &send("#{verb}_scope")
+            else
+              log "No #{verb} scopes available, returning empty scope."
+              select {|record| false }
+            end
+          end
+
+          # Model.verbable: returns all records that are verbable by anonymous users.
+          define_method verbable do
+            send "#{verbable}_by", nil
+          end
+        }
+
+        # Model#verbable_by?: returns whether this record is verbable by account.
+        define_method "#{verbable}_by?" do |account|
+          if !account.nil? && self.class.respond_to?("#{verb}_scope_for")
+            self.class.send("#{verb}_scope_for", account).call(self)
+          elsif self.class.respond_to?("#{verb}_scope")
+            self.class.send("#{verb}_scope").call(self)
+          else
+            log "No #{verb} scopes available, returning false."
+            false
+          end
+        end
+
+        # Model#verbable?: returns whether this record is verbable by anonymous users.
+        define_method "#{verbable}?" do
+          send "#{verbable}_by?", nil
+        end
+      end
+
+    end
+
+    module InstanceMethods
+
+    end
+  end
+end
