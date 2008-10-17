@@ -6,6 +6,7 @@ module Hammock
 
       base.class_eval {
         before_modify :set_editing
+        before_create :set_creator_id_if_appropriate
         helper_method :mdl, :mdl_name, :editing?
       }
     end
@@ -87,6 +88,10 @@ module Hammock
 
       def set_editing
         @editing = @record
+      end
+
+      def set_creator_id_if_appropriate
+        @record.creator_id = @current_account.id if @record.respond_to?(:creator_id=)
       end
 
     end
