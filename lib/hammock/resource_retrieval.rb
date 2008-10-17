@@ -60,7 +60,7 @@ module Hammock
         else
           escort_for_404
         end
-        nil
+        false
       end
 
 
