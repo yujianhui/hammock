@@ -32,12 +32,6 @@ module Hammock
         params[key] || {}
       end
 
-      private
-
-      def make_new_record
-        assign_resource mdl.new params_for mdl.symbolize
-      end
-
       def assign_resource record_or_records
         assignment = if record_or_records.nil?
           # Fail
@@ -57,6 +51,12 @@ module Hammock
         else
           escort :not_found
         end
+      end
+
+      private
+
+      def make_new_record
+        assign_resource mdl.new params_for mdl.symbolize
       end
 
       def assign_nestable_resources

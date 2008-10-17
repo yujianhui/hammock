@@ -15,10 +15,6 @@ module Hammock
 
     module InstanceMethods
 
-      def get_binding
-        binding
-      end
-
       def partial_exists? name, extension = nil
         !Dir.glob(File.join(RAILS_ROOT, 'app/views', controller_name, "_#{name}.html.#{extension || '*'}")).empty?
       end
@@ -33,6 +29,10 @@ module Hammock
 
       def development?
         'development' == ENV['RAILS_ENV']
+      end
+
+      def production?
+        'production' == ENV['RAILS_ENV']
       end
 
     end

@@ -25,7 +25,6 @@ module Hammock
 
       def reset_cached_column_info
         reset_column_information
-        reset_inheritable_attributes
         reset_column_information_and_inheritable_attributes_for_all_subclasses
       end
     end

@@ -54,18 +54,18 @@ module Hammock
       end
 
       def destroy
-        if find_record(:deleted_ok => true) {|record| @current_account.can_destroy? record }
+        if find_record
           result = callback(:before_destroy) and @record.destroy and callback(:after_destroy)
           render_for_destroy result
         end
       end
 
-      def undestroy
-        if find_record(:deleted_ok => true) {|record| @current_account.can_destroy? record }
-          result = callback(:before_undestroy) and @record.undestroy and callback(:after_undestroy)
-          render_for_destroy result
-        end
-      end
+      # def undestroy
+      #   if find_deleted_record
+      #     result = callback(:before_undestroy) and @record.undestroy and callback(:after_undestroy)
+      #     render_for_destroy result
+      #   end
+      # end
 
       def suggest
         @results = if params[:q].blank?
@@ -116,7 +116,7 @@ module Hammock
         if callback("before_#{verb}") and callback(:before_save) and save
           callback("after_#{verb}") and callback(:after_save)
         else
-          log @record.errors.full_messages.join(', ')
+          log "#{mdl} errors: " + @record.errors.full_messages.join(', ')
           callback("after_failed_#{verb}") and callback(:after_failed_save) and false
         end
       end
