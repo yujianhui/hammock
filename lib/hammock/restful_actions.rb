@@ -24,7 +24,7 @@ module Hammock
       end
 
       def create
-        render_or_redirect_after(find_record_on_create || save_record) if make_createable_record
+        render_or_redirect_after(find_record_on_create || (make_createable_record && save_record)) if createable?
       end
 
       def show
@@ -96,7 +96,7 @@ module Hammock
       end
 
       def tasks_for_new
-        make_createable_record and callback(:before_modify) and callback(:before_new)
+        make_new_record and callback(:before_modify) and callback(:before_new) if createable?
       end
 
       def find_record_on_create

@@ -59,8 +59,12 @@ module Hammock
         assign_resource mdl.new params_for mdl.symbolize
       end
 
+      def createable?
+        mdl.createable_by?(@current_account) || escort(:unauthed)
+      end
+
       def make_createable_record
-        make_new_record.createable_by?(@current_account) || escort(:unauthed)
+        make_new_record.createable_by? @current_account
       end
 
       def assign_nestable_resources
