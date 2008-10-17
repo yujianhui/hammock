@@ -32,7 +32,7 @@ module Hammock
 
       def retrieve_resource
         if (scope = current_scope).nil?
-          escort :not_found
+          escort :unauthed
         else
           assign_resource scope
         end
@@ -51,6 +51,8 @@ module Hammock
           escort_for_bad_request
         elsif :readonly == reason
           escort_for_read_only
+        elsif :unauthed == reason
+          escort_for_403
         elsif @current_account.nil? && account_verb_scope?
           escort_for_login
         else
@@ -81,8 +83,10 @@ module Hammock
         redirect_to returning_login_path
       end
       def escort_for_404
-        log
-        render :file => File.join(RAILS_ROOT, 'public/404.html'), :status => 404 # not found
+        render :file => File.join(RAILS_ROOT, 'public/404.html'), :status => 404
+      end
+      def escort_for_403
+        render :file => File.join(RAILS_ROOT, 'public/404.html'), :status => 403
       end
 
     end
