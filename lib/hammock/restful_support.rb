@@ -59,6 +59,10 @@ module Hammock
         assign_resource mdl.new params_for mdl.symbolize
       end
 
+      def make_createable_record
+        make_new_record.createable_by?(@current_account) || escort(:unauthed)
+      end
+
       def assign_nestable_resources
         @current_nested_records = []
         params.symbolize_keys.dragnet(*nestable_resources.keys).all? {|param_name,column_name|

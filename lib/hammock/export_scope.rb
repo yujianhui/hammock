@@ -65,6 +65,10 @@ module Hammock
 
     module InstanceMethods
 
+      def createable_by? account
+        false
+      end
+
     end
   end
 end
