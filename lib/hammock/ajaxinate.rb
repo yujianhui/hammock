@@ -16,10 +16,6 @@ module Hammock
         ajax_link verb, record, opts.merge(:class => [opts[:class], 'button'].squash.join(' '))
       end
 
-      def link_id_for verb, record, attribute = nil
-        [verb, record.base_model, record.id_or_describer, attribute].compact.join('_')
-      end
-
       def ajax_link verb, record, opts = {}
         if :ok == can_verb_entity?(verb, record)
           link_path = ajaxinate verb, record, opts
@@ -84,6 +80,10 @@ module Hammock
       end
 
       private
+
+      def link_id_for verb, record, attribute = nil
+        [verb, record.base_model, record.id_or_describer.gsub(/[^a-zA-Z0-9-_]/, ''), attribute].compact.join('_')
+      end
 
       def clean_snippet snippet
         report "Double quote detected in snippet '#{snippet}'" if snippet['"'] unless snippet.nil?
