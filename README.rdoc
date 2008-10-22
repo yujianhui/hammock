@@ -12,10 +12,6 @@ At the moment, you can do this with Hammock:
   end
 
   class BeersController < ApplicationController
-    before_create :set_creator_id
-    def set_creator_id
-      @beer.creator_id = @current_account.id
-    end
   end
 
   class Beer < ActiveRecord::Base
