@@ -5,10 +5,6 @@ module Hammock
     def self.included base
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods
-
-      base.class_eval {
-        alias_method_chain :log, :model
-      }
     end
 
     module ClassMethods
@@ -25,6 +21,7 @@ module Hammock
 
         log_without_model *args.unshift(message).push(opts.merge(:skip => (opts[:skip] || 0) + 1))
       end
+      alias_method_chain :log, :model
 
     end
   end
