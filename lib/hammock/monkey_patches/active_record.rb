@@ -35,6 +35,10 @@ module Hammock
         "#{self.class}<#{self.id || 'new'}>"
       end
 
+      def id_or_describer
+        attributes.map {|k,v| "#{k}-#{(v.to_s || '')[0..10]}" }.join("_")
+      end
+
       def base_model
         self.class.base_class.to_s.underscore
       end
