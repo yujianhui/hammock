@@ -27,14 +27,6 @@ module Hammock
         end
       end
 
-      def development?
-        'development' == ENV['RAILS_ENV']
-      end
-
-      def production?
-        'production' == ENV['RAILS_ENV']
-      end
-
     end
   end
 end

@@ -13,6 +13,14 @@ module Hammock
 
     module Methods
 
+      def development?
+        'development' == ENV['RAILS_ENV']
+      end
+
+      def production?
+        'production' == ENV['RAILS_ENV']
+      end
+
       def log_hit
         buf = "#{colorify request.remote_ip}" +
           (@current_site.nil? ? '' : " | #{@current_site.name}") +
