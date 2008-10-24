@@ -132,7 +132,7 @@ module Hammock
             # rendered - no redirect
           else
             if result
-              flash[:notice] = "Page was successfully #{'create' == action_name ? 'created' : 'updated'}."
+              flash[:notice] = "#{mdl} was successfully #{'create' == action_name ? 'created' : 'updated'}."
               respond_to do |format|
                 format.html { redirect_to postsave_redirect || nested_path_for((@record unless inline_createable_resource?) || mdl) }
                 format.xml {
