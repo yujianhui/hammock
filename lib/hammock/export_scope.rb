@@ -18,7 +18,7 @@ module Hammock
       end
 
       def createable_by? account
-        true
+        false
       end
 
       def export_scopes *verbs
@@ -36,7 +36,8 @@ module Hammock
             elsif respond_to?("#{verb}_scope")
               select &send("#{verb}_scope")
             else
-              select &all_scope
+              log "No #{verb} scopes available."
+              nil
             end
           end
 
@@ -53,7 +54,8 @@ module Hammock
           elsif self.class.respond_to?("#{verb}_scope")
             self.class.send("#{verb}_scope").call(self)
           else
-            true
+            log "No #{verb} scopes available, returning false."
+            false
           end
         end
 
@@ -62,21 +64,13 @@ module Hammock
           send "#{verbable}_by?", nil
         end
       end
-      
-      def all_scope
-        lambda {|record| true }
-      end
-
-      def none_scope
-        lambda {|record| false }
-      end
 
     end
 
     module InstanceMethods
 
       def createable_by? account
-        true
+        false
       end
 
     end
