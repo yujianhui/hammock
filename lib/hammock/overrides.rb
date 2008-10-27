@@ -10,6 +10,10 @@ module Hammock
 
     module InstanceMethods
 
+      def custom_scope
+        nil
+      end
+
       def postsave_render result
         nil
       end
