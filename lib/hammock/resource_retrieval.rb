@@ -47,7 +47,9 @@ module Hammock
       end
 
       def escort reason
-        if request.xhr?
+        if rendered_or_redirected?
+          # lol
+        elsif request.xhr?
           escort_for_bad_request
         elsif :readonly == reason
           escort_for_read_only

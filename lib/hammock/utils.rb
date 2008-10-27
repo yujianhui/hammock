@@ -27,6 +27,10 @@ module Hammock
         end
       end
 
+      def rendered_or_redirected?
+        @performed_render || @performed_redirect
+      end
+
     end
   end
 end
