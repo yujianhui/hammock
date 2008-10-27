@@ -12,7 +12,7 @@ module Hammock
         define_callbacks *%w{
           before_find      during_find
 
-          before_index     before_show
+          before_index     before_show     after_failed_show
           before_modify    before_new      before_edit
 
           before_save      after_save      after_failed_save

@@ -24,7 +24,11 @@ module Hammock
         end
 
         if :ok != result
-          escort result
+          if required_callback :after_failed_show
+            # TODO make_new_record required?
+          else
+            escort result
+          end
         else
           assign_resource record
         end
