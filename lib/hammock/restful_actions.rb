@@ -13,7 +13,7 @@ module Hammock
       def index
         if tasks_for_index
           respond_to do |format|
-            format.html # index.html.erb
+            format.html
             format.xml { render :xml => @records.kick }
           end
         end
