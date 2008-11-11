@@ -6,9 +6,9 @@ module Hammock
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods
 
-      base.class_eval {
-        alias_method_chain :fatal, :color
-      }
+      # base.class_eval {
+      #   alias_method_chain :fatal, :color
+      # }
     end
 
     module ClassMethods

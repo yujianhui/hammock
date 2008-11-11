@@ -6,9 +6,9 @@ module Hammock
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods
       
-      base.class_eval {
-        alias_method_chain :clean_backtrace, :truncation
-      }
+      # base.class_eval {
+      #   alias_method_chain :clean_backtrace, :truncation
+      # }
     end
 
     module ClassMethods
