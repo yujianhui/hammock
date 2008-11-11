@@ -17,10 +17,6 @@ module Hammock
         "#{scope_name}able_by" if respond_to? "#{scope_name}_scope_for"
       end
 
-      def createable_by? account
-        false
-      end
-
       def export_scopes *verbs
         verbs.each {|verb| export_scope verb }
       end
