@@ -19,6 +19,7 @@ module Hammock
       end
 
       def find_column column_name
+        # TODO define to_param on model.
         write_inheritable_attribute :find_column, column_name
       end
     end
