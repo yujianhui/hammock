@@ -1,5 +1,5 @@
 module Hammock
-  module InheritableAttributes
+  module ControllerAttributes
     def self.included base
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods
