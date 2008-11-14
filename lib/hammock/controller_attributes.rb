@@ -1,5 +1,5 @@
 module Hammock
-  module InheritableAttributes
+  module ControllerAttributes
     def self.included base # :nodoc:
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods
@@ -37,6 +37,7 @@ module Hammock
       # This is useful for controllers that are indexed by primary key, but are accessed with URLs containing some other unique attribute of the resource, like a randomly-generated key.
       #     find_column :key
       def find_column column_name
+        # TODO define to_param on model.
         write_inheritable_attribute :find_column, column_name
       end
     end

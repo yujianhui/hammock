@@ -18,7 +18,7 @@ module Hammock
       def append_javascript snippet
         # TODO This should be an array of strings.
         @_domready_javascript ||= ''
-        @_domready_javascript << snippet.strip.end_with(';') << "\n\n"
+        @_domready_javascript << snippet.strip.end_with(';') << "\n\n" unless snippet.nil?
       end
 
       # Add +snippet+ to the request's toplevel javascript cache.
@@ -26,7 +26,7 @@ module Hammock
       # The contents of this cache can be rendered into a <tt>\<script type="text/javascript"></tt> block by calling <tt>javascript_for_page</tt> within the \<head> of the layout.
       def append_toplevel_javascript snippet
         @_toplevel_javascript ||= ''
-        @_toplevel_javascript << snippet.strip.end_with(';') << "\n\n"
+        @_toplevel_javascript << snippet.strip.end_with(';') << "\n\n" unless snippet.nil?
       end
 
       # Render the snippets cached by +append_javascript+ and +append_toplevel_javascript+ within a <tt>\<script type="text/javascript"></tt> tag.

@@ -6,7 +6,8 @@ module Hammock
 
       base.class_eval {
         before_modify :set_editing
-        helper_method :mdl, :mdl_name, :editing?
+        before_create :set_creator_id_if_appropriate
+        helper_method :mdl, :mdl_name, :editing?, :createable?
       }
     end
 
@@ -43,12 +44,6 @@ module Hammock
         params[key] || {}
       end
 
-      private
-
-      def make_new_record
-        assign_resource mdl.new params_for mdl.symbolize
-      end
-
       def assign_resource record_or_records
         assignment = if record_or_records.nil?
           # Fail
@@ -68,6 +63,20 @@ module Hammock
         else
           escort :not_found
         end
+      end
+
+      private
+
+      def make_new_record
+        assign_resource mdl.new_with params_for mdl.symbolize
+      end
+
+      def createable?
+        @record.createable_by? @current_account
+      end
+
+      def make_createable?
+        make_new_record.createable_by? @current_account
       end
 
       def assign_nestable_resources
@@ -99,6 +108,10 @@ module Hammock
 
       def set_editing
         @editing = @record
+      end
+
+      def set_creator_id_if_appropriate
+        @record.creator_id = @current_account.id if @record.respond_to?(:creator_id=)
       end
 
     end

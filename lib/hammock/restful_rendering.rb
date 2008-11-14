@@ -19,12 +19,14 @@ module Hammock
         end
       end
 
-      def do_render opts = {}
+      def do_render result = true, opts = {}
         if request.xhr?
           if params[:attribute]
             render_attribute opts
           elsif params[:display_as]
             render_as
+          else
+            render :nothing => true, :status => (result ? 200 : 500)
           end
         end
       end

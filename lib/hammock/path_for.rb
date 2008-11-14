@@ -65,7 +65,7 @@ module Hammock
 
       def nested_path_for *resources
         requested_verb = resources.shift if resources.first.is_a?(Symbol)
-        args = (resources.last.is_a?(mdl) ? @current_nested_records.dup : []).concat(resources)
+        args = @current_nested_records.dup.concat(resources)
 
         args.unshift(requested_verb) unless requested_verb.nil?
         path_for *args

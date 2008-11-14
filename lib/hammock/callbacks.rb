@@ -10,7 +10,7 @@ module Hammock
         include ActiveSupport::Callbacks
 
         define_callbacks *%w{
-          before_find      during_find
+          before_find      during_find     after_failed_find
 
           before_index     before_show
           before_modify    before_new      before_edit
@@ -36,14 +36,24 @@ module Hammock
       CallbackFail = false.freeze
 
       def callback kind, *args
-        chain = self.class.send "#{kind}_callback_chain"
-
-        chain.all? {|cb|
+        callback_chain_for(kind).all? {|cb|
           # dlog "Calling #{kind} callback #{cb.method}"
           result = cb.call(self, *args) != false
           log "#{self.class}.#{cb.kind} callback '#{cb.method}' failed." unless result
           result
         }
+      end
+
+      def required_callback kind, *args
+        callback(kind, *args) if has_callbacks_for?(kind)
+      end
+
+      def has_callbacks_for? kind
+        !callback_chain_for(kind).empty?
+      end
+
+      def callback_chain_for kind
+        self.class.send "#{kind}_callback_chain"
       end
 
     end

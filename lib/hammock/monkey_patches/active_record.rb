@@ -9,46 +9,6 @@ module Hammock
 
     module ClassMethods
 
-      def export_scope verb, opts = {}
-        verbable = "#{opts[:as] || verb}able"
-
-        class << self; self end.instance_eval {
-          # Model.verbable_by: returns all records that are verbable by account.
-          define_method "#{verbable}_by" do |account|
-            if !account.nil? && respond_to?("#{verb}_scope_for")
-              select &send("#{verb}_scope_for", account)
-            elsif respond_to?("#{verb}_scope")
-              select &send("#{verb}_scope")
-            else
-              log "No #{verb} scopes available, returning empty scope."
-              select {|record| false }
-            end
-          end
-
-          # Model.verbable: returns all records that are verbable by anonymous users.
-          define_method verbable do
-            send "#{verbable}_by", nil
-          end
-        }
-
-        # Model#verbable_by?: returns whether this record is verbable by account.
-        define_method "#{verbable}_by?" do |account|
-          if !account.nil? && self.class.respond_to?("#{verb}_scope_for")
-            self.class.send("#{verb}_scope_for", account).call(self)
-          elsif self.class.respond_to?("#{verb}_scope")
-            self.class.send("#{verb}_scope").call(self)
-          else
-            log "No #{verb} scopes available, returning false."
-            false
-          end
-        end
-
-        # Model#verbable?: returns whether this record is verbable by anonymous users.
-        define_method "#{verbable}?" do
-          send "#{verbable}_by?", nil
-        end
-      end
-
       def sorter
         # TODO updated_at DESC
         proc {|record| record.id }
@@ -65,7 +25,6 @@ module Hammock
 
       def reset_cached_column_info
         reset_column_information
-        reset_inheritable_attributes
         reset_column_information_and_inheritable_attributes_for_all_subclasses
       end
     end
@@ -76,8 +35,12 @@ module Hammock
         "#{self.class}<#{self.id || 'new'}>"
       end
 
+      def id_or_describer
+        attributes.map {|k,v| "#{k}-#{(v.to_s || '')[0..10]}" }.join("_")
+      end
+
       def base_model
-        self.class.base_class.to_s.downcase
+        self.class.base_class.to_s.underscore
       end
 
       def undestroy
