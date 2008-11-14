@@ -12,6 +12,15 @@ module Hammock
 
     module InstanceMethods
 
+      def discard! *keys
+        keys.each {|k| delete k }
+        self
+      end
+
+      def discard *keys
+        dup.discard! *keys
+      end
+
       def dragnet *keys
         keys.inject({}) {|acc,key|
           acc[key] = self[key] if self.has_key?(key)

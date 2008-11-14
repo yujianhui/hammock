@@ -1,5 +1,5 @@
 module Hammock
-  module InheritableAttributes
+  module ControllerAttributes
     def self.included base
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods
@@ -14,18 +14,20 @@ module Hammock
         write_inheritable_attribute :inline_create, true
       end
 
-      def find_on_create &proc
+      def find_on_create
         write_inheritable_attribute :find_on_create, true
-        write_inheritable_attribute :find_on_create_proc, proc
       end
 
-
       def find_column column_name
+        # TODO define to_param on model.
         write_inheritable_attribute :find_column, column_name
       end
     end
 
     module InstanceMethods
+
+      private
+
       def nestable_resources
         self.class.read_inheritable_attribute(:nestable_by) || {}
       end
@@ -36,9 +38,6 @@ module Hammock
 
       def findable_on_create?
         self.class.read_inheritable_attribute :find_on_create
-      end
-      def find_on_create_proc
-        self.class.read_inheritable_attribute :find_on_create_proc
       end
 
       def find_column_name

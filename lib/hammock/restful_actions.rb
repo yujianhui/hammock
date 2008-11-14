@@ -13,7 +13,7 @@ module Hammock
       def index
         if tasks_for_index
           respond_to do |format|
-            format.html # index.html.erb
+            format.html
             format.xml { render :xml => @records.kick }
           end
         end
@@ -24,8 +24,13 @@ module Hammock
       end
 
       def create
-        make_new_record
-        render_or_redirect_after(find_record_on_create || save_record)
+        if !find_record_on_create && !make_createable?
+          escort(:not_found)
+        elsif !createable?
+          escort(:unauthed)
+        else
+          render_or_redirect_after save_record
+        end
       end
 
       def show
@@ -54,18 +59,18 @@ module Hammock
       end
 
       def destroy
-        if find_record(:deleted_ok => true) {|record| @current_account.can_destroy? record }
+        if find_record
           result = callback(:before_destroy) and @record.destroy and callback(:after_destroy)
           render_for_destroy result
         end
       end
 
-      def undestroy
-        if find_record(:deleted_ok => true) {|record| @current_account.can_destroy? record }
-          result = callback(:before_undestroy) and @record.undestroy and callback(:after_undestroy)
-          render_for_destroy result
-        end
-      end
+      # def undestroy
+      #   if find_deleted_record
+      #     result = callback(:before_undestroy) and @record.undestroy and callback(:after_undestroy)
+      #     render_for_destroy result
+      #   end
+      # end
 
       def suggest
         @results = if params[:q].blank?
@@ -97,7 +102,11 @@ module Hammock
       end
 
       def tasks_for_new
-        make_new_record and callback(:before_modify) and callback(:before_new)
+        if !make_new_record
+          
+        elsif createable?
+          callback(:before_modify) and callback(:before_new)
+        end
       end
 
       def find_record_on_create
@@ -116,7 +125,7 @@ module Hammock
         if callback("before_#{verb}") and callback(:before_save) and save
           callback("after_#{verb}") and callback(:after_save)
         else
-          log @record.errors.full_messages.join(', ')
+          log "#{mdl} errors: " + @record.errors.full_messages.join(', ')
           callback("after_failed_#{verb}") and callback(:after_failed_save) and false
         end
       end
@@ -127,15 +136,15 @@ module Hammock
 
       def render_or_redirect_after result
         if request.xhr?
-          do_render :editable => true, :edit => false
+          do_render result, :editable => true, :edit => false
         else
           if postsave_render result
             # rendered - no redirect
           else
             if result
-              flash[:notice] = "Page was successfully #{'create' == action_name ? 'created' : 'updated'}."
+              flash[:notice] = "#{mdl} was successfully #{'create' == action_name ? 'created' : 'updated'}."
               respond_to do |format|
-                format.html { redirect_to postsave_redirect || nested_path_for(@record || mdl) }
+                format.html { redirect_to postsave_redirect || nested_path_for((@record unless inline_createable_resource?) || mdl) }
                 format.xml {
                   if 'create' == action_name
                     render :xml => @record, :status => :created, :location => @record
@@ -163,9 +172,8 @@ module Hammock
 
       def render_for_destroy success, opts = {}
         if request.xhr?
-          render :partial => "#{table_name}/index_entry", :locals => { :record => @record }
+          render :partial => "#{mdl.table_name}/index_entry", :locals => { :record => @record }
         else
-          flash[:error] = "#{@record.name} was removed."
           respond_to do |format|
             format.html { redirect_to postdestroy_redirect || nested_path_for(@record.class) }
             format.xml  { head :ok }

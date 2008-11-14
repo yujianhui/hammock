@@ -10,16 +10,8 @@ module Hammock
 
     module InstanceMethods
 
-      def finder_column
-        :id
-      end
-
-      def index_finder
-        if mdl.respond_to? :index_for
-          mdl.index_for @current_account
-        else
-          mdl.all
-        end
+      def custom_scope
+        nil
       end
 
       def postsave_render result

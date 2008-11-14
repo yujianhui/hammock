@@ -6,7 +6,8 @@ module Hammock
 
       base.class_eval {
         before_modify :set_editing
-        helper_method :mdl, :mdl_name, :table_name, :editing?
+        before_create :set_creator_id_if_appropriate
+        helper_method :mdl, :mdl_name, :editing?, :createable?
       }
     end
 
@@ -20,14 +21,15 @@ module Hammock
         @_cached_mdl ||= Object.const_get self.class.to_s.sub('Controller', '').singularize
       end
       def mdl_name
-        @_cached_mdl_name ||= table_name.singularize
-      end
-      def table_name
-        mdl.table_name
+        @_cached_mdl_name ||= self.class.to_s.sub('Controller', '').singularize.underscore
       end
 
-      def make_new_record
-        assign_resource mdl.new params_for mdl.symbolize
+      def editing? record
+        record == @editing
+      end
+
+      def params_for key
+        params[key] || {}
       end
 
       def assign_resource record_or_records
@@ -37,9 +39,9 @@ module Hammock
           instance_variable_set "@#{mdl_name}", (@record = record_or_records)
         elsif record_or_records.is_a? Ambition::Context
           # log "Unkicked query: #{record_or_records.to_s}"
-          instance_variable_set "@#{table_name}", (@records = record_or_records)
+          instance_variable_set "@#{mdl_name.pluralize}", (@records = record_or_records)
         elsif record_or_records.is_a? Array
-          instance_variable_set "@#{table_name}", (@records = record_or_records)
+          instance_variable_set "@#{mdl_name.pluralize}", (@records = record_or_records)
         else
           raise "Unknown record(s) type #{record_or_records.class}."
         end
@@ -51,20 +53,35 @@ module Hammock
         end
       end
 
+      private
+
+      def make_new_record
+        assign_resource mdl.new_with params_for mdl.symbolize
+      end
+
+      def createable?
+        @record.createable_by? @current_account
+      end
+
+      def make_createable?
+        make_new_record.createable_by? @current_account
+      end
+
       def assign_nestable_resources
         @current_nested_records = []
         params.symbolize_keys.dragnet(*nestable_resources.keys).all? {|param_name,column_name|
-          constant = Object.const_get param_name.to_s.sub(/_id$/, '').camelize rescue nil
+          constant_name = param_name.to_s.sub(/_id$/, '').camelize
+          constant = Object.const_get constant_name rescue nil
 
           if constant.nil?
-            log "'#{param_name.sub(/_id$/, '').camelize}' is not available for #{param_name}."
+            log "'#{constant_name}' is not available for #{param_name}."
           elsif (record = constant.find_by_id(params[param_name])).nil?
             log "#{constant}<#{params[param_name]}> not found."
           else
             @current_nested_records << record
             @record.send "#{nestable_resources[param_name]}=", params[param_name] unless @record.nil?
             # log "Assigning @#{constant.name.underscore} with #{record.inspect}."
-            instance_variable_set "@#{constant.name.underscore}", record
+            instance_variable_set "@#{constant_name.underscore}", record
           end
         }
       end
@@ -81,12 +98,8 @@ module Hammock
         @editing = @record
       end
 
-      def editing? record
-        record == @editing
-      end
-
-      def params_for key
-        params[key] || {}
+      def set_creator_id_if_appropriate
+        @record.creator_id = @current_account.id if @record.respond_to?(:creator_id=)
       end
 
     end
