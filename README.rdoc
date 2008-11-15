@@ -35,7 +35,7 @@ At the moment, you can do this with Hammock:
 
   <% @beers.each do |beer| %>
     From <%= beer.creator.name %> to <%= beer.recipient.name %>, <%= beer.reason %>, rated <%= beer.rating %>
-    <%= link_to_if_allowed :edit, beer %>
+    <%= hamlink_to :edit, beer %>
   <% end %>
 
 The scope methods above require just one thing -- a context-free proc object that takes an ActiveRecord record as its argument, and returns true iff that record is within the scope for the specified account. Hammock uses the method (e.g. Beer.read_scope_for) to define resource and record scopes for the model:
@@ -59,7 +59,7 @@ Hammock uses the conditions specified in Beer.read_scope_for to generate (assumi
 
 Hammock uses Beer.read_scope_for on #show, and write_scope_for on #edit, #update and #destroy. These scopes can be accessed as above through Beer.readable_by(account) and Beer.writeable_by(account). This eliminates authorization checks from the action, because if the ID of a Beer is provided that the user doesn't have access to it will fall outside the scope and will not be found in the DB at all.
 
-- They are used to discover credentials for already-queried ActiveRecord objects, without touching the database again. Just as Beer.readable_by(account) returns the set of Beer records whose existence can be known by account, @beer.readable_by?(account) returns true iff @beer's existence can be known by account. This is employed by link_to_if_allowed.
+- They are used to discover credentials for already-queried ActiveRecord objects, without touching the database again. Just as Beer.readable_by(account) returns the set of Beer records whose existence can be known by account, @beer.readable_by?(account) returns true iff @beer's existence can be known by account. This is employed by hamlink_to.
 
 These three uses of the scope, plus another as-yet unimplemented bit, provide the entire security model of the application.
 

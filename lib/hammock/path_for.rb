@@ -5,7 +5,7 @@ module Hammock
       base.send :extend, ClassMethods
 
       base.class_eval {
-        helper_method :method_for, :path_for, :nested_path_for
+        helper_method :method_for, :path_for, :nested_path_for, :verb_for
       }
     end
 
@@ -24,7 +24,7 @@ module Hammock
       )
 
       def verb_for requested_verb, record
-        requested_verb ||= :show
+        requested_verb = :show if requested_verb.blank?
         
         if (:show == requested_verb) && record.is_a?(Class)
           :index
@@ -41,26 +41,24 @@ module Hammock
         HTTPMethods[verb_for(requested_verb, record)]
       end
 
-      def path_for *resources
-        opts = resources.last.is_a?(Hash) ? resources.pop.symbolize_keys! : {}
+      def path_for *args
+        opts = args.last.is_a?(Hash) ? args.pop.symbolize_keys! : {}
 
         [ :controller, :action, :id ].each {|key|
           raise ArgumentError, "path_for() infers :#{key} from the resources you provided, so you don't need to specify it manually." if opts.delete key
         }
 
-        requested_verb = resources.shift if resources.first.is_a?(Symbol)
-        resource = resources.pop unless resources.last.is_a?(ActiveRecord::Base)
-        verb = verb_for requested_verb, (resource || resources.last)
+        requested_verb = args.shift if args.first.nil? || args.first.is_a?(Symbol)
+        resource = args.pop unless args.last.is_a?(ActiveRecord::Base)
+        verb = verb_for requested_verb, (resource || args.last)
 
         path = []
         path << verb unless implied_verb?(verb)
-        path.concat resources.map(&:base_model)
+        path.concat args.map(&:base_model)
         path << resource.base_model.send_if(plural_verb?(verb), :pluralize) unless resource.nil?
         path << 'path'
 
-        # log path.inspect
-
-        send path.compact.join('_'), *resources
+        send path.compact.join('_'), *args
       end
 
       def nested_path_for *resources
