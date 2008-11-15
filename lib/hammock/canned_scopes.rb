@@ -16,11 +16,11 @@ module Hammock
       protected
 
       def public_resource
-        public_scope_for *StandardVerbs
+        public_resource_for *StandardVerbs
       end
 
       def creator_resource
-        creator_scope_for *StandardVerbs
+        creator_resource_for *StandardVerbs
       end
 
       def partitioned_resource
