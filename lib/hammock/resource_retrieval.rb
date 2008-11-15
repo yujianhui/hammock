@@ -1,6 +1,6 @@
 module Hammock
   module ResourceRetrieval
-    def self.included base
+    def self.included base # :nodoc:
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods
     end
@@ -50,6 +50,7 @@ module Hammock
         if rendered_or_redirected?
           # lol
         elsif request.xhr?
+          # TODO bad request might only be appropriate for invalid requests, as opposed to just an auth failure.
           escort_for_bad_request
         elsif :readonly == reason
           escort_for_read_only

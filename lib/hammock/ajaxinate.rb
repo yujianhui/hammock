@@ -2,7 +2,7 @@ module Hammock
   module Ajaxinate
     MixInto = ActionView::Base
     
-    def self.included base
+    def self.included base # :nodoc:
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods
     end
@@ -82,7 +82,7 @@ module Hammock
       private
 
       def link_id_for verb, record, attribute = nil
-        [verb, record.base_model, record.id_or_describer.to_s.gsub(/[^a-zA-Z0-9-_]/, ''), attribute].compact.join('_')
+        [verb, record.base_model, record.id_or_describer.to_s.gsub(/[^a-zA-Z0-9\-_]/, ''), attribute].compact.join('_')
       end
 
       def clean_snippet snippet

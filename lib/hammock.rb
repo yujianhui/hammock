@@ -3,7 +3,7 @@ Dir.glob("#{File.dirname __FILE__}/hammock/**/*.rb").each {|dep|
 }
 
 module Hammock
-  def self.included base
+  def self.included base # :nodoc:
     Hammock.constants.map {|constant_name|
       Hammock.const_get constant_name
     }.select {|constant|

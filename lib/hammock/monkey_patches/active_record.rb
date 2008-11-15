@@ -2,12 +2,19 @@ module Hammock
   module ActiveRecordPatches
     MixInto = ActiveRecord::Base
 
-    def self.included base
+    def self.included base # :nodoc:
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods # TODO maybe include in the metaclass instead of extending the class?
     end
 
     module ClassMethods
+
+      def new_with attributes
+        default_attributes.merge(attributes).inject(new) {|record,(k,v)|
+          record.send "#{k}=", v
+          record
+        }
+      end
 
       def sorter
         # TODO updated_at DESC

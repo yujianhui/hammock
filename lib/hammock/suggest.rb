@@ -2,7 +2,7 @@ module Hammock
   module Suggest
     MixInto = ActiveRecord::Base
 
-    def self.included base
+    def self.included base # :nodoc:
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods
     end

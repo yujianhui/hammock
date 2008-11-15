@@ -14,31 +14,59 @@ At the moment, you can do this with Hammock:
   class BeersController < ApplicationController
   end
 
+  class Person < ActiveRecord::Base
+  end
+
   class Beer < ActiveRecord::Base
     belongs_to :creator, :class_name => 'Person'
     belongs_to :recipient, :class_name => 'Person'
 
-    def editable_by? account
-      creator_id == account.id
+    def read_scope_for account
+      proc {|beer| beer.creator_id == account.id || beer.recipient_id == account.id }
     end
-    def self.index_for account
-      find :all, :conditions => ["creator_id = ? OR recipient_id = ?", account.id, account.id]
+    export_scope :read
+    export_scope :read, :as => :index
+    
+    def write_scope_for account
+      proc {|beer| record.creator_id == account.id }
     end
+    export_scope :write
   end
 
-  <%= link_to_if_allowed :edit, @beer %>
+  <% @beers.each do |beer| %>
+    From <%= beer.creator.name %> to <%= beer.recipient.name %>, <%= beer.reason %>, rated <%= beer.rating %>
+    <%= link_to_if_allowed :edit, beer %>
+  <% end %>
 
+The scope methods above require just one thing -- a context-free proc object that takes an ActiveRecord record as its argument, and returns true iff that record is within the scope for the specified account. Hammock uses the method (e.g. Beer.read_scope_for) to define resource and record scopes for the model:
 
-That's the whole app. It's not ideal yet, because the index lookup and record checks are implemented separately and hence have duplicate logic in them. But...
+  Beer.readable_by(account): the set of Beer records whose existence can be known by account
+  Beer#readable_by?(account): returns true if the existence of this Beer instance can be known by account
+
+You define the logic for read, index and write scopes in Beer.[read,index,write]_scope_for, and the rest just works.
+
+These scope definitions are exploited extensively, to provide index selection, scoping for record selection, and post-selection object checks.
+
+- They provide the conditions that should be applied to retrieve the index of each resource. The scope is used transperently by Hammock on /beers -> BeersController#index, and is available for use through Beer.indexable_by(account).
+
+- They provide a scope within which records are searched for on single-record actions. For example, given the request /beers/5 -> BeersController#show{:id => 5}, Rails would generate the following SQL:
+
+  SELECT * FROM "beers" WHERE (beers."id" = 5) LIMIT 1
+
+Hammock uses the conditions specified in Beer.read_scope_for to generate (assuming an account_id of 3):
+
+  SELECT * FROM "beers" WHERE ((beers.creator_id = 3 OR beers.recipient_id = 3) AND beers."id" = 5) LIMIT 1
+
+Hammock uses Beer.read_scope_for on #show, and write_scope_for on #edit, #update and #destroy. These scopes can be accessed as above through Beer.readable_by(account) and Beer.writeable_by(account). This eliminates authorization checks from the action, because if the ID of a Beer is provided that the user doesn't have access to it will fall outside the scope and will not be found in the DB at all.
+
+- They are used to discover credentials for already-queried ActiveRecord objects, without touching the database again. Just as Beer.readable_by(account) returns the set of Beer records whose existence can be known by account, @beer.readable_by?(account) returns true iff @beer's existence can be known by account. This is employed by link_to_if_allowed.
+
+These three uses of the scope, plus another as-yet unimplemented bit, provide the entire security model of the application.
 
 
 == The Master Plan
 
-Lots of functionality is planned that will take this much, much further.
-
-Proper nested route support is a priority. At the moment, nested routes have to be generated the old way, which means you can't get security checks for free like you can with link_to_if_allowed.
-
-Secondly, the current design -- using Model.index_for, Model#editable_by?, etc -- involves some duplication, because record checks are implemented as methods, whereas index lookups are ActiveRecord finds. That's just a stepping stone.
+Lots of functionality is planned that will take this much further.
 
 
 == Installation
