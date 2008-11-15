@@ -28,7 +28,11 @@ module Hammock
       #
       # This action is available within the same scope as +create+, since it is only useful if a subsequent +create+ would be successful.
       def new
-        do_render || standard_render if tasks_for_new
+        if !tasks_for_new
+          escort :unauthed
+        else
+          do_render || standard_render
+        end
       end
 
       # The +create+ action. (POST, unsafe, non-idempotent)
@@ -133,11 +137,7 @@ module Hammock
       end
 
       def tasks_for_new
-        if !make_new_record
-          
-        elsif createable?
-          callback(:before_modify) and callback(:before_new)
-        end
+        callback(:before_modify) and callback(:before_new) if make_createable?
       end
 
       def find_record_on_create
