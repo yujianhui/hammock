@@ -9,6 +9,13 @@ module Hammock
 
     module ClassMethods
 
+      def new_with attributes
+        default_attributes.merge(attributes).inject(new) {|record,(k,v)|
+          record.send "#{k}=", v
+          record
+        }
+      end
+
       def sorter
         # TODO updated_at DESC
         proc {|record| record.id }
