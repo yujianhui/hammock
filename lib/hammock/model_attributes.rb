@@ -20,7 +20,7 @@ module Hammock
       end
 
       def default_attributes
-        read_inheritable_attribute "default_attributes"
+        read_inheritable_attribute("default_attributes") || {}
       end
       def accessible_attributes_on_create
         read_inheritable_attribute "attr_accessible_on_create"
