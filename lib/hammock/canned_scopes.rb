@@ -1,6 +1,8 @@
 module Hammock
+  # TODO This file is horribly non-DRY.
   module CannedScopes
     MixInto = ActiveRecord::Base
+
     # TODO Put this somewhere better.
     StandardVerbs = [:read, :write, :index]
 
@@ -21,7 +23,11 @@ module Hammock
         creator_scope_for *StandardVerbs
       end
 
-      def creator_scope_for *verbs
+      def partitioned_resource
+        partitioned_resource_for *StandardVerbs
+      end
+
+      def creator_resource_for *verbs
         verbs = StandardVerbs if verbs.blank?
         metaclass.instance_eval {
           verbs.each {|verb|
@@ -34,13 +40,26 @@ module Hammock
         export_scopes *verbs
       end
 
-      def public_scope_for *verbs
+      def public_resource_for *verbs
         verbs = StandardVerbs if verbs.blank?
         metaclass.instance_eval {
           verbs.each {|verb|
             puts "defining #{verb}_scope on #{self}"
             send :define_method, "#{verb}_scope" do
               lambda {|record| true }
+            end
+          }
+        }
+        export_scopes *verbs
+      end
+
+      def partitioned_resource_for *verbs
+        verbs = StandardVerbs if verbs.blank?
+        metaclass.instance_eval {
+          verbs.each {|verb|
+            puts "defining #{verb}_scope on #{self}"
+            send :define_method, "#{verb}_scope_for" do |account|
+              lambda {|record| record.id == account.id }
             end
           }
         }
