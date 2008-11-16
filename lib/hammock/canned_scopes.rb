@@ -32,7 +32,7 @@ module Hammock
         metaclass.instance_eval {
           verbs.each {|verb|
             send :define_method, "#{verb}_scope_for" do |account|
-              creator_scope
+              creator_scope account
             end
           }
         }
@@ -58,7 +58,7 @@ module Hammock
         metaclass.instance_eval {
           verbs.each {|verb|
             send :define_method, "#{verb}_scope_for" do |account|
-              partitioned_scope
+              partitioned_scope account
             end
           }
         }
@@ -83,11 +83,11 @@ module Hammock
         end
       end
       
-      def creator_scope
+      def creator_scope account
         lambda {|record| record.creator_id == account.id }
       end
       
-      def partitioned_scope
+      def partitioned_scope account
         lambda {|record| record.id == account.id }
       end
 
