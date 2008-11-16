@@ -71,6 +71,8 @@ module Hammock
         assign_resource(mdl.new_with(params_for(mdl.symbolize)))
       end
 
+      # TODO This implicitly references the current model, but is called through hamlink_to
+      # for varying models.
       def make_createable?
         if !make_new_record.createable_by?(@current_account)
           log "#{requester_name} can't create new #{mdl.base_model.pluralize}."
