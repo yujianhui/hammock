@@ -14,6 +14,7 @@ module Hammock
         result = if !callback(:before_find)
           # callbacks failed
         elsif (record = retrieve_record).nil?
+          log "#{mdl}<#{params[:id]}> doesn't exist within #{requester_name.possessive} #{action_name} scope."
           :not_found
         elsif :ok != (verbability = can_verb_record?(action_name, record))
           verbability
@@ -40,7 +41,7 @@ module Hammock
 
       def retrieve_record
         if (scope = current_scope).nil?
-          
+
         else
           scope.find :first, :conditions => {find_column_name => params[:id]}
         end
