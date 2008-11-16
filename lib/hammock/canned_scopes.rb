@@ -4,7 +4,7 @@ module Hammock
     MixInto = ActiveRecord::Base
 
     # TODO Put this somewhere better.
-    StandardVerbs = [:read, :write, :index]
+    StandardVerbs = [:read, :write, :index, :create]
 
     def self.included base
       base.send :include, InstanceMethods
@@ -32,10 +32,11 @@ module Hammock
         metaclass.instance_eval {
           verbs.each {|verb|
             send :define_method, "#{verb}_scope_for" do |account|
-              lambda {|record| record.creator_id == account.id }
+              creator_scope
             end
           }
         }
+        define_createable creator_scope if verbs.include?(:create)
         export_scopes *verbs
       end
 
@@ -44,10 +45,11 @@ module Hammock
         metaclass.instance_eval {
           verbs.each {|verb|
             send :define_method, "#{verb}_scope" do
-              all_scope
+              public_scope
             end
           }
         }
+        define_createable public_scope if verbs.include?(:create)
         export_scopes *verbs
       end
 
@@ -56,20 +58,37 @@ module Hammock
         metaclass.instance_eval {
           verbs.each {|verb|
             send :define_method, "#{verb}_scope_for" do |account|
-              lambda {|record| record.id == account.id }
+              partitioned_scope
             end
           }
         }
+        define_createable partitioned_scope if verbs.include?(:create)
         export_scopes *verbs
       end
 
+      def define_createable scope
+        instance_eval {
+          send :define_method, :createable_by? do |account|
+            scope
+          end
+        }
+      end
+
       # TODO This should be somewhere else
-      def all_scope
+      def public_scope
         if sqlite?
           lambda {|record| 1 }
         else
           lambda {|record| true }
         end
+      end
+      
+      def creator_scope
+        lambda {|record| record.creator_id == account.id }
+      end
+      
+      def partitioned_scope
+        lambda {|record| record.id == account.id }
       end
 
       # TODO This should be somewhere else
