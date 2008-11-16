@@ -19,6 +19,14 @@ module Hammock
         self.delete_if &:blank?
       end
 
+      def discard *args
+        self.dup.discard! *args
+      end
+      def discard! *args
+        args.each {|arg| self.delete arg }
+        self
+      end
+
       def as_index_for &value_function
         inject({}) do |accum, elem|
           accum[elem] = value_function.call(elem)
