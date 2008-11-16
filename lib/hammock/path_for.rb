@@ -42,13 +42,14 @@ module Hammock
       end
 
       def path_for *args
+        args.squash!
         opts = args.last.is_a?(Hash) ? args.pop.symbolize_keys! : {}
 
         [ :controller, :action, :id ].each {|key|
           raise ArgumentError, "path_for() infers :#{key} from the resources you provided, so you don't need to specify it manually." if opts.delete key
         }
 
-        requested_verb = args.shift if args.first.nil? || args.first.is_a?(Symbol)
+        requested_verb = args.shift if args.first.is_a?(Symbol)
         resource = args.pop unless args.last.is_a?(ActiveRecord::Base)
         verb = verb_for requested_verb, (resource || args.last)
 
@@ -62,6 +63,7 @@ module Hammock
       end
 
       def nested_path_for *resources
+        resources.squash!
         requested_verb = resources.shift if resources.first.is_a?(Symbol)
         args = @current_nested_records.dup.concat(resources)
 
