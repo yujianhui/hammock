@@ -18,7 +18,7 @@ module Hammock
       end
 
       def export_scopes *verbs
-        verbs.each {|verb| export_scope verb }
+        verbs.discard(:createits).each {|verb| export_scope verb }
       end
 
       def export_scope verb
