@@ -68,7 +68,7 @@ module Hammock
       private
 
       def make_new_record
-        assign_resource mdl.new_with params_for mdl.symbolize
+        assign_resource(mdl.new_with(params_for(mdl.symbolize)))
       end
 
       def make_createable?
