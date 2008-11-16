@@ -40,9 +40,9 @@ module Hammock
       # Creates a new record with the supplied attributes. TODO
       def create
         if !find_record_on_create && !make_createable?
-          escort(:not_found)
+          escort :not_found
         elsif !createable?
-          escort(:unauthed)
+          escort :unauthed
         else
           render_or_redirect_after save_record
         end
