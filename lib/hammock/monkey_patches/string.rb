@@ -47,6 +47,10 @@ module Hammock
         ends_with?(str) ? self : self + str
       end
 
+      def possessive
+        "#{self}'#{'s' unless self[-1, 1] == 's'}"
+      end
+
       def colorize description = ''
         Colorizer.colorize self, description
       end
