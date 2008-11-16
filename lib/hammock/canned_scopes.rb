@@ -31,7 +31,6 @@ module Hammock
         verbs = StandardVerbs if verbs.blank?
         metaclass.instance_eval {
           verbs.each {|verb|
-            puts "defining #{verb}_scope on #{self}"
             send :define_method, "#{verb}_scope_for" do |account|
               lambda {|record| record.creator_id == account.id }
             end
@@ -44,7 +43,6 @@ module Hammock
         verbs = StandardVerbs if verbs.blank?
         metaclass.instance_eval {
           verbs.each {|verb|
-            puts "defining #{verb}_scope on #{self}"
             send :define_method, "#{verb}_scope" do
               all_scope
             end
@@ -57,7 +55,6 @@ module Hammock
         verbs = StandardVerbs if verbs.blank?
         metaclass.instance_eval {
           verbs.each {|verb|
-            puts "defining #{verb}_scope on #{self}"
             send :define_method, "#{verb}_scope_for" do |account|
               lambda {|record| record.id == account.id }
             end
