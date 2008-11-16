@@ -1,5 +1,5 @@
 module Hammock
-  module LinkTo
+  module HamlinkTo
     MixInto = ActionView::Base
 
     def self.included base # :nodoc:
@@ -24,7 +24,7 @@ module Hammock
 
         if :ok == can_verb_entity?(verb, record_or_resource)
           link_to verb_for(opts.delete(:text) || verb.to_s.capitalize, record_or_resource),
-            path_for(verb, *args),
+            nested_path_for(verb, *args),
             opts.merge(:method => (method unless method == :get))
         end
       end
