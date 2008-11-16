@@ -23,7 +23,7 @@ module Hammock
         method = (opts.delete(:method) || method_for(verb, record_or_resource))
 
         if :ok == can_verb_entity?(verb, record_or_resource)
-          link_to verb_for(opts.delete(:text) || verb.to_s.capitalize, record_or_resource),
+          link_to verb_for(opts.delete(:text) || verb.to_s, record_or_resource),
             nested_path_for(verb, *args),
             opts.merge(:method => (method unless method == :get))
         end
