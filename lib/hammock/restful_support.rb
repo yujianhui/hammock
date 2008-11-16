@@ -72,7 +72,11 @@ module Hammock
       end
 
       def make_createable?
-        make_new_record.createable_by? @current_account
+        if !make_new_record.createable_by?(@current_account)
+          log "#{requester_name} can't create new #{mdl.base_model.pluralize}."
+        else
+          true
+        end
       end
 
       def assign_nestable_resources

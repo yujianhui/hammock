@@ -135,11 +135,7 @@ module Hammock
       end
 
       def tasks_for_new
-        if !make_createable?
-          log "#{requester_name} can't create new #{mdl.base_model.pluralize}."
-        else
-          callback(:before_modify) and callback(:before_new)
-        end
+        callback(:before_modify) and callback(:before_new) if make_createable?
       end
 
       def find_record_on_create
