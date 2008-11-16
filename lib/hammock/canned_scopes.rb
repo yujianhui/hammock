@@ -46,7 +46,7 @@ module Hammock
           verbs.each {|verb|
             puts "defining #{verb}_scope on #{self}"
             send :define_method, "#{verb}_scope" do
-              lambda {|record| true }
+              all_scope
             end
           }
         }
@@ -64,6 +64,20 @@ module Hammock
           }
         }
         export_scopes *verbs
+      end
+
+      # TODO This should be somewhere else
+      def all_scope
+        if sqlite?
+          lambda {|record| 1 }
+        else
+          lambda {|record| true }
+        end
+      end
+
+      # TODO This should be somewhere else
+      def sqlite?
+        'SQLite' == connection.adapter_name
       end
 
     end
