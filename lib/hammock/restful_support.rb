@@ -7,7 +7,7 @@ module Hammock
       base.class_eval {
         before_modify :set_editing
         before_create :set_creator_id_if_appropriate
-        helper_method :mdl, :mdl_name, :editing?, :createable?
+        helper_method :mdl, :mdl_name, :editing?
       }
     end
 
@@ -69,10 +69,6 @@ module Hammock
 
       def make_new_record
         assign_resource mdl.new_with params_for mdl.symbolize
-      end
-
-      def createable?
-        @record.createable_by? @current_account
       end
 
       def make_createable?
