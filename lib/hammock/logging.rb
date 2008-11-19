@@ -13,12 +13,14 @@ module Hammock
 
     module Methods
 
-      def development?
-        'development' == ENV['RAILS_ENV']
+      def rails_env
+        ENV['RAILS_ENV'] || 'development'
       end
-
+      def development?
+        'development' == rails_env
+      end
       def production?
-        'production' == ENV['RAILS_ENV']
+        'production' == rails_env
       end
 
       def log_hit
@@ -33,7 +35,7 @@ module Hammock
 
       def log_concise msg, report = false
         buf = "#{Time.now.strftime('%Y-%m-%d %H:%M:%S %Z')} | #{msg}\n"
-        path = File.join RAILS_ROOT, 'log', ENV['RAILS_ENV']
+        path = File.join RAILS_ROOT, 'log', rails_env
 
         File.open("#{path}.concise.log", 'a') {|f| f << buf }
         File.open("#{path}.report.log", 'a') {|f| f << buf } if report
