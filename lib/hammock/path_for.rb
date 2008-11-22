@@ -42,7 +42,7 @@ module Hammock
       end
 
       def path_for *args
-        args.squash!
+        args.delete_if &:nil?
         opts = args.last.is_a?(Hash) ? args.pop.symbolize_keys! : {}
 
         [ :controller, :action, :id ].each {|key|
@@ -63,7 +63,7 @@ module Hammock
       end
 
       def nested_path_for *resources
-        resources.squash!
+        resources.delete_if &:nil?
         requested_verb = resources.shift if resources.first.is_a?(Symbol)
         args = @current_nested_records.dup.concat(resources)
 
