@@ -66,9 +66,9 @@ module Hammock
           "#{ErrorPrefix}: #{opts[:error]}"
         elsif args.first.is_a? String
           args.first
-        elsif args.all? {|i| i.is_a?(Symbol) }
+        elsif args.all? {|i| i.is_a?(ActiveRecord::Base) }
           @errorModels = args unless opts[:errorModels] == false
-          args.map {|a| "#{a}: " + instance_variable_get('@' + a.to_s).errors.full_messages.inspect }.join(', ')
+          args.map {|record| "#{record.inspect}: #{record.errors.full_messages.inspect}" }.join(', ')
         else
           args.map(&:to_s).join(', ')
         end
