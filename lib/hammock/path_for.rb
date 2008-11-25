@@ -13,6 +13,7 @@ module Hammock
     end
 
     module InstanceMethods
+      private
 
       HTTPMethods = Hash.new(
         :get

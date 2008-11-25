@@ -9,6 +9,7 @@ module Hammock
     end
 
     module InstanceMethods
+      private
 
       def find_record
         result = if !callback(:before_find)

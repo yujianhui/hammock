@@ -16,6 +16,7 @@ module Hammock
     end
 
     module InstanceMethods
+      private
 
       # The model this controller operates on. Defined as the singularized controller name. For example, for +GelatinousBlobsController+, this will return the +GelatinousBlob+ class.
       def mdl

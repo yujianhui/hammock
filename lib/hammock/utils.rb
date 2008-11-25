@@ -14,6 +14,7 @@ module Hammock
     end
 
     module InstanceMethods
+      private
 
       def partial_exists? name, extension = nil
         !Dir.glob(File.join(RAILS_ROOT, 'app/views', controller_name, "_#{name}.html.#{extension || '*'}")).empty?

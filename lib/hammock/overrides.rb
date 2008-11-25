@@ -9,6 +9,7 @@ module Hammock
     end
 
     module InstanceMethods
+      private
 
       def custom_scope
         nil

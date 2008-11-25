@@ -30,7 +30,6 @@ module Hammock
     end
 
     module InstanceMethods
-
       private
 
       CallbackFail = false.freeze

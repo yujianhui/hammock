@@ -13,6 +13,7 @@ module Hammock
     end
 
     module InstanceMethods
+      private
 
       def can_verb_entity? verb, entity
         if entity.is_a? ActiveRecord::Base
