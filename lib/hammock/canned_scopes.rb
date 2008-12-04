@@ -19,6 +19,10 @@ module Hammock
         public_resource_for *StandardVerbs
       end
 
+      def authed_resource
+        authed_resource_for *StandardVerbs
+      end
+
       def creator_resource
         creator_resource_for *StandardVerbs
       end
@@ -53,6 +57,19 @@ module Hammock
         export_scopes *verbs
       end
 
+      def authed_resource_for *verbs
+        verbs = StandardVerbs if verbs.blank?
+        metaclass.instance_eval {
+          verbs.each {|verb|
+            send :define_method, "#{verb}_scope_for" do |account|
+              authed_scope account
+            end
+          }
+        }
+        define_createable authed_scope if verbs.include?(:create)
+        export_scopes *verbs
+      end
+
       def partitioned_resource_for *verbs
         verbs = StandardVerbs if verbs.blank?
         metaclass.instance_eval {
@@ -82,7 +99,12 @@ module Hammock
           lambda {|record| true }
         end
       end
-      
+
+      def authed_scope account
+        has_account = !account.nil?
+        lambda {|record| has_account }
+      end
+
       def creator_scope account
         lambda {|record| record.creator_id == account.id }
       end
