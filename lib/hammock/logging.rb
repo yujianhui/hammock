@@ -45,14 +45,14 @@ module Hammock
       end
 
       def report *args
-        opts = args.last.is_a?(Hash) ? args.pop : {}
+        opts = args.extract_options!
         log *(args << opts.merge(:report => true, :skip => (opts[:skip] || 0) + 1))
         log caller.join("\n")
       end
 
       def dlog *args
         unless production?
-          opts = args.last.is_a?(Hash) ? args.pop : {}
+          opts = args.extract_options!
           log *(args << opts.merge(:skip => (opts[:skip] || 0) + 1))
         end
       end
@@ -60,7 +60,7 @@ module Hammock
       def log *args
         opts = {
           :skip => 0
-        }.merge(args.last.is_a?(Hash) ? args.pop : {})
+        }.merge(args.extract_options!)
 
         msg = if opts[:error]
           "#{ErrorPrefix}: #{opts[:error]}"
