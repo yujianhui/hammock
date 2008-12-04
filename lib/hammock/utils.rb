@@ -17,7 +17,8 @@ module Hammock
       private
 
       def partial_exists? name, extension = nil
-        !Dir.glob(File.join(RAILS_ROOT, 'app/views', controller_name, "_#{name}.html.#{extension || '*'}")).empty?
+        partial_name, ctrler_name = name.split('/', 2).reverse
+        !Dir.glob(File.join(RAILS_ROOT, 'app/views', ctrler_name || '', "_#{partial_name}.html.#{extension || '*'}")).empty?
       end
 
       def redirect_back_or path = nil
