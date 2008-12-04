@@ -43,18 +43,18 @@ module Hammock
         form_elements_hash = if :get == request_method
           '{ }'
         elsif attribute.blank?
-          "(jQuery)('form').serializeHash()"
+          "jQuery('form').serializeHash()"
         else
           "{ '#{record.base_model}[#{attribute}]': $('##{link_id}').val() }"
         end
 
         # TODO check the response code in the callback, and replace :after with :success and :failure.
         js = %Q{
-          (jQuery)('##{link_id}').#{opts[:on] || 'click'}(function() {
-            if (#{attribute.blank? ? 'false' : 'true'} && (jQuery('##{link_id}_target .original_value').html() == jQuery('##{link_id}_target .modify input').val())) {
+          jQuery('##{link_id}').#{opts[:on] || 'click'}(function() {
+            /*if (#{attribute.blank? ? 'false' : 'true'} && (jQuery('##{link_id}_target .original_value').html() == jQuery('##{link_id}_target .modify input').val())) {
               eval("#{clean_snippet opts[:skipped]}");
-            } else if (!eval("#{clean_snippet opts[:before]}")) { // before callback failed
-              
+            } else*/ if (false == eval("#{clean_snippet opts[:before]}")) {
+              // before callback failed
             } else { // fire the request
               jQuery.#{request_method}(
                 '#{link_path}',
@@ -66,8 +66,8 @@ module Hammock
                 ),
                 function(response) {
                   //log("response: " + response);
-                  //(jQuery)('.#{opts[:target] || link_id + '_target'}').html(response);
-                  (jQuery)('##{opts[:target] || link_id + '_target'}').before(response).remove();
+                  //jQuery('.#{opts[:target] || link_id + '_target'}').html(response);
+                  jQuery('##{opts[:target] || link_id + '_target'}').before(response).remove();
                   eval("#{clean_snippet opts[:after]}");
                 }
               );
