@@ -21,9 +21,9 @@ module Hammock
         !Dir.glob(File.join(RAILS_ROOT, 'app/views', ctrler_name || '', "_#{partial_name}.html.#{extension || '*'}")).empty?
       end
 
-      def redirect_back_or path = nil
+      def redirect_back_or opts = {}, *parameters_for_method_reference
         if request.referer.blank?
-          redirect_to path || root_path
+          redirect_to opts, *parameters_for_method_reference
         else
           redirect_to request.referer
         end
