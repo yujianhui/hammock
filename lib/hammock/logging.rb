@@ -70,7 +70,7 @@ module Hammock
           @errorModels = args unless opts[:errorModels] == false
           args.map {|record| "#{record.inspect}: #{record.errors.full_messages.inspect}" }.join(', ')
         else
-          args.map(&:to_s).join(', ')
+          args.map(&:inspect).join(', ')
         end
 
         file = caller[opts[:skip]].gsub(/^.*\/([^\/\:]*\:[0-9]*)\:.*$/, '\1')
