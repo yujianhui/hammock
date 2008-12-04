@@ -88,10 +88,18 @@ module Hammock
         redirect_to returning_login_path
       end
       def escort_for_404
-        render :file => File.join(RAILS_ROOT, 'public/404.html'), :status => 404
+        if partial_exists? 'shared/status_404'
+          render :partial => 'shared/status_404', :layout => true
+        else
+          render :file => File.join(RAILS_ROOT, 'public/404.html'), :status => 404
+        end
       end
       def escort_for_403
-        render :file => File.join(RAILS_ROOT, 'public/404.html'), :status => 403
+        if partial_exists? 'shared/status_404'
+          render :partial => 'shared/status_404', :layout => true
+        else
+          render :file => File.join(RAILS_ROOT, 'public/404.html'), :status => 403
+        end
       end
 
     end
