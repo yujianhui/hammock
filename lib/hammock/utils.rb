@@ -11,6 +11,11 @@ module Hammock
 
     module ClassMethods
 
+      require 'pathname'
+      def rails_root
+        @_cached_rails_root ||= Pathname(RAILS_ROOT).realpath.to_s
+      end
+
     end
 
     module InstanceMethods
@@ -31,6 +36,10 @@ module Hammock
 
       def rendered_or_redirected?
         @performed_render || @performed_redirect
+      end
+      
+      def rails_root
+        self.class.rails_root
       end
 
     end
