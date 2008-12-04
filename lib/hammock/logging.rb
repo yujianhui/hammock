@@ -1,7 +1,7 @@
 module Hammock
   module Logging
     MixInto = ActionController::Base
-    
+
     def self.included base
       base.send :include, Methods
       base.send :extend, Methods
@@ -73,10 +73,8 @@ module Hammock
           args.map(&:inspect).join(', ')
         end
 
-        file = caller[opts[:skip]].gsub(/^.*\/([^\/\:]*\:[0-9]*)\:.*$/, '\1')
-        method = caller[opts[:skip]].gsub(/^.*\`([^\`\']*)\'.*$/, '\1')
-
-        entry = "#{file} / #{method}#{msg.blank? ? (opts[:report] ? ' <-- something broke here' : '.') : ' | '}#{msg}"
+        callpoint = caller[opts[:skip]].sub(rails_root.end_with('/'), '')
+        entry = "#{callpoint}#{msg.blank? ? (opts[:report] ? ' <-- something broke here' : '.') : ' | '}#{msg}"
 
         logger.send opts[:error].blank? ? :info : :error, entry # Write to the Rails log
         log_concise entry, opts[:report] # Also write to the concise log
