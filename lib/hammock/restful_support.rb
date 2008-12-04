@@ -7,7 +7,7 @@ module Hammock
       base.class_eval {
         before_modify :set_editing
         before_create :set_creator_id_if_appropriate
-        helper_method :mdl, :mdl_name, :editing?
+        helper_method :mdl, :mdl_name, :editing?, :nested_within?
       }
     end
 
@@ -83,7 +83,7 @@ module Hammock
       end
 
       def assign_nestable_resources
-        @current_nested_records = []
+        @current_nested_records, @current_nested_resources = [], []
         params.symbolize_keys.dragnet(*nestable_resources.keys).all? {|param_name,column_name|
           constant_name = param_name.to_s.sub(/_id$/, '').camelize
           constant = Object.const_get constant_name rescue nil
@@ -94,11 +94,20 @@ module Hammock
             log "#{constant}<#{params[param_name]}> not found."
           else
             @current_nested_records << record
+            @current_nested_resources << record.class
             @record.send "#{nestable_resources[param_name]}=", params[param_name] unless @record.nil?
             # log "Assigning @#{constant.name.underscore} with #{record.inspect}."
             instance_variable_set "@#{constant_name.underscore}", record
           end
         }
+      end
+
+      def nested_within? record_or_resource
+        if record_or_resource.is_a? ActiveRecord::Base
+          @current_nested_records.include? record_or_resource
+        else
+          @current_nested_resources.include? record_or_resource
+        end
       end
 
       def safe_action_and_implication? action = nil
