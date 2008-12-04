@@ -15,7 +15,7 @@ module Hammock
       include Hammock::Logging::Methods
 
       def log_with_model *args
-        opts = args.last.is_a?(Hash) ? args.pop : {}
+        opts = args.extract_options!
 
         message = "#{self.class}<#{self.id}>#{(' | ' + args.shift) if args.first.is_a?(String)}"
 
