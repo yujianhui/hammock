@@ -25,7 +25,7 @@ module Hammock
         if :ok == can_verb_entity?(verb, record_or_resource)
           path_method_name = opts[:nest] == false ? :path_for : :nested_path_for
           link_to verb_for(opts.delete(:text) || verb.to_s, record_or_resource),
-            send(path_method_name, verb, *args),
+            send(path_method_name, verb, *args.push({:params => opts.delete(:params)})),
             opts.merge(:method => (method unless method == :get))
         end
       end
