@@ -13,16 +13,6 @@ module Hammock
 
     module Methods
 
-      def rails_env
-        ENV['RAILS_ENV'] || 'development'
-      end
-      def development?
-        'development' == rails_env
-      end
-      def production?
-        'production' == rails_env
-      end
-
       def log_hit
         buf = "#{colorify request.remote_ip}" +
           (@current_site.nil? ? '' : " | #{@current_site.name}") +

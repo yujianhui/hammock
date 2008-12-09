@@ -1,45 +1,28 @@
 module Hammock
   module Utils
     def self.included base # :nodoc:
-      base.send :include, InstanceMethods
-      base.send :extend, ClassMethods
-
-      base.class_eval {
-        helper_method :partial_exists?
-      }
+      base.send :include, Methods
+      base.send :extend, Methods
     end
 
-    module ClassMethods
+    module Methods
+      private
 
       require 'pathname'
       def rails_root
         @_cached_rails_root ||= Pathname(RAILS_ROOT).realpath.to_s
       end
 
-    end
-
-    module InstanceMethods
-      private
-
-      def partial_exists? name, extension = nil
-        partial_name, ctrler_name = name.split('/', 2).reverse
-        !Dir.glob(File.join(RAILS_ROOT, 'app/views', ctrler_name || '', "_#{partial_name}.html.#{extension || '*'}")).empty?
+      def rails_env
+        ENV['RAILS_ENV'] || 'development'
       end
 
-      def redirect_back_or opts = {}, *parameters_for_method_reference
-        if request.referer.blank?
-          redirect_to opts, *parameters_for_method_reference
-        else
-          redirect_to request.referer
-        end
+      def development?
+        'development' == rails_env
       end
 
-      def rendered_or_redirected?
-        @performed_render || @performed_redirect
-      end
-      
-      def rails_root
-        self.class.rails_root
+      def production?
+        'production' == rails_env
       end
 
     end

@@ -8,10 +8,12 @@ module Hammock
     end
 
     module ClassMethods
+      include Hammock::Utils::Methods
       include Hammock::Logging::Methods
     end
 
     module InstanceMethods
+      include Hammock::Utils::Methods
       include Hammock::Logging::Methods
 
       def log_with_model *args

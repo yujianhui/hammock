@@ -7,7 +7,7 @@ module Hammock
       base.class_eval {
         before_modify :set_editing
         before_create :set_creator_id_if_appropriate
-        helper_method :mdl, :mdl_name, :editing?, :nested_within?
+        helper_method :mdl, :mdl_name, :editing?, :nested_within?, :partial_exists?
       }
     end
 
@@ -124,6 +124,23 @@ module Hammock
 
       def set_creator_id_if_appropriate
         @record.creator_id = @current_account.id if @record.respond_to?(:creator_id=)
+      end
+
+      def partial_exists? name, extension = nil
+        partial_name, ctrler_name = name.split('/', 2).reverse
+        !Dir.glob(File.join(RAILS_ROOT, 'app/views', ctrler_name || '', "_#{partial_name}.html.#{extension || '*'}")).empty?
+      end
+
+      def redirect_back_or opts = {}, *parameters_for_method_reference
+        if request.referer.blank?
+          redirect_to opts, *parameters_for_method_reference
+        else
+          redirect_to request.referer
+        end
+      end
+
+      def rendered_or_redirected?
+        @performed_render || @performed_redirect
       end
 
     end
