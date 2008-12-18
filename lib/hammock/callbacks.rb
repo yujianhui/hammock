@@ -9,7 +9,7 @@ module Hammock
       base.class_eval {
         include ActiveSupport::Callbacks
 
-        define_hammock_callbacks *%w{
+        define_hammock_callbacks *%w[
           before_find      during_find     after_failed_find
 
           before_index     before_show
@@ -22,7 +22,7 @@ module Hammock
           before_undestroy after_undestroy
 
           before_suggest   after_suggest
-        }
+        ]
       }
     end
 
