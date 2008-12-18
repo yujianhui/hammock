@@ -26,7 +26,7 @@ module Hammock
         end
 
         if :ok != result
-          required_callback(:after_failed_find) || escort(result)
+          escort(result)
         else
           assign_resource record
         end
@@ -44,7 +44,8 @@ module Hammock
         if (scope = current_scope).nil?
 
         else
-          scope.find :first, :conditions => {find_column_name => params[:id]}
+          record = scope.find :first, :conditions => {find_column_name => params[:id]}
+          record || required_callback(:after_failed_find)
         end
       end
 
