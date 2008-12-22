@@ -51,8 +51,8 @@ module Hammock
         }
 
         requested_verb = args.shift if args.first.is_a?(Symbol)
-        resource = args.pop unless args.last.is_a?(ActiveRecord::Base)
-        verb = verb_for requested_verb, (resource || args.last)
+        verb = verb_for requested_verb, args.last
+        resource = args.pop.resource if recordless_verb?(verb) || !args.last.is_a?(ActiveRecord::Base)
 
         path = []
         path << verb unless implied_verb?(verb)
