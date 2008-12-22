@@ -115,7 +115,7 @@ module Hammock
       end
 
       def action_requires_record? action
-        %{ show edit update delete }.include?(action.to_s)
+        %{ show edit update destroy }.include?(action.to_s)
       end
 
       def set_editing
