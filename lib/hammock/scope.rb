@@ -37,15 +37,24 @@ module Hammock
       end
 
       def can_verb_record? verb, record
-        if !record.readable_by?(@current_account)
-          log "#{requester_name} can't see #{record.class}<#{record.id}>."
-          :not_found
-        elsif !safe_action_and_implication?(verb) && !record.writeable_by?(@current_account)
-          log "#{requester_name} can't #{verb} #{record.class}<#{record.id}>."
-          :read_only
+        if [:save, :create].include?(verb) && record.new_record?
+          if !record.createable_by?(@current_account)
+            log "#{requester_name} can't create a #{record.class} with #{record.attributes.inspect}."
+            :unauthed
+          else
+            :ok
+          end
         else
-          # log "#{requester_name} can #{verb} #{record.class}<#{record.id}>."
-          :ok
+          if !record.readable_by?(@current_account)
+            log "#{requester_name} can't see #{record.class}<#{record.id}>."
+            :not_found
+          elsif !safe_action_and_implication?(verb) && !record.writeable_by?(@current_account)
+            log "#{requester_name} can't #{verb} #{record.class}<#{record.id}>."
+            :read_only
+          else
+            # log "#{requester_name} can #{verb} #{record.class}<#{record.id}>."
+            :ok
+          end
         end
       end
 
