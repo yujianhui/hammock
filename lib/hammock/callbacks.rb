@@ -53,7 +53,7 @@ module Hammock
                 elsif !methods.first.is_a?(String)
                   raise ArgumentError, "Inline callback definitions require a description as their sole argument."
                 else
-                  logger.info "defining \#{methods.first} on \#{name} with method \#{block.inspect}."
+                  # logger.info "defining \#{methods.first} on \#{name} with method \#{block.inspect}."
                   [HammockCallback.new(:#{callback}, block, :identifier => methods.first)]
                 end || []
               end
