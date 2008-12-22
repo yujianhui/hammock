@@ -21,6 +21,10 @@ module Hammock
         proc {|record| record.id }
       end
 
+      def resource
+        self
+      end
+
       def base_model
         base_class.to_s.underscore
       end
@@ -40,6 +44,10 @@ module Hammock
 
       def concise_inspect
         "#{self.class}<#{self.id || 'new'}>"
+      end
+
+      def resource
+        self.class
       end
 
       def id_or_describer
