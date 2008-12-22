@@ -111,11 +111,11 @@ module Hammock
       end
 
       def safe_action_and_implication? action = nil
-        request.get? && %w{ index show }.include?((action || action_name).to_s)
+        request.get? && %w[index show].include?((action || action_name).to_s)
       end
 
       def action_requires_record? action
-        %{ show edit update destroy }.include?(action.to_s)
+        %[show edit update destroy].include?(action.to_s)
       end
 
       def set_editing
@@ -128,7 +128,12 @@ module Hammock
 
       def partial_exists? name, extension = nil
         partial_name, ctrler_name = name.split('/', 2).reverse
-        !Dir.glob(File.join(RAILS_ROOT, 'app/views', ctrler_name || '', "_#{partial_name}.html.#{extension || '*'}")).empty?
+        !Dir.glob(File.join(
+          RAILS_ROOT,
+          'app/views',
+          ctrler_name || '',
+          "_#{partial_name}.html.#{extension || '*'}"
+        )).empty?
       end
 
       def redirect_back_or opts = {}, *parameters_for_method_reference
