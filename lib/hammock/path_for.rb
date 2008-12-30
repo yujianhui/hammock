@@ -15,6 +15,7 @@ module Hammock
     module InstanceMethods
       private
 
+      # TODO Get this from the routing table, like a real man, not some god damn nancy :get-defaulting Hash. JESUS.
       HTTPMethods = Hash.new(
         :get
       ).update(
