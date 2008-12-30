@@ -78,6 +78,19 @@ module Hammock
         append_javascript js
         link_path
       end
+      
+      def jquery_xhr verb, record, attributes = {}
+        method = method_for verb, record
+        %Q{
+          jQuery.#{method == :get ? 'get' : 'post'}('#{path_for verb, record}',
+            jQuery.extend(
+              #{{record.base_model => attributes}.to_flattened_json},
+              {_method: '#{method}'},
+              #{forgery_key_json(method)}
+            )
+          );
+        }
+      end
 
       private
 
