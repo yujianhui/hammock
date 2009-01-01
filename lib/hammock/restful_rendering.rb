@@ -16,7 +16,7 @@ module Hammock
         respond_to do |format|
           format.html
           format.xml { render :xml => @record }
-        end
+        end unless rendered_or_redirected?
       end
 
       def do_render result = true, opts = {}
