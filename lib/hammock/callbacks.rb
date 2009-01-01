@@ -33,7 +33,7 @@ module Hammock
 
         def evaluate_method method, *args, &block
           if method.is_a? Proc
-            puts "was a HammockCallback proc within #{args.first.class}."
+            # puts "was a HammockCallback proc within #{args.first.class}."
             method.bind(args.shift).call(*args, &block)
           else
             super

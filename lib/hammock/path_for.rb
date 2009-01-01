@@ -63,6 +63,7 @@ module Hammock
 
         args.push({args.last.base_model => opts[:params]}) unless args.blank? || opts[:params].blank?
 
+        # log "sending #{path.compact.join('_')}(#{args.map(&:inspect).join(', ')})"
         send path.compact.join('_'), *args
       end
 
