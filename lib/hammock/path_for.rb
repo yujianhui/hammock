@@ -61,7 +61,7 @@ module Hammock
         path << resource.base_model.send_if(plural_verb?(verb), :pluralize) unless resource.nil?
         path << 'path'
 
-        args.push({args.last.base_model => opts[:params]}) unless args.blank? || opts[:params].blank?
+        args.push({(resource || args.last).base_model => opts[:params]}) unless opts[:params].blank?
 
         # log "sending #{path.compact.join('_')}(#{args.map(&:inspect).join(', ')})"
         send path.compact.join('_'), *args
