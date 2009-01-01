@@ -55,6 +55,9 @@ module Hammock
         elsif request.xhr?
           # TODO bad request might only be appropriate for invalid requests, as opposed to just an auth failure.
           escort_for_bad_request
+        elsif :relogin == reason
+          reset_session # TODO: instead of a full reset, this should just set unauthed so we can remember who the user was without granting them their creds.
+          redirect_to returning_login_path
         elsif :readonly == reason
           escort_for_read_only
         elsif :unauthed == reason
