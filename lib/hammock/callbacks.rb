@@ -84,7 +84,7 @@ module Hammock
       def callback kind, *args
         callback_chain_for(kind).all? {|cb|
           # dlog "Calling #{kind} callback #{cb.method}"
-          result = cb.call(self, *args) != false
+          result = cb.call(self, *args) != CallbackFail
           log "#{self.class}.#{cb.kind} callback '#{cb.method}' failed." unless result
           result
         }
