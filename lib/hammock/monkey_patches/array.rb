@@ -34,6 +34,12 @@ module Hammock
         end
       end
 
+      def remove_framework_backtrace
+        reverse.drop_while {|step|
+          !step.starts_with?(RAILS_ROOT)
+        }.reverse
+      end
+
     end
   end
 end

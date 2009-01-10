@@ -37,7 +37,7 @@ module Hammock
       def report *args
         opts = args.extract_options!
         log *(args << opts.merge(:report => true, :skip => (opts[:skip] || 0) + 1))
-        log caller.join("\n")
+        log caller.remove_framework_backtrace.join("\n")
       end
 
       def dlog *args
