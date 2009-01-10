@@ -54,6 +54,9 @@ module Hammock
       def colorize description = ''
         Colorizer.colorize self, description
       end
+      def colorize! description = ''
+        replace colorize(description)
+      end
 
       private
 
