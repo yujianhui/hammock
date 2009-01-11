@@ -14,13 +14,30 @@ module Hammock
     module Methods
 
       def log_hit
-        buf = "#{colorify request.remote_ip}" +
-          (@current_site.nil? ? '' : " | #{@current_site.name}") +
-          " | #{session.nil? ? 'nil' : (session.session_id[0, 8] + '...' + session.session_id[-8, 8])}/" +
-          colorify(@current_account.nil? ? "unauthed " : "Account<#{@current_account.id}> #{@current_account.name}") +
-          " | #{headers['Status']} | #{'XHR/' if request.xhr?}#{(params[:_method] || request.method).to_s.upcase} #{request.request_uri} | #{params[:controller]}\##{params[:action]} #{params.discard(:controller, :action).inspect.gsub("\n", '\n')}"
+        log_concise [
+          request.remote_ip.colorize('green'),
+          (@current_site.subdomain unless @current_site.nil?),
+          (session.nil? ? 'nil' : ('...' + session.session_id[-8, 8])),
+          (@current_account.nil? ? "unauthed" : "Account<#{@current_account.id}> #{@current_account.name}").colorize('green'),
+          headers['Status'],
+          log_hit_request_info,
+          log_hit_route_info
+        ].squash.join(' | ')
+      end
 
-        log_concise buf
+      def log_hit_request_info
+        (request.xhr? ? 'XHR/' : '') +
+        (params[:_method] || request.method).to_s.upcase +
+        ' ' +
+        request.request_uri.colorize('grey', '?')
+      end
+      
+      def log_hit_route_info
+        params[:controller] +
+        '#' +
+        params[:action] +
+        ' ' +
+        params.discard(:controller, :action).inspect.gsub("\n", '\n').colorize('grey')
       end
 
       def log_concise msg, report = false
@@ -69,23 +86,6 @@ module Hammock
 
         logger.send opts[:error].blank? ? :info : :error, entry # Write to the Rails log
         log_concise entry, opts[:report] # Also write to the concise log
-      end
-
-
-      private
-
-      ColorMap = {
-        :black => 30,
-        :red => 31,
-        :green => 32,
-        :yellow => 33,
-        :blue => 34,
-        :pink => 35,
-        :cyan => 36,
-      }.freeze
-
-      def colorify str, color = :green
-        "\e[0;#{ColorMap[color]};1m#{str}\e[0m"
       end
 
     end
