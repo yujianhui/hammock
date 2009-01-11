@@ -91,12 +91,12 @@ module Hammock
 
       def render_for_destroy success, opts = {}
         if request.xhr?
-          render :partial => "shared/destroy", :locals => { :record => @record }
+          render :partial => "shared/#{action_name}", :locals => { :record => @record }
         else
           respond_to do |format|
             format.html { redirect_to postdestroy_redirect || nested_path_for(@record.class) }
             format.xml  { head :ok }
-            format.js { render :partial => 'shared/destroy', :locals => {:record => @record} }
+            format.js { render :partial => "shared/#{action_name}", :locals => {:record => @record} }
           end
         end
       end
