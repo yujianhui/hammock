@@ -62,6 +62,8 @@ module Hammock
           args.map(&:inspect).join(', ')
         end
 
+        msg.colorize!('on red') if opts[:error] || opts[:report]
+
         callpoint = caller[opts[:skip]].sub(rails_root.end_with('/'), '')
         entry = "#{callpoint}#{msg.blank? ? (opts[:report] ? ' <-- something broke here' : '.') : ' | '}#{msg}"
 
