@@ -30,7 +30,6 @@ module Hammock
         File.open("#{path}.concise.log", 'a') {|f| f << buf }
         File.open("#{path}.report.log", 'a') {|f| f << buf } if report
 
-        raise buf if report unless production?
         nil
       end
 
