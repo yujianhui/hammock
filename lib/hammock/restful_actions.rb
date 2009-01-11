@@ -18,6 +18,8 @@ module Hammock
           respond_to do |format|
             format.html
             format.xml { render :xml => @records.kick }
+            format.json { render :json => @records.kick }
+            format.yaml { render :text => @records.kick.to_yaml }
           end
         end
       end
@@ -31,7 +33,7 @@ module Hammock
         if !tasks_for_new
           escort :unauthed
         else
-          do_render || standard_render
+          render_for_safe_actions
         end
       end
 
@@ -51,7 +53,7 @@ module Hammock
       # Displays the specified record if it is within the current read scope, defined by +read_scope+ and +read_scope_for+ on the current model.
       def show
         if find_record
-          do_render || standard_render if callback(:before_show)
+          render_for_safe_actions if callback(:before_show)
         end
       end
 
@@ -62,7 +64,7 @@ module Hammock
       # This action is available within the same scope as +update+, since it is only useful if a subsequent +update+ would be successful.
       def edit
         if find_record
-          do_render if callback(:before_modify) and callback(:before_edit)
+          render_for_safe_actions if callback(:before_modify) and callback(:before_edit)
         end
       end
 
@@ -161,53 +163,6 @@ module Hammock
 
       def save
         @record.save
-      end
-
-      def render_or_redirect_after result
-        if request.xhr?
-          do_render result, :editable => true, :edit => false
-        else
-          if postsave_render result
-            # rendered - no redirect
-          else
-            if result
-              flash[:notice] = "#{mdl} was successfully #{'create' == action_name ? 'created' : 'updated'}."
-              respond_to do |format|
-                format.html { redirect_to(postsave_redirect || nested_path_for((@record unless inline_createable_resource?) || mdl)) }
-                format.xml {
-                  if 'create' == action_name
-                    render :xml => @record, :status => :created, :location => @record
-                  else # update
-                    head :ok
-                  end
-                }
-              end
-            else
-              respond_to do |format|
-                format.html {
-                  if inline_createable_resource?
-                    tasks_for_index
-                    render :action => :index
-                  else
-                    render :action => (@record.new_record? ? 'new' : 'edit')
-                  end
-                }
-                format.xml { render :xml => @record.errors, :status => :unprocessable_entity }
-              end
-            end
-          end
-        end
-      end
-
-      def render_for_destroy success, opts = {}
-        if request.xhr?
-          render :partial => "#{mdl.table_name}/index_entry", :locals => { :record => @record }
-        else
-          respond_to do |format|
-            format.html { redirect_to postdestroy_redirect || nested_path_for(@record.class) }
-            format.xml  { head :ok }
-          end
-        end
       end
 
     end
