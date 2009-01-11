@@ -50,6 +50,11 @@ module Hammock
         self.class
       end
 
+      def id_str
+        report "called on new record" if new_record?
+        "#{base_model}_#{id}"
+      end
+
       def id_or_describer
         if id && id > 0
           id
