@@ -51,11 +51,15 @@ module Hammock
         "#{self}'#{'s' unless self[-1, 1] == 's'}"
       end
 
-      def colorize description = ''
-        Colorizer.colorize self, description
+      def colorize description = '', start_at = nil
+        if start_at.nil? || (cut_point = index(start_at)).nil?
+          Colorizer.colorize self, description
+        else
+          self[0...cut_point] + Colorizer.colorize(self[cut_point..-1], description)
+        end
       end
-      def colorize! description = ''
-        replace colorize(description)
+      def colorize! description = '', start_at = nil
+        replace colorize(description, start_at)
       end
 
       private
