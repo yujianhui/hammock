@@ -39,6 +39,7 @@ module Hammock
         link_id = link_id_for verb, record, attribute
 
         request_method, link_params[:_method] = :post, request_method unless [:get, :post].include?(request_method)
+        link_params[:format] = opts[:format].to_s
 
         form_elements_hash = if :get == request_method
           '{ }'
@@ -46,6 +47,13 @@ module Hammock
           "jQuery('form').serializeHash()"
         else
           "{ '#{record.base_model}[#{attribute}]': $('##{link_id}').val() }"
+        end
+
+        response_action = case link_params[:format].to_s
+        when 'js'
+          "eval(response)"
+        else
+          "jQuery('##{opts[:target] || link_id + '_target'}').before(response).remove()"
         end
 
         # TODO check the response code in the callback, and replace :after with :success and :failure.
@@ -65,9 +73,7 @@ module Hammock
                   #{forgery_key_json(request_method)}
                 ),
                 function(response) {
-                  //log("response: " + response);
-                  //jQuery('.#{opts[:target] || link_id + '_target'}').html(response);
-                  jQuery('##{opts[:target] || link_id + '_target'}').before(response).remove();
+                  #{response_action};
                   eval("#{clean_snippet opts[:after]}");
                 }
               );
