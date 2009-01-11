@@ -97,12 +97,12 @@ module Hammock
       # The +undestroy+ action. (POST, unsafe, idempotent)
       #
       # Reverses a previous destroy on the specified record if it is within the current write scope, defined by +write_scope+ and +write_scope_for+ on the current model.
-      # def undestroy
-      #   if find_deleted_record
-      #     result = callback(:before_undestroy) and @record.undestroy and callback(:after_undestroy)
-      #     render_for_destroy result
-      #   end
-      # end
+      def undestroy
+        if find_deleted_record
+          result = callback(:before_undestroy) and @record.undestroy and callback(:after_undestroy)
+          render_for_destroy result
+        end
+      end
 
       # The +suggest+ action. (GET, safe, idempotent)
       #
