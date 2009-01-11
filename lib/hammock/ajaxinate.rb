@@ -90,8 +90,8 @@ module Hammock
         %Q{
           jQuery.#{method == :get ? 'get' : 'post'}('#{path_for verb, record}',
             jQuery.extend(
-              #{{record.base_model => attributes}.to_flattened_json},
-              {_method: '#{method}'},
+              #{{record.base_model => (attributes[:params] || {})}.to_flattened_json},
+              {format: '#{attributes[:format] || 'html'}', _method: '#{method}'},
               #{forgery_key_json(method)}
             )
           );
