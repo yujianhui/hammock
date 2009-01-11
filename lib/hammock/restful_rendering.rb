@@ -27,7 +27,11 @@ module Hammock
           elsif params[:display_as]
             render_as
           else
-            render :nothing => true, :status => (result ? 200 : 500)
+            respond_to {|format|
+              format.html { render :nothing => true, :status => (result ? 200 : 500) }
+              format.xml
+              format.js
+            }
           end
         end
       end
