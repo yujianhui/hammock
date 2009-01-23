@@ -85,15 +85,24 @@ module Hammock
         link_path
       end
       
-      def jquery_xhr verb, record, attributes = {}
+      def jquery_xhr verb, record, opts = {}
         method = method_for verb, record
+        params = if opts[:params].is_a?(String)
+          opts[:params].chomp(',').start_with('{').end_with('}')
+        else
+          {record.base_model => (opts[:params] || {})}.to_flattened_json
+        end
+        
         %Q{
           jQuery.#{method == :get ? 'get' : 'post'}('#{path_for verb, record}',
             jQuery.extend(
-              #{{record.base_model => (attributes[:params] || {})}.to_flattened_json},
-              {format: '#{attributes[:format] || 'html'}', _method: '#{method}'},
+              #{params},
+              {format: '#{opts[:format] || 'html'}', _method: '#{method}'},
               #{forgery_key_json(method)}
-            )
+            ),
+            function(data, textStatus) {
+              #{(opts[:callback] || '').end_with(';')}
+            }
           );
         }
       end
