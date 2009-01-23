@@ -40,6 +40,24 @@ module Hammock
         }.reverse
       end
 
+      def hash_by *methods, &block
+        hsh = Hash.new {|h,k| h[k] = [] }
+        this_method = methods.shift
+
+        # First, hash this array into +hsh+.
+        self.each {|i| hsh[i.send(this_method)] << i }
+
+        if methods.empty?
+          # If there are no methods remaining, yield this group to the block if required.
+          hsh.each_pair {|k,v| hsh[k] = yield(hsh[k]) } if block_given?
+        else
+          # Recursively hash remaining methods.
+          hsh.each_pair {|k,v| hsh[k] = v.hash_by(*methods, &block) }
+        end
+
+        hsh
+      end
+
     end
   end
 end
