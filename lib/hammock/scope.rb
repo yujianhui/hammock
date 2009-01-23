@@ -27,7 +27,7 @@ module Hammock
         if !resource.indexable_by(@current_account)
           log "#{requester_name} can't index #{resource.name.pluralize}."
           :not_found
-        elsif !safe_action_and_implication?(verb) && !make_createable?
+        elsif !safe_verb_and_implication?(verb, resource) && !make_createable?
           log "#{requester_name} can't #{verb} #{resource.name.pluralize}."
           :read_only
         else
@@ -48,7 +48,7 @@ module Hammock
           if !record.readable_by?(@current_account)
             log "#{requester_name} can't see #{record.class}<#{record.id}>."
             :not_found
-          elsif !safe_action_and_implication?(verb) && !record.writeable_by?(@current_account)
+          elsif !safe_verb_and_implication?(verb, record) && !record.writeable_by?(@current_account)
             log "#{requester_name} can't #{verb} #{record.class}<#{record.id}>."
             :read_only
           else
@@ -93,7 +93,7 @@ module Hammock
       def scope_name_for_action
         if 'index' == action_name
           'index'
-        elsif safe_action_and_implication?
+        elsif safe_verb_and_implication?
           'read'
         else
           'write'

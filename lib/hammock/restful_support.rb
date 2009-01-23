@@ -110,8 +110,12 @@ module Hammock
         end
       end
 
-      def safe_action_and_implication? action = nil
-        request.get? && %w[index show].include?((action || action_name).to_s)
+      def safe_verb_and_implication? verb = nil, record = nil
+        if verb.nil?
+          request.get? && !ImpliedUnsafeActions.include?(action_name.to_s)
+        else
+          (:get == method_for(verb, record)) && !ImpliedUnsafeActions.include?(verb.to_s)
+        end
       end
 
       def action_requires_record? action
