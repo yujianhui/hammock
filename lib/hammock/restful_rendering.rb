@@ -34,7 +34,7 @@ module Hammock
             render_as
           else
             respond_to {|format|
-              format.html { render :nothing => true, :status => (result ? 200 : 500) }
+              format.html { render :template => "#{controller_name}/#{action_name}", :layout => false }
               format.xml
               format.js
             }
