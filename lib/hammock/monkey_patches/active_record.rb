@@ -25,6 +25,11 @@ module Hammock
         self
       end
 
+      def resource_name
+        # TODO almost certainly a better way to do this
+        base_class.to_s.pluralize.underscore
+      end
+
       def base_model
         base_class.to_s.underscore
       end
@@ -48,6 +53,10 @@ module Hammock
 
       def resource
         self.class
+      end
+
+      def resource_name
+        self.class.resource_name
       end
 
       def id_str
