@@ -22,7 +22,7 @@ module Hammock
       end
 
       def resource
-        self
+        base_class
       end
 
       def resource_name
@@ -52,7 +52,7 @@ module Hammock
       end
 
       def resource
-        self.class
+        self.class.resource
       end
 
       def resource_name
