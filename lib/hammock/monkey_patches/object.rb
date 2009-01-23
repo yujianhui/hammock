@@ -40,9 +40,9 @@ module Hammock
         self.to_s.underscore.to_sym
       end
 
-      # If +condition+ evaluates to true, return the result of sending +method_name+, <tt>*args</tt> to +self+, otherwise, return +self+ as-is.
+      # If +condition+ evaluates to true, return the result of sending +method_name+ to +self+; <tt>*args</tt> to +self+, otherwise, return +self+ as-is.
       def send_if condition, method_name, *args
-        condition ? self.send(method_name, *args) : self
+        condition ? send(method_name, *args) : self
       end
 
     end
