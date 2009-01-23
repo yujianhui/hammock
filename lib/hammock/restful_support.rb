@@ -20,11 +20,11 @@ module Hammock
 
       # The model this controller operates on. Defined as the singularized controller name. For example, for +GelatinousBlobsController+, this will return the +GelatinousBlob+ class.
       def mdl
-        @_cached_mdl ||= Object.const_get self.class.to_s.sub('Controller', '').singularize
+        @hammock_cached_mdl ||= Object.const_get self.class.to_s.sub('Controller', '').classify
       end
       # The lowercase name of the model this controller operates on. For example, for +GelatinousBlobsController+, this will return "gelatinous_blob".
       def mdl_name
-        @_cached_mdl_name ||= self.class.to_s.sub('Controller', '').singularize.underscore
+        @hammock_cached_mdl_name ||= self.class.to_s.sub('Controller', '').singularize.underscore
       end
 
       # Returns true if the current action represents an edit on +record+.

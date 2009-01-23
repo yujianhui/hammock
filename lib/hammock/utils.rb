@@ -10,7 +10,7 @@ module Hammock
 
       require 'pathname'
       def rails_root
-        @_cached_rails_root ||= Pathname(RAILS_ROOT).realpath.to_s
+        @hammock_cached_rails_root ||= Pathname(RAILS_ROOT).realpath.to_s
       end
 
       def rails_env
