@@ -51,8 +51,11 @@ module Hammock
       end
 
       def id_str
-        report "called on new record" if new_record?
-        "#{base_model}_#{id}"
+        if new_record?
+          "new_#{base_model}"
+        else
+          "#{base_model}_#{id}"
+        end
       end
 
       def id_or_describer
