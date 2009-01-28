@@ -45,6 +45,11 @@ module Hammock
         condition ? send(method_name, *args) : self
       end
 
+      # If +condition+ evaluates to true, return the result of sending +method_name+ to +self+; <tt>*args</tt> to +self+, otherwise, return +self+ as-is.
+      def send_if_respond_to method_name, *args
+        send_if respond_to?(method_name), method_name, *args
+      end
+
     end
   end
 end
