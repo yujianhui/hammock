@@ -32,7 +32,6 @@ module Hammock
       end
 
       def creator_resource_for *verbs
-        verbs = StandardVerbs if verbs.blank?
         metaclass.instance_eval {
           verbs.each {|verb|
             send :define_method, "#{verb}_scope_for" do |account|
@@ -45,7 +44,6 @@ module Hammock
       end
 
       def public_resource_for *verbs
-        verbs = StandardVerbs if verbs.blank?
         metaclass.instance_eval {
           verbs.each {|verb|
             send :define_method, "#{verb}_scope" do
@@ -58,7 +56,6 @@ module Hammock
       end
 
       def authed_resource_for *verbs
-        verbs = StandardVerbs if verbs.blank?
         metaclass.instance_eval {
           verbs.each {|verb|
             send :define_method, "#{verb}_scope_for" do |account|
@@ -71,7 +68,6 @@ module Hammock
       end
 
       def partitioned_resource_for *verbs
-        verbs = StandardVerbs if verbs.blank?
         metaclass.instance_eval {
           verbs.each {|verb|
             send :define_method, "#{verb}_scope_for" do |account|
