@@ -113,11 +113,6 @@ module Hammock
         lambda {|record| record.id == account.id }
       end
 
-      # TODO This should be somewhere else
-      def sqlite?
-        'SQLite' == connection.adapter_name
-      end
-
     end
 
     module InstanceMethods
