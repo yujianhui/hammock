@@ -79,6 +79,13 @@ module Hammock
         self.class.base_model
       end
 
+      def new_or_deleted_before_save?
+        @new_or_deleted_before_save
+      end
+      def set_new_or_deleted_before_save
+        @new_or_deleted_before_save = new_record? || send_if_respond_to(:deleted?)
+      end
+
       def undestroy
         unless new_record?
           if frozen?
