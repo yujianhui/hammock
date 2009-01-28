@@ -62,6 +62,11 @@ module Hammock
         replace colorize(description, start_at)
       end
 
+      # Returns true if the string represents a valid email address.
+      def valid_email?
+        /^([a-z0-9\-\+\_\.]{2,})\@([a-z0-9\-]+\.)*([a-z0-9\-]{2,}\.)([a-z0-9\-]{2,})$/ =~ self
+      end
+
       private
 
       class Colorizer
