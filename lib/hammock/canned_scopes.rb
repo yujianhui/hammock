@@ -40,7 +40,7 @@ module Hammock
             end
           }
         }
-        define_createable creator_scope if verbs.include?(:create)
+        define_createable :creator_scope if verbs.include?(:create)
         export_scopes *verbs
       end
 
@@ -53,7 +53,7 @@ module Hammock
             end
           }
         }
-        define_createable public_scope if verbs.include?(:create)
+        define_createable :public_scope if verbs.include?(:create)
         export_scopes *verbs
       end
 
@@ -66,7 +66,7 @@ module Hammock
             end
           }
         }
-        define_createable authed_scope if verbs.include?(:create)
+        define_createable :authed_scope if verbs.include?(:create)
         export_scopes *verbs
       end
 
@@ -79,19 +79,18 @@ module Hammock
             end
           }
         }
-        define_createable partitioned_scope if verbs.include?(:create)
+        define_createable :partitioned_scope if verbs.include?(:create)
         export_scopes *verbs
       end
 
-      def define_createable scope
+      def define_createable scope_name
         instance_eval {
           send :define_method, :createable_by? do |account|
-            scope
+            send scope_name, account
           end
         }
       end
 
-      # TODO This should be somewhere else
       def public_scope
         if sqlite?
           lambda {|record| 1 }
