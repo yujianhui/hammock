@@ -79,7 +79,7 @@ module Hammock
     module InstanceMethods
       private
 
-      CallbackFail = false.freeze
+      CallbackFail = false
 
       def callback kind, *args
         callback_chain_for(kind).all? {|cb|
