@@ -72,6 +72,11 @@ module Hammock
         self.replace self.capitalize_name
       end
 
+      # Returns true if the string represents a valid email address.
+      def valid_email?
+        /^([a-z0-9\-\+\_\.]{2,})\@([a-z0-9\-]+\.)*([a-z0-9\-]{2,}\.)([a-z0-9\-]{2,})$/ =~ self
+      end
+
       def colorize description = '', start_at = nil
         if start_at.nil? || (cut_point = index(start_at)).nil?
           Colorizer.colorize self, description
@@ -79,13 +84,9 @@ module Hammock
           self[0...cut_point] + Colorizer.colorize(self[cut_point..-1], description)
         end
       end
+
       def colorize! description = '', start_at = nil
         replace colorize(description, start_at)
-      end
-
-      # Returns true if the string represents a valid email address.
-      def valid_email?
-        /^([a-z0-9\-\+\_\.]{2,})\@([a-z0-9\-]+\.)*([a-z0-9\-]{2,}\.)([a-z0-9\-]{2,})$/ =~ self
       end
 
       private
