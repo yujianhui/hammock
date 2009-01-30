@@ -82,7 +82,7 @@ module Hammock
       def define_createable scope_name
         instance_eval {
           send :define_method, :createable_by? do |account|
-            send scope_name, account
+            self.class.send scope_name, account
           end
         }
       end
