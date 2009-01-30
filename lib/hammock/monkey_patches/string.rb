@@ -51,6 +51,27 @@ module Hammock
         "#{self}'#{'s' unless self[-1, 1] == 's'}"
       end
 
+      # TODO any more to add?
+      NamePrefixes = %w[de den la von].freeze
+
+      def capitalize_name
+        split(' ').map {|term|
+          term.split('-').map {|term|
+            if NamePrefixes.include?(term)
+              term.downcase
+            elsif (term != term.downcase)
+              term
+            else # only capitalize words that are entirely lower case
+              term.capitalize
+            end
+          }.join('-')
+        }.join(' ')
+      end
+
+      def capitalize_name!
+        self.replace self.capitalize_name
+      end
+
       def colorize description = '', start_at = nil
         if start_at.nil? || (cut_point = index(start_at)).nil?
           Colorizer.colorize self, description
