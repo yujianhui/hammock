@@ -51,6 +51,82 @@ module Hammock
         "#{self}'#{'s' unless self[-1, 1] == 's'}"
       end
 
+      # TODO any more to add?
+      NamePrefixes = %w[de den la von].freeze
+
+      def capitalize_name
+        split(' ').map {|term|
+          term.split('-').map {|term|
+            if NamePrefixes.include?(term)
+              term.downcase
+            elsif (term != term.downcase)
+              term
+            else # only capitalize words that are entirely lower case
+              term.capitalize
+            end
+          }.join('-')
+        }.join(' ')
+      end
+
+      def capitalize_name!
+        self.replace self.capitalize_name
+      end
+
+      # Returns whether this IP should be considered a valid one for a client to be using.
+      def valid_ip?
+        if production?
+          describe_as_ip == :public
+        else
+          describe_as_ip.in? :public, :private, :loopback
+        end
+      end
+
+      # Returns a symbol describing the class of IP address +self+ represents, if any.
+      #
+      # Examples:
+      #
+      #     "Hello world!".valid_ip?   #=> false
+      #     "192.168.".valid_ip?       #=> false
+      #     "127.0.0.1".valid_ip?      #=> :loopback
+      #     "172.24.137.6".valid_ip?   #=> :private
+      #     "169.254.1.142".valid_ip?  #=> :self_assigned
+      #     "72.9.108.122".valid_ip?   #=> :public
+      def describe_as_ip
+        parts = strip.split('.')
+        bytes = parts.zip(parts.map(&:to_i)).map {|(str,val)|
+          val if ((1..255) === val) || (val == 0 && str == '0')
+        }.squash
+
+        if bytes.length != 4
+          false
+        elsif bytes.starts_with? 0 # Source hosts on "this" network
+          :reserved
+        elsif bytes.starts_with? 127 # Loopback network; RFC1700
+          :loopback
+        elsif bytes.starts_with? 10 # Class-A private; RFC1918
+          :private
+        elsif bytes.starts_with?(172) && ((16..31) === bytes[1]) # Class-B private; RFC1918
+          :private
+        elsif bytes.starts_with? 169, 254 # Link-local range; RFC3330/3927
+          bytes[2].in?(0, 255) ? :reserved : :self_assigned
+        elsif bytes.starts_with? 192, 0, 2 # TEST-NET - used as example.com IP
+          :reserved
+        elsif bytes.starts_with? 192, 88, 99 # 6-to-4 relay anycast; RFC3068
+          :reserved
+        elsif bytes.starts_with? 192, 168 # Class-C private; RFC1918
+          :private
+        elsif bytes.starts_with? 198, 18 # Benchmarking; RFC2544
+          :reserved
+        else
+          :public
+        end
+      end
+
+      # Returns true if the string represents a valid email address.
+      def valid_email?
+        /^([a-z0-9\-\+\_\.]{2,})\@([a-z0-9\-]+\.)*([a-z0-9\-]{2,}\.)([a-z0-9\-]{2,})$/ =~ self
+      end
+
       def colorize description = '', start_at = nil
         if start_at.nil? || (cut_point = index(start_at)).nil?
           Colorizer.colorize self, description
@@ -58,13 +134,9 @@ module Hammock
           self[0...cut_point] + Colorizer.colorize(self[cut_point..-1], description)
         end
       end
+
       def colorize! description = '', start_at = nil
         replace colorize(description, start_at)
-      end
-
-      # Returns true if the string represents a valid email address.
-      def valid_email?
-        /^([a-z0-9\-\+\_\.]{2,})\@([a-z0-9\-]+\.)*([a-z0-9\-]{2,}\.)([a-z0-9\-]{2,})$/ =~ self
       end
 
       private

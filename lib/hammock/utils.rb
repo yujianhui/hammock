@@ -25,6 +25,10 @@ module Hammock
         'production' == rails_env
       end
 
+      def sqlite?
+        'SQLite' == connection.adapter_name
+      end
+
     end
   end
 end

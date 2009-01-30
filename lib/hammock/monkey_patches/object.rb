@@ -28,6 +28,12 @@ module Hammock
         yield self
         self
       end
+      
+      # The reverse of <tt>Enumerable#include?</tt> - returns +true+ if +self+ is
+      # equal to one of the elements of +args+.
+      def in? *args
+        args.include? self
+      end
 
       # A symbolized, underscored (i.e. reverse-camelized) representation of +self+.
       #
@@ -43,6 +49,11 @@ module Hammock
       # If +condition+ evaluates to true, return the result of sending +method_name+ to +self+; <tt>*args</tt> to +self+, otherwise, return +self+ as-is.
       def send_if condition, method_name, *args
         condition ? send(method_name, *args) : self
+      end
+
+      # If +condition+ evaluates to true, return the result of sending +method_name+ to +self+; <tt>*args</tt> to +self+, otherwise, return +self+ as-is.
+      def send_if_respond_to method_name, *args
+        send_if respond_to?(method_name), method_name, *args
       end
 
     end

@@ -79,6 +79,13 @@ module Hammock
         self.class.base_model
       end
 
+      def new_or_deleted_before_save?
+        @new_or_deleted_before_save
+      end
+      def set_new_or_deleted_before_save
+        @new_or_deleted_before_save = new_record? || send_if_respond_to(:deleted?)
+      end
+
       def undestroy
         unless new_record?
           if frozen?
@@ -91,6 +98,17 @@ module Hammock
             self if result != false
           end
         end
+      end
+
+      # Updates each given attribute to the current time, expecting that they are all +datetime+ columns.
+      #
+      # The updates are done with update_attribute, and as such they are done with callbacks but
+      # without validation.
+      def touch *attrs
+        now = Time.now
+        attrs.each {|attribute|
+          update_attribute attribute, now
+        }
       end
 
       def unsaved_attributes
