@@ -6,6 +6,8 @@ module Hammock
 
       base.class_eval {
         before_modify :set_editing
+        # TODO Investigate the usefulness of this.
+        # before_destroy :set_editing
         before_create :set_creator_id_if_appropriate
         helper_method :mdl, :mdl_name, :editing?, :nested_within?, :partial_exists?
       }
