@@ -110,8 +110,9 @@ module Hammock
         end
       end
 
+      ImpliedUnsafeActions = %w[new edit destroy]
+
       def safe_verb_and_implication? verb = nil, record = nil
-        ImpliedUnsafeActions = %w[new edit destroy]
         if verb.nil?
           request.get? && !ImpliedUnsafeActions.include?(action_name.to_s)
         else
