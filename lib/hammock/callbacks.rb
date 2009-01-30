@@ -49,7 +49,7 @@ module Hammock
                 CallbackChain.build(:#{callback}, *methods, &block)
               else # hammock-style callback
                 if methods.empty?
-                  log "<-- you really should give this callback a description", :skip => 1
+                  log "<-- you should give this callback a description", :skip => 1
                 elsif !methods.first.is_a?(String)
                   raise ArgumentError, "Inline callback definitions require a description as their sole argument."
                 else
