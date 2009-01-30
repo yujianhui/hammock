@@ -28,6 +28,12 @@ module Hammock
         yield self
         self
       end
+      
+      # The reverse of <tt>Enumerable#include?</tt> - returns +true+ if +self+ is
+      # equal to one of the elements of +args+.
+      def in? *args
+        args.include? self
+      end
 
       # A symbolized, underscored (i.e. reverse-camelized) representation of +self+.
       #
