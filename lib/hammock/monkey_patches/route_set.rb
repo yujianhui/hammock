@@ -112,11 +112,18 @@ module Hammock
         def ancestry
           parent.nil? ? [] : parent.ancestry.push(self)
         end
-        
-        def for verb, *args
-          opts = args.extract_options!
-          raise "You have to supply at least one record or resource." if args.empty?
-          _for verb, args, opts
+
+        def for verb, entities, options
+          raise "HammockResource#for requires an explicitly specified verb as its first argument." unless verb.is_a?(Symbol)
+          raise "You have to supply at least one record or resource." if entities.empty?
+
+          entity = entities.shift
+
+          if entities.empty?
+            piece_for verb, entity
+          else
+            children[entity.resource].for(verb, entities, options).within piece_for(nil, entity)
+          end
         end
 
         def add entity, options, steps = nil
@@ -147,16 +154,6 @@ module Hammock
         def add_child entity, options
           child = HammockResource.new entity, options.merge(:parent => self)
           self.children[child.mdl] = child
-        end
-
-        def _for verb, entities, opts
-          entity = entities.shift
-
-          if entities.empty?
-            piece_for verb, entity
-          else
-            children[entity.resource].send(:_for, verb, entities, opts).within piece_for(verb, entity)
-          end
         end
 
         def piece_for verb, entity
