@@ -22,8 +22,12 @@ module Hammock
       end
 
       def dragnet *keys
+        dup.dragnet! *keys
+      end
+
+      def dragnet! *keys
         keys.inject({}) {|acc,key|
-          acc[key] = self[key] if self.has_key?(key)
+          acc[key] = self.delete(key) if self.has_key?(key)
           acc
         }
       end
