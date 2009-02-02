@@ -17,16 +17,16 @@ module Hammock
       #
       # Use this method to render edit and delete links, and anything else that is only available to certain users or under certain conditions.
       def hamlink_to *args
-        opts = args.last.is_a?(Hash) ? args.pop.symbolize_keys! : {}
-        verb = args.shift if args.first.is_a?(Symbol)
+        opts = args.extract_options!
+        verb = args.first if args.first.is_a?(Symbol)
         entity = args.last
 
         if :ok == can_verb_entity?(verb, entity)
           route = route_for(verb, entity, opts.dragnet(:nest, :format))
 
           link_to(opts.delete(:text) || route.verb,
-            route.path_for(*args.push(:params => opts.delete(:params))),
-            opts.merge(:method => route.method)
+            route.path(opts.delete(:params)),
+            opts.merge(:method => route.http_method)
           )
         end
       end
