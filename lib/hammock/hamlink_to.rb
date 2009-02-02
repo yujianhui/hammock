@@ -19,14 +19,15 @@ module Hammock
       def hamlink_to *args
         opts = args.last.is_a?(Hash) ? args.pop.symbolize_keys! : {}
         verb = args.shift if args.first.is_a?(Symbol)
-        record_or_resource = args.last
-        method = (opts.delete(:method) || method_for(verb, record_or_resource))
+        entity = args.last
 
-        if :ok == can_verb_entity?(verb, record_or_resource)
-          path_method_name = opts[:nest] == false ? :path_for : :nested_path_for
-          link_to verb_for(opts.delete(:text) || verb.to_s, record_or_resource),
-            send(path_method_name, verb, *args.push({:params => opts.delete(:params)})),
-            opts.merge(:method => (method unless method == :get))
+        if :ok == can_verb_entity?(verb, entity)
+          route = route_for(verb, entity, opts.dragnet(:nest, :format))
+
+          link_to(opts.delete(:text) || route.verb,
+            route.path_for(*args.push(:params => opts.delete(:params))),
+            opts.merge(:method => route.method)
+          )
         end
       end
 

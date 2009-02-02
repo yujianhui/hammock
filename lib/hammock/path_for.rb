@@ -15,15 +15,56 @@ module Hammock
     module InstanceMethods
       private
 
-      # TODO Get this from the routing table, like a real man, not some god damn nancy :get-defaulting Hash. JESUS.
-      HTTPMethods = Hash.new(
-        :get
-      ).update(
-        :create => :post,
-        :update => :put,
-        :destroy => :delete,
-        :undestroy => :post
-      )
+      class RouteMap
+
+        def self.for verb, record
+          map[record.resource][verb]
+        end
+
+        private
+
+        def self.map
+          @@route_map ||= ActionController::Routing::Routes.routes.hash_by(:resource, :verb) {|routes|
+            RouteGroup.new routes
+          }
+        end
+        
+        class RouteGroup
+          def initialize routes
+            @routes = routes
+          end
+
+          attr_reader :routes
+
+          def for *records
+            opts = records.extract_options!
+
+            routes.detect {|route|
+              route.nesting_matches?(*records) && route.format_matches?(opts[:format])
+            }
+          end
+
+          def render *records
+            self.for(records).render *records
+          end
+
+        end
+      end
+
+      # def route_group_for verb, record, opts = {}
+      #   RouteMap.for(verb, record)
+      # end
+
+      def resource_map
+        @hammock_resource_map
+      end
+      
+      def route_for *args
+        verb = args.shift if args.first.is_a?(Symbol)
+        # verb = verb_for requested_verb, args.last
+        
+        resource_map.route_for verb, *args
+      end
 
       def verb_for requested_verb, record
         requested_verb = :show if requested_verb.blank?
@@ -37,10 +78,6 @@ module Hammock
         else
           requested_verb
         end
-      end
-
-      def method_for requested_verb, record
-        HTTPMethods[verb_for(requested_verb, record)]
       end
 
       def path_for *args
@@ -75,7 +112,6 @@ module Hammock
         args.unshift(requested_verb) unless requested_verb.nil?
         path_for *args
       end
-
 
       private
 
