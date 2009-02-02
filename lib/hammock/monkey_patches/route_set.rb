@@ -26,6 +26,68 @@ module Hammock
       end
 
       class HammockResource < ActionController::Resources::Resource
+        class HammockRoutePiece
+          attr_reader :resource, :routeable_as, :verb, :entity, :parent
+
+          def initialize resource
+            @resource = resource
+          end
+
+          def for verb, entity
+            routeable_as = resource.routeable_as(verb, entity)
+
+            if !routeable_as
+              raise "The verb #{verb} can't be applied to the #{entity.resource} resource#{' or instances of it' if entity.is_a?(ActiveRecord::Base)}."
+            elsif (:record == routeable_as) && entity.new_record?
+              raise "The verb #{verb} requires a #{entity.resource} that has an ID (i.e. not a new record)."
+            else
+              @verb, @entity, @routeable_as = verb, entity, routeable_as
+            end
+
+            self
+          end
+
+          def within parent
+            @parent = parent
+            self
+          end
+          
+          def setup?
+            !@entity.nil?
+          end
+          
+          def path
+            raise_unless_setup_while_trying_to 'render a path'
+
+            buf = entity.resource_name
+            buf << '/' + entity.to_param if entity.is_a?(ActiveRecord::Base)
+            buf << '/' + verb.to_s unless verb.nil? or implied_verb?(verb)
+            buf
+
+            if parent.nil?
+              buf
+            else
+              parent.path + '/' + buf
+            end
+          end
+          
+          def http_method
+            raise_unless_setup_while_trying_to 'extract the HTTP method'
+            resource.send("#{routeable_as}_routes")[verb]
+          end
+          
+          private
+          
+          def implied_verb? verb
+            verb.in? :index, :create, :show, :update, :destroy
+          end
+          
+          def raise_unless_setup_while_trying_to task
+            raise "You have to call for(verb, entity) (and optionally within(parent)) on this HammockRoutePiece before you can #{task}." unless setup?
+          end
+          
+        end
+        
         DefaultRecordVerbs = {
           :show => :get,
           :edit => :get,
@@ -50,10 +112,11 @@ module Hammock
         def ancestry
           parent.nil? ? [] : parent.ancestry.push(self)
         end
-
+        
         def for verb, *args
           opts = args.extract_options!
-          _for(verb, args, opts).join(' / ')
+          raise "You have to supply at least one record or resource." if args.empty?
+          _for verb, args, opts
         end
 
         def add entity, options, steps = nil
@@ -66,6 +129,13 @@ module Hammock
           end
         end
 
+        def routeable_as verb, entity
+          if entity.is_a?(ActiveRecord::Base) && record_routes[verb || :show]
+            :record
+          elsif resource_routes[verb || :index]
+            :resource
+          end
+        end
 
         private
 
@@ -78,48 +148,27 @@ module Hammock
           child = HammockResource.new entity, options.merge(:parent => self)
           self.children[child.mdl] = child
         end
-        
+
         def _for verb, entities, opts
           entity = entities.shift
 
           if entities.empty?
-            puts "ending #{verb}"
-            [segment_for(verb, entity)]
+            piece_for verb, entity
           else
-            puts "recursing #{verb}"
-            puts entity.resource.to_s
-            puts children.keys.map {|r| r.to_s }
-            child = children[entities.first.resource]
-
-            if child.nil?
-              raise "Can't route #{entity.resource.base_model} from #{ancestry.map {|r| r.resource.mdl.to_s }}."
-            else
-              [segment_for(nil, entity)].concat child.send(:_for, verb, entities, opts)
-            end
+            children[entity.resource].send(:_for, verb, entities, opts).within piece_for(verb, entity)
           end
         end
-        
-        def segment_for verb, entity
-          puts "generating #{verb.inspect} #{entity.to_s}"
 
-          if !routeable?(verb, entity)
-            raise "The verb #{verb} can't be applied to the #{entity.resource} resource#{' or instances of it' if entity.is_a?(ActiveRecord::Base)}."
+        def piece_for verb, entity
+          child = children[entity.resource]
+
+          if child.nil?
+            raise "Can't route #{entity.resource} within #{ancestry.map {|r| r.mdl.to_s }.join(', ')}."
           else
-            [
-              entity.resource_name,
-              (entity.to_param if entity.is_a?(ActiveRecord::Base)),
-              (verb unless verb.nil? or implied_verb?(verb))
-            ].squash.join('/')
+            HammockRoutePiece.new(child).for(verb, entity)
           end
         end
-        
-        def routeable? verb, entity
-          verb.nil? || resource_routes.has_key?(verb) || (entity.is_a?(ActiveRecord::Base) && record_routes.has_key?(verb))
-        end
 
-        def implied_verb? verb
-          [ :index, :create, :show, :update, :destroy ].include? verb
-        end
       end
 
     end
