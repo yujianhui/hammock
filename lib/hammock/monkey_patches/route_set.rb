@@ -103,7 +103,7 @@ module Hammock
         attr_reader :mdl, :parent, :children, :record_routes, :resource_routes
 
         def initialize entity = nil, options = {}
-          @mdl = Object.const_get(entity.to_s.classify) unless entity.nil?
+          @mdl = entity if entity.is_a?(Symbol)
           @parent = options[:parent]
           @children = {}
           define_routes options
@@ -122,13 +122,13 @@ module Hammock
           if entities.empty?
             piece_for verb, entity
           else
-            children[entity.resource].for(verb, entities, options).within piece_for(nil, entity)
+            children[entity.resource_sym].for(verb, entities, options).within piece_for(nil, entity)
           end
         end
 
         def add entity, options, steps = nil
           if steps.nil?
-            add entity, options, (options[:name_prefix] || '').chomp('_').split('_').map {|i| Object.const_get i.classify }
+            add entity, options, (options[:name_prefix] || '').chomp('_').split('_').map {|i| i.pluralize.underscore.to_sym }
           elsif steps.empty?
             add_child entity, options
           else
@@ -153,14 +153,14 @@ module Hammock
 
         def add_child entity, options
           child = HammockResource.new entity, options.merge(:parent => self)
-          self.children[child.mdl] = child
+          children[child.mdl] = child
         end
 
         def piece_for verb, entity
-          child = children[entity.resource]
+          child = children[entity.resource_sym]
 
           if child.nil?
-            raise "Can't route #{entity.resource} within #{ancestry.map {|r| r.mdl.to_s }.join(', ')}."
+            raise "No routes are defined for #{entity.route_map}#{' within ' + ancestry.map {|r| r.mdl.to_s }.join(', ') unless ancestry.empty?}."
           else
             HammockRoutePiece.new(child).for(verb, entity)
           end
