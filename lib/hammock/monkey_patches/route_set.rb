@@ -37,9 +37,9 @@ module Hammock
             routeable_as = resource.routeable_as(verb, entity)
 
             if !routeable_as
-              raise "The verb #{verb} can't be applied to the #{entity.resource} resource#{' or instances of it' if entity.is_a?(ActiveRecord::Base)}."
+              raise "The verb '#{verb}' can't be applied to " + (entity.record? ? "#{entity.resource} records" : "the #{entity.resource} resource") + "."
             elsif (:record == routeable_as) && entity.new_record?
-              raise "The verb #{verb} requires a #{entity.resource} that has an ID (i.e. not a new record)."
+              raise "The verb '#{verb}' requires a #{entity.resource} with an ID (i.e. not a new record)."
             else
               @verb, @entity, @routeable_as = verb, entity, routeable_as
             end
