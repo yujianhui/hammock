@@ -118,7 +118,8 @@ module Hammock
         if verb.nil?
           request.get? && !ImpliedUnsafeActions.include?(action_name.to_s)
         else
-          (:get == method_for(verb, record)) && !ImpliedUnsafeActions.include?(verb.to_s)
+          route = route_for(verb, record)
+          route.get? && !ImpliedUnsafeActions.include?(route.verb)
         end
       end
 
