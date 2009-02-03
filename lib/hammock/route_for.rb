@@ -5,7 +5,7 @@ module Hammock
       base.send :extend, ClassMethods
 
       base.class_eval {
-        helper_method :path_for, :route_for, :nested_route_for
+        helper_method :path_for, :nested_path_for, :route_for, :nested_route_for
       }
     end
 
@@ -17,6 +17,10 @@ module Hammock
 
       def path_for *args
         route_for(*args).path
+      end
+
+      def nested_path_for *args
+        nested_route_for(*args).path
       end
 
       def route_for *args
