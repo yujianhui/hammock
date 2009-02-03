@@ -139,7 +139,7 @@ module Hammock
         def routeable_as verb, entity
           if entity.record? && record_routes[verb || :show]
             :record
-          elsif resource_routes[verb || :index]
+          elsif entity.resource? && resource_routes[verb || :index]
             :resource
           end
         end
