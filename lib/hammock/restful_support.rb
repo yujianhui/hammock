@@ -112,7 +112,7 @@ module Hammock
         end
       end
 
-      ImpliedUnsafeActions = %w[new edit destroy]
+      ImpliedUnsafeActions = [:new, :edit, :destroy]
 
       def safe_verb_and_implication? verb = nil, record = nil
         if verb.nil?
