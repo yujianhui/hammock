@@ -7,9 +7,8 @@ module Hammock
       base.send :extend, ClassMethods
 
       base.class_eval {
-        # unless defined?(:map_resource_without_hammock_hook)
-        alias_method_chain :map_resource, :hammock_route_map
-        alias_method_chain :map_singleton_resource, :hammock_route_map
+        alias_method_chain_once :map_resource, :hammock_route_map
+        alias_method_chain_once :map_singleton_resource, :hammock_route_map
       }
     end
 
