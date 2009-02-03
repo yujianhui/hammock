@@ -38,6 +38,9 @@ module Hammock
         base_class.to_s.underscore
       end
 
+      def record?; false end
+      def resource?; true end
+
       def update_statement set_clause, where_clause
         statement = "UPDATE #{table_name} SET #{set_clause} WHERE #{send :sanitize_sql_array, where_clause}"
         connection.update statement
@@ -66,6 +69,9 @@ module Hammock
       def resource_name
         self.class.resource_name
       end
+
+      def record?; true end
+      def resource?; false end
 
       def id_str
         if new_record?
