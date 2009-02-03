@@ -24,6 +24,7 @@ module Hammock
       end
 
       def can_verb_resource? verb, resource
+        verb = verb.to_sym
         if !resource.indexable_by(@current_account)
           log "#{requester_name} can't index #{resource.name.pluralize}."
           :not_found
@@ -37,6 +38,7 @@ module Hammock
       end
 
       def can_verb_record? verb, record
+        verb = verb.to_sym
         if [:save, :create].include?(verb) && record.new_record?
           if !record.createable_by?(@current_account)
             log "#{requester_name} can't create a #{record.class} with #{record.attributes.inspect}."
