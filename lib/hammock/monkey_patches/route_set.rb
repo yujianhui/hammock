@@ -60,7 +60,7 @@ module Hammock
             raise_unless_setup_while_trying_to 'render a path'
 
             buf = entity.resource_name
-            buf << '/' + entity.to_param if entity.is_a?(ActiveRecord::Base)
+            buf << '/' + entity.to_param if entity.record?
             buf << '/' + verb.to_s unless verb.nil? or implied_verb?(verb)
             buf
 
@@ -137,7 +137,7 @@ module Hammock
         end
 
         def routeable_as verb, entity
-          if entity.is_a?(ActiveRecord::Base) && record_routes[verb || :show]
+          if entity.record? && record_routes[verb || :show]
             :record
           elsif resource_routes[verb || :index]
             :resource
