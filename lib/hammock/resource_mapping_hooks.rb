@@ -3,8 +3,7 @@ module Hammock
     MixInto = ActionController::Resources
 
     def self.included base # :nodoc:
-      base.send :include, InstanceMethods
-      base.send :extend, ClassMethods
+      base.send :include, Methods
 
       base.class_eval {
         alias_method_chain_once :map_resource, :hammock_route_map
@@ -12,13 +11,7 @@ module Hammock
       }
     end
 
-    module ClassMethods
-
-    end
-
-    module InstanceMethods
-
-      private
+    module Methods
 
       def map_resource_with_hammock_route_map entity, options = {}, &block
         ActionController::Routing::Routes.route_map.add entity, options
