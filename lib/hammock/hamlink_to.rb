@@ -24,10 +24,12 @@ module Hammock
         if :ok == can_verb_entity?(verb, entity)
           route = route_for(verb, entity, opts.dragnet(:nest, :format))
 
-          link_to(opts.delete(:text) || route.verb,
+          link_to(opts.delete(:text) || opts.delete(:text_or_else) || route.verb,
             route.path(opts.delete(:params)),
             opts.merge(:method => route.http_method)
           )
+        else
+          opts[:else] || opts[:text_or_else]
         end
       end
 
