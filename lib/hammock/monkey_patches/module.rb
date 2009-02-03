@@ -17,10 +17,7 @@ module Hammock
         aliased_target, punctuation = target.to_s.sub(/([?!=])$/, ''), $1
         without_method = "#{aliased_target}_without_#{feature}#{punctuation}"
 
-        if [public_instance_methods, protected_instance_methods, private_instance_methods].flatten.include? without_method
-          puts "not repeating alias_method_chain #{target} -> #{feature}."
-        else
-          puts "calling alias_method_chain #{target} -> #{feature}."
+        unless [public_instance_methods, protected_instance_methods, private_instance_methods].flatten.include? without_method
           alias_method_chain target, feature
         end
       end
