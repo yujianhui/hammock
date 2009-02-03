@@ -8,8 +8,8 @@ module Hammock
 
       base.class_eval {
         # unless defined?(:map_resource_without_hammock_hook)
-        alias_method_chain :map_resource, :hammock_hook
-        alias_method_chain :map_singleton_resource, :hammock_hook
+        alias_method_chain :map_resource, :hammock_route_map
+        alias_method_chain :map_singleton_resource, :hammock_route_map
       }
     end
 
@@ -21,14 +21,14 @@ module Hammock
 
       private
 
-      def map_resource_with_hammock_hook entity, options = {}, &block
+      def map_resource_with_hammock_route_map entity, options = {}, &block
         ActionController::Routing::Routes.route_map.add entity, options
-        map_resource_without_hammock_hook entity, options, &block
+        map_resource_without_hammock_route_map entity, options, &block
       end
 
-      def map_singleton_resource_with_hammock_hook entity, options = {}, &block
+      def map_singleton_resource_with_hammock_route_map entity, options = {}, &block
         ActionController::Routing::Routes.route_map.add_singleton entity, options
-        map_singleton_resource_without_hammock_hook entity, options.dup, &block
+        map_singleton_resource_without_hammock_route_map entity, options.dup, &block
       end
 
     end
