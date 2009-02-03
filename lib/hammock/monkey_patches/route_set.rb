@@ -74,6 +74,15 @@ module Hammock
             resource.send("#{routeable_as}_routes")[verb]
           end
           
+          def fake_http_method
+            http_method.in?(:get, :post) ? http_method : :post
+          end
+
+          def get?;       :get == http_method end
+          def post?;     :post == http_method end
+          def put?;       :put == http_method end
+          def delete?; :delete == http_method end
+
           private
           
           def implied_verb? verb
