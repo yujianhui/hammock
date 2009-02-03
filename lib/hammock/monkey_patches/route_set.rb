@@ -160,7 +160,7 @@ module Hammock
           child = children[entity.resource_sym]
 
           if child.nil?
-            raise "No routes are defined for #{entity.route_map}#{' within ' + ancestry.map {|r| r.mdl.to_s }.join(', ') unless ancestry.empty?}."
+            raise "No routes are defined for #{entity.resource}#{' within ' + ancestry.map {|r| r.mdl.to_s }.join(', ') unless ancestry.empty?}."
           else
             HammockRoutePiece.new(child).for(verb, entity)
           end
