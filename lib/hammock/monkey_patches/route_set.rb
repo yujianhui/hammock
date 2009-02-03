@@ -54,19 +54,18 @@ module Hammock
             !@entity.nil?
           end
           
-          def path
+          def path params = nil
             raise_unless_setup_while_trying_to 'render a path'
 
-            buf = entity.resource_name
+            buf = '/'
+            buf << entity.resource_name
             buf << '/' + entity.to_param if entity.record?
             buf << '/' + verb.to_s unless verb.nil? or implied_verb?(verb)
-            buf
 
-            if parent.nil?
-              buf
-            else
-              parent.path + '/' + buf
-            end
+            buf = parent.path + buf unless parent.nil?
+            buf << param_str(params) unless params.nil?
+
+            buf
           end
           
           def http_method
@@ -93,6 +92,10 @@ module Hammock
             raise "You have to call for(verb, entity) (and optionally within(parent)) on this HammockRoutePiece before you can #{task}." unless setup?
           end
           
+          def param_str params
+            params.nil? ? '' : ('?' + {entity.base_model => params}.to_query)
+          end
+
         end
         
         DefaultRecordVerbs = {
