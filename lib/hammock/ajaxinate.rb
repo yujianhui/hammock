@@ -18,13 +18,13 @@ module Hammock
 
       def ajax_link verb, record, opts = {}
         if :ok == can_verb_entity?(verb, record)
-          link_path = ajaxinate verb, record, opts
+          route = ajaxinate verb, record, opts
 
           content_tag :a,
-            opts[:text] || verb.to_s.capitalize,
-            :id => link_id_for(verb, record),
+            opts[:text] || route.verb.to_s.capitalize,
+            :id => link_id_for(route.verb, record),
             :class => opts[:class],
-            :href => link_path,
+            :href => route.path,
             :onclick => 'return false;',
             :style => opts[:style]
         end
@@ -33,15 +33,14 @@ module Hammock
       def ajaxinate verb, record, opts = {}
         record_attributes = {record.base_model => record.unsaved_attributes}
         link_params = {record.base_model => (opts.delete(:record) || {}) }.merge(opts[:params] || {})
-        request_method = method_for verb, record
-        link_path = path_for verb, record
+        route = route_for verb, record
         attribute = link_params[:attribute]
         link_id = link_id_for verb, record, attribute
 
-        request_method, link_params[:_method] = :post, request_method unless [:get, :post].include?(request_method)
+        link_params[:_method] = route.fake_http_method
         link_params[:format] = opts[:format].to_s
 
-        form_elements_hash = if :get == request_method
+        form_elements_hash = if route.get?
           '{ }'
         elsif attribute.blank?
           "jQuery('form').serializeHash()"
@@ -64,13 +63,13 @@ module Hammock
             } else*/ if (false == eval("#{clean_snippet opts[:before]}")) {
               // before callback failed
             } else { // fire the request
-              jQuery.#{request_method}(
-                '#{link_path}',
+              jQuery.#{route.fake_http_method}(
+                '#{route.path}',
                 jQuery.extend(
                   #{record_attributes.to_flattened_json},
                   #{form_elements_hash},
                   #{link_params.to_flattened_json},
-                  #{forgery_key_json(request_method)}
+                  #{forgery_key_json(route.http_method)}
                 ),
                 function(response) {
                   #{response_action};
@@ -82,11 +81,11 @@ module Hammock
         }
 
         append_javascript js
-        link_path
+        route
       end
       
       def jquery_xhr verb, record, opts = {}
-        method = method_for verb, record
+        route = route_for verb, record
         params = if opts[:params].is_a?(String)
           opts[:params].chomp(',').start_with('{').end_with('}')
         else
@@ -94,11 +93,11 @@ module Hammock
         end
         
         %Q{
-          jQuery.#{method == :get ? 'get' : 'post'}('#{path_for verb, record}',
+          jQuery.#{route.http_method == :get ? 'get' : 'post'}('#{route.path}',
             jQuery.extend(
               #{params},
-              {format: '#{opts[:format] || 'html'}', _method: '#{method}'},
-              #{forgery_key_json(method)}
+              {format: '#{opts[:format] || 'html'}', _method: '#{route.http_method}'},
+              #{forgery_key_json(route.http_method)}
             ),
             function(data, textStatus) {
               #{(opts[:callback] || '').end_with(';')}
