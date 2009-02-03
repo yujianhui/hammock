@@ -27,7 +27,7 @@ module Hammock
 
       def map_singleton_resource_with_hammock_route_map entity, options = {}, &block
         ActionController::Routing::Routes.route_map.add_singleton entity, options
-        map_singleton_resource_without_hammock_route_map entity, options.dup, &block
+        map_singleton_resource_without_hammock_route_map entity, options, &block
       end
 
     end
