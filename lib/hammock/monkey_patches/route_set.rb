@@ -9,8 +9,6 @@ module Hammock
       base.class_eval {
         attr_accessor :route_map
       }
-
-      ActionController::Routing::Routes.send :initialize_hammock_route_map
     end
 
     module ClassMethods
