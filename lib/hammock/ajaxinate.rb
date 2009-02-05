@@ -37,7 +37,7 @@ module Hammock
         attribute = link_params[:attribute]
         link_id = link_id_for verb, record, attribute
 
-        link_params[:_method] = route.fake_http_method
+        link_params[:_method] = route.http_method
         link_params[:format] = opts[:format].to_s
 
         form_elements_hash = if route.get?
