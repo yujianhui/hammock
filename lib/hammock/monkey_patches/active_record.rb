@@ -50,6 +50,42 @@ module Hammock
         reset_column_information
         subclasses.each &:reset_cached_column_info
       end
+      
+      def find_or_new_with(find_attributes, create_attributes = {})
+        finder = respond_to?(:find_with_deleted) ? :find_with_deleted : :find
+
+        if record = send(finder, :first, :conditions => find_attributes.discard(:deleted_at))
+          # Found the record, so we can return it, if:
+          # (a) the record can't have a stored deletion state,
+          # (b) it can, but it's not actually deleted,
+          # (c) it is deleted, but we want to find one that's deleted, or
+          # (d) we don't want a deleted record, and undestruction succeeds.
+          if (finder != :find_with_deleted) || !record.deleted? || create_attributes[:deleted_at] || record.undestroy
+            record
+          end
+        else
+          creating_class = if create_attributes[:type].is_a?(ActiveRecord::Base)
+            create_attributes.delete(:type)
+          else
+            self
+          end
+          creating_class.new_with create_attributes.merge(find_attributes)
+        end
+      end
+
+      def find_or_create_with(find_attributes, create_attributes = {}, adjust_attributes = false)
+        if record = find_or_new_with(find_attributes, create_attributes)
+          log "Create failed. #{record.errors.inspect}", :skip => 1 if record.new_record? && !record.save
+          log "Adjust failed. #{record.errors.inspect}", :skip => 1 if adjust_attributes && !record.adjust(create_attributes)
+          record
+        end
+      end
+      
+      # def find_or_create_with! find_attributes, create_attributes = {}, adjust_attributes = false)
+      #   record = find_or_new_with find_attributes, create_attributes, adjust_attributes
+      #   record.valid? ? record : raise("Save failed. #{record.errors.inspect}")
+      # end
+
     end
 
     module InstanceMethods
