@@ -47,7 +47,7 @@ module Hammock
         metaclass.instance_eval {
           verbs.each {|verb|
             send :define_method, "#{verb}_scope" do
-              public_scope
+              public_scope nil
             end
           }
         }
@@ -87,7 +87,7 @@ module Hammock
         }
       end
 
-      def public_scope
+      def public_scope account
         if sqlite?
           lambda {|record| 1 }
         else
