@@ -77,7 +77,9 @@ module Hammock
       # TODO This implicitly references the current model, but is called through hamlink_to
       # for varying models.
       def make_createable?
-        if !make_new_record.createable_by?(@current_account)
+        if !(new_record = make_new_record)
+          log "Couldn't create a new #{mdl.base_model} with the given nesting level and parameters."
+        elsif !new_record.createable_by?(@current_account)
           log "#{requester_name} can't create new #{mdl.base_model.pluralize}."
         else
           true
