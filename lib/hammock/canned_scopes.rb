@@ -108,6 +108,10 @@ module Hammock
         lambda {|record| record.id == account.id }
       end
 
+      def empty_scope
+        lambda {|record| false }
+      end
+
     end
 
     module InstanceMethods
