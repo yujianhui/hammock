@@ -109,7 +109,7 @@ module Hammock
       private
 
       def link_id_for verb, record, attribute = nil
-        [verb, record.base_model, record.id_or_describer.to_s.gsub(/[^a-zA-Z0-9\-_]/, ''), attribute].compact.join('_')
+        [verb, record.base_model, record.id_or_description.to_s.gsub(/[^a-zA-Z0-9\-_]/, ''), attribute].compact.join('_')
       end
 
       def clean_snippet snippet

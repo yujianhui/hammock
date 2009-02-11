@@ -117,12 +117,12 @@ module Hammock
         end
       end
 
-      def id_or_describer
-        if id && id > 0
-          id
-        else
-          attributes.map {|k,v| "#{k}-#{(v.to_s || '')[0..10]}" }.join("_")
-        end
+      def id_or_description
+        new_record? ? new_record_description : id
+      end
+      
+      def new_record_description
+        attributes.map {|k,v| "#{k}-#{(v.to_s || '')[0..10]}" }.join("_")
       end
 
       def base_model
