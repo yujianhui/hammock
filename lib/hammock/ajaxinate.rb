@@ -35,7 +35,7 @@ module Hammock
         link_params = {record.base_model => (opts.delete(:record) || {}) }.merge(opts[:params] || {})
         route = route_for verb, record
         attribute = link_params[:attribute]
-        link_id = link_id_for verb, record, attribute
+        link_id = link_id_for route.verb, record, attribute
 
         link_params[:_method] = route.http_method
         link_params[:format] = opts[:format].to_s
