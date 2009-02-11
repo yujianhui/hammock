@@ -93,7 +93,8 @@ module Hammock
         end
         
         %Q{
-          jQuery.#{route.fake_http_method}('#{route.path}',
+          jQuery.#{route.fake_http_method}(
+            '#{route.path}',
             jQuery.extend(
               #{params},
               {format: '#{opts[:format] || 'html'}', _method: '#{route.http_method}'},
