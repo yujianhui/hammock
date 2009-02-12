@@ -35,7 +35,7 @@ module Hammock
         link_params = {record.base_model => (opts.delete(:record) || {}) }.merge(opts[:params] || {})
         route = route_for verb, record
         attribute = link_params[:attribute]
-        link_id = link_id_for verb, record, attribute
+        link_id = link_id_for route.verb, record, attribute
 
         link_params[:_method] = route.http_method
         link_params[:format] = opts[:format].to_s
@@ -93,7 +93,8 @@ module Hammock
         end
         
         %Q{
-          jQuery.#{route.http_method == :get ? 'get' : 'post'}('#{route.path}',
+          jQuery.#{route.fake_http_method}(
+            '#{route.path}',
             jQuery.extend(
               #{params},
               {format: '#{opts[:format] || 'html'}', _method: '#{route.http_method}'},
@@ -109,7 +110,7 @@ module Hammock
       private
 
       def link_id_for verb, record, attribute = nil
-        [verb, record.base_model, record.id_or_describer.to_s.gsub(/[^a-zA-Z0-9\-_]/, ''), attribute].compact.join('_')
+        [verb, record.base_model, record.id_or_description.to_s.gsub(/[^a-zA-Z0-9\-_]/, ''), attribute].compact.join('_')
       end
 
       def clean_snippet snippet

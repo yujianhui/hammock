@@ -48,7 +48,7 @@ module Hammock
       end
 
       def possessive
-        "#{self}'#{'s' unless self[-1, 1] == 's'}"
+        "#{self}'#{'s' unless ends_with?('s')}"
       end
 
       # TODO any more to add?
