@@ -29,6 +29,10 @@ module Hammock
         @hammock_cached_mdl_name ||= self.class.to_s.sub('Controller', '').singularize.underscore
       end
 
+      def current_route
+        @hammock_cached_current_route ||= route_for(action_name.to_sym, *current_nested_records.concat(@record))
+      end
+
       # Returns true if the current action represents an edit on +record+.
       #
       # For example, consider the route <tt>/articles/3/comments/31/edit</tt>, which fires <tt>CommentsController#edit</tt>. The nested route handler would assign <tt>@comment</tt> and <tt>@article</tt> to the appropriate records, and then the following would be observed:
