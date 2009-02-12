@@ -110,6 +110,14 @@ module Hammock
         }
       end
 
+      def current_nested_records
+        @current_nested_records.nil? ? [] : @current_nested_records.dup
+      end
+
+      def current_nested_resources
+        @current_nested_resources.nil? ? [] : @current_nested_resources.dup
+      end
+
       def nested_within? record_or_resource
         if record_or_resource.is_a? ActiveRecord::Base
           @current_nested_records.include? record_or_resource
