@@ -28,7 +28,7 @@ module Hammock
         if !resource.indexable_by(@current_account)
           log "#{requester_name} can't index #{resource.name.pluralize}."
           :not_found
-        elsif !safe_verb_and_implication?(verb, resource) && !make_createable?
+        elsif !safe_verb_and_implication?(verb, resource) && !make_createable(resource)
           log "#{requester_name} can't #{verb} #{resource.name.pluralize}."
           :read_only
         else

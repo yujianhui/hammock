@@ -74,19 +74,17 @@ module Hammock
 
       private
 
-      def make_new_record
-        assign_resource(mdl.new_with(params_for(mdl.symbolize)))
+      def make_new_record resource = mdl
+        assign_entity(resource.new_with(params_for(resource.symbolize)))
       end
 
-      # TODO This implicitly references the current model, but is called through hamlink_to
-      # for varying models.
-      def make_createable?
-        if !(new_record = make_new_record)
-          log "Couldn't create a new #{mdl.base_model} with the given nesting level and parameters."
+      def make_createable resource = mdl
+        if !(new_record = make_new_record(resource))
+          log "Couldn't create a new #{resource.base_model} with the given nesting level and parameters."
         elsif !new_record.createable_by?(@current_account)
-          log "#{requester_name} can't create new #{mdl.base_model.pluralize}."
+          log "#{requester_name} can't create new #{new_record.base_model.pluralize}."
         else
-          true
+          new_record
         end
       end
 

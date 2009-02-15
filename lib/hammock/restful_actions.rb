@@ -41,7 +41,7 @@ module Hammock
       #
       # Creates a new record with the supplied attributes. TODO
       def create
-        if !find_record_on_create && !make_createable?
+        if !find_record_on_create && !make_createable
           escort :unauthed
         else
           render_or_redirect_after save_record
@@ -137,7 +137,7 @@ module Hammock
       end
 
       def tasks_for_new
-        callback(:before_modify) and callback(:before_new) if make_createable?
+        callback(:before_modify) and callback(:before_new) if make_createable
       end
 
       def find_record_on_create
