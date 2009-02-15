@@ -51,8 +51,8 @@ module Hammock
         params[key] || {}
       end
 
-      def assign_resource record_or_records
-        assignment = if record_or_records.nil?
+      def assign_entity record_or_records
+        @entity = if record_or_records.nil?
           # Fail
         elsif record_or_records.is_a? ActiveRecord::Base
           instance_variable_set "@#{mdl_name}", (@record = record_or_records)
@@ -66,7 +66,7 @@ module Hammock
         end
 
         if assign_nestable_resources
-          assignment
+          @entity
         else
           escort :not_found
         end

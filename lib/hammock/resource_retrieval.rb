@@ -32,7 +32,7 @@ module Hammock
         if :ok != result
           escort(result)
         else
-          assign_resource record
+          assign_entity record
         end
       end
 
@@ -40,7 +40,7 @@ module Hammock
         if (scope = current_scope).nil?
           escort :unauthed
         else
-          assign_resource scope
+          assign_entity scope
         end
       end
 
