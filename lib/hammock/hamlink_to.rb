@@ -22,7 +22,7 @@ module Hammock
         entity = args.last
 
         if :ok == can_verb_entity?(verb, entity)
-          route = route_for(verb, entity, opts.dragnet(:nest, :format))
+          route = route_for *args.push(opts.dragnet(:nest, :format))
 
           link_to(opts.delete(:text) || opts.delete(:text_or_else) || route.verb,
             route.path(opts.delete(:params)),
