@@ -26,7 +26,7 @@ module Hammock
 
           link_to(opts.delete(:text) || opts.delete(:text_or_else) || route.verb,
             route.path(opts.delete(:params)),
-            opts.merge(:method => route.http_method)
+            opts.merge(:method => (route.http_method unless route.get?))
           )
         else
           opts[:else] || opts[:text_or_else]
