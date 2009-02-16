@@ -75,7 +75,11 @@ module Hammock
       private
 
       def make_new_record resource = mdl
-        assign_entity(resource.new_with(params_for(resource.symbolize)))
+        resource.new_with(params_for(resource.symbolize))
+      end
+
+      def assign_createable
+        assign_entity make_createable
       end
 
       def make_createable resource = mdl
