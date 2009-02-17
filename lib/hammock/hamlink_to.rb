@@ -26,7 +26,13 @@ module Hammock
 
           opts[:class] = ['current', opts[:class]].squash.join(' ') if opts[:indicate_current] && (route == controller.current_route)
 
-          link_to(opts.delete(:text) || opts.delete(:text_or_else) || route.verb,
+          text = opts.delete(:text) || opts.delete(:text_or_else)
+
+          if text.is_a?(Symbol)
+            text = entity.send(text)
+          end
+
+          link_to(text || route.verb,
             route.path(opts.delete(:params)),
             opts.merge(:method => (route.http_method unless route.get?))
           )
