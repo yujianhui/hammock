@@ -21,7 +21,7 @@ module Hammock
         verb = args.first if args.first.is_a?(Symbol)
         entity = args.last
 
-        if :ok == can_verb_entity?(verb, entity)
+        if can_verb_entity?(verb, entity)
           route = route_for *args.push(opts.dragnet(:nest, :format))
 
           opts[:class] = ['current', opts[:class]].squash.join(' ') if opts[:indicate_current] && (route == controller.current_route)

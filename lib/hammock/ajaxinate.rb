@@ -17,7 +17,7 @@ module Hammock
       end
 
       def ajax_link verb, record, opts = {}
-        if :ok == can_verb_entity?(verb, record)
+        if can_verb_entity?(verb, record)
           route = ajaxinate verb, record, opts
 
           content_tag :a,

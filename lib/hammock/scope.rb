@@ -20,7 +20,7 @@ module Hammock
           can_verb_record? verb, entity
         else
           can_verb_resource? verb, entity
-        end
+        end == :ok
       end
 
       def can_verb_resource? verb, resource
