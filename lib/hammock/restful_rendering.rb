@@ -51,7 +51,15 @@ module Hammock
       def render_http_success
         flash[:notice] = "#{mdl} was successfully #{@record.new_or_deleted_before_save? ? 'created' : 'updated'}."
         respond_to do |format|
-          format.html { redirect_back_or(postsave_redirect || nested_path_for((@record unless inline_createable_resource?) || mdl)) }
+          format.html {
+            default_redirect_path = postsave_redirect || nested_path_for(inline_createable_resource? ? mdl : @entity)
+
+            if params[:redirect] == 'back'
+              redirect_back_or default_redirect_path
+            else
+              redirect_to default_redirect_path
+            end
+          }
           format.xml {
             if @record.new_or_deleted_before_save?
               render :xml => @record, :status => :created, :location => @record
