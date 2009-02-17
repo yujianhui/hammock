@@ -23,7 +23,7 @@ module Hammock
           content_tag :a,
             opts[:text] || route.verb.to_s.capitalize,
             :id => link_id_for(route.verb, record),
-            :class => opts[:class],
+            :class => [opts[:class], link_class_for(route.verb, record)].squash.join(' '),
             :href => route.path,
             :onclick => 'return false;',
             :style => opts[:style]
@@ -126,6 +126,10 @@ module Hammock
 
       def link_id_for verb, record, attribute = nil
         [verb, record.base_model, record.id_or_description.to_s.gsub(/[^a-zA-Z0-9\-_]/, ''), attribute].compact.join('_')
+      end
+
+      def link_class_for verb, record, attribute = nil
+        [verb, record.base_model, attribute].compact.join('_')
       end
 
       def clean_snippet snippet
