@@ -24,11 +24,12 @@ module Hammock
       end
 
       def can_verb_resource? verb, resource
-        verb = verb.to_sym
-        if !resource.indexable_by(@current_account)
+        raise "The verb at #{call_point} must be supplied as a Symbol." unless verb.nil? || verb.is_a?(Symbol)
+        route = route_for verb, resource
+        if route.safe? && !resource.indexable_by(@current_account)
           log "#{requester_name} can't index #{resource.name.pluralize}."
           :not_found
-        elsif !safe_verb_and_implication?(verb, resource) && !make_createable(resource)
+        elsif !route.safe? && !make_createable(resource)
           log "#{requester_name} can't #{verb} #{resource.name.pluralize}."
           :read_only
         else
@@ -38,8 +39,9 @@ module Hammock
       end
 
       def can_verb_record? verb, record
-        verb = verb.to_sym
-        if [:save, :create].include?(verb) && record.new_record?
+        raise "The verb at #{call_point} must be supplied as a Symbol." unless verb.nil? || verb.is_a?(Symbol)
+        route = route_for verb, record
+        if route.verb.in?(:save, :create) && record.new_record?
           if !record.createable_by?(@current_account)
             log "#{requester_name} can't create a #{record.class} with #{record.attributes.inspect}."
             :unauthed
@@ -50,7 +52,7 @@ module Hammock
           if !record.readable_by?(@current_account)
             log "#{requester_name} can't see #{record.class}<#{record.id}>."
             :not_found
-          elsif !safe_verb_and_implication?(verb, record) && !record.writeable_by?(@current_account)
+          elsif !route.safe? && !record.writeable_by?(@current_account)
             log "#{requester_name} can't #{verb} #{record.class}<#{record.id}>."
             :read_only
           else
