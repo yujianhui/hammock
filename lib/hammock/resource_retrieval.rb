@@ -21,7 +21,7 @@ module Hammock
         elsif (record = retrieve_record(finder)).nil?
           log "#{mdl}<#{params[:id]}> doesn't exist within #{requester_name.possessive} #{action_name} scope."
           :not_found
-        elsif :ok != (verbability = can_verb_record?(action_name, record))
+        elsif :ok != (verbability = can_verb_record?(action_name.to_sym, record))
           verbability
         elsif !callback(:during_find, record)
           # callbacks failed
