@@ -38,6 +38,8 @@ module Hammock
               raise "The verb '#{verb}' can't be applied to " + (entity.record? ? "#{entity.resource} records" : "the #{entity.resource} resource") + "."
             elsif (:record == routeable_as) && entity.new_record?
               raise "The verb '#{verb}' requires a #{entity.resource} with an ID (i.e. not a new record)."
+            elsif (:build == routeable_as) && entity.record? && !entity.new_record?
+              raise "The verb '#{verb}' requires either the #{entity.resource} resource, or a #{entity.resource} without an ID (i.e. a new record)."
             else
               @verb, @entity, @routeable_as = verb, entity, routeable_as
             end
@@ -59,11 +61,11 @@ module Hammock
 
             buf = '/'
             buf << entity.resource_name
-            buf << '/' + entity.to_param if entity.record?
+            buf << '/' + entity.to_param if entity.record? && !entity.new_record?
             buf << '/' + verb.to_s unless verb.nil? or implied_verb?(verb)
 
             buf = parent.path + buf unless parent.nil?
-            buf << param_str(params) unless params.nil?
+            buf << param_str(params)
 
             buf
           end
@@ -97,7 +99,13 @@ module Hammock
           end
           
           def param_str params
-            params.nil? ? '' : ('?' + {entity.base_model => params}.to_query)
+            link_params = entity.record? ? entity.unsaved_attributes.merge(params || {}) : params
+
+            if link_params.blank?
+              ''
+            else
+              '?' + {entity.base_model => link_params}.to_query
+            end
           end
 
         end
@@ -109,12 +117,14 @@ module Hammock
           :destroy => :delete
         }.freeze
         DefaultResourceVerbs = {
-          :index => :get,
+          :index => :get
+        }.freeze
+        DefaultBuildVerbs = {
           :new => :get,
           :create => :post
         }.freeze
 
-        attr_reader :mdl, :parent, :children, :record_routes, :resource_routes
+        attr_reader :mdl, :parent, :children, :record_routes, :resource_routes, :build_routes
 
         def initialize entity = nil, options = {}
           @mdl = entity if entity.is_a?(Symbol)
@@ -155,6 +165,8 @@ module Hammock
             :record
           elsif entity.resource? && resource_routes[verb || :index]
             :resource
+          elsif !verb.nil? && build_routes[verb]
+            :build
           end
         end
 
@@ -163,6 +175,7 @@ module Hammock
         def define_routes options
           @record_routes = DefaultRecordVerbs.dup.update(options[:member] || {})
           @resource_routes = DefaultResourceVerbs.dup.update(options[:collection] || {})
+          @build_routes = DefaultBuildVerbs.dup.update(options[:build] || {})
         end
 
         def add_child entity, options
