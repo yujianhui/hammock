@@ -86,7 +86,7 @@ module Hammock
         if !(new_record = make_new_record(resource))
           log "Couldn't create a new #{resource.base_model} with the given nesting level and parameters."
         elsif !new_record.createable_by?(@current_account)
-          log "#{requester_name} can't create new #{new_record.base_model.pluralize}."
+          log "#{requester_name} can't create #{new_record.resource_name}."
         else
           new_record
         end

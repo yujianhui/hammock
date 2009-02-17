@@ -84,6 +84,18 @@ module Hammock
         route
       end
       
+      def status_callback
+        %Q{
+          if ('success' == textStatus) {
+            obj.replaceWith(data);
+            jQuery('.success', jQuery('#' + jQuery(data).attr("id"))).show().fadeOut(4000);
+          } else {
+            jQuery('.statuses .failure', obj).hide();
+            jQuery('.statuses .failure', obj).show().parents('obj').BlindUp();
+          }
+        }
+      end
+
       def jquery_xhr verb, record, opts = {}
         route = route_for verb, record
         params = if opts[:params].is_a?(String)
@@ -93,6 +105,8 @@ module Hammock
         end
         
         %Q{
+          jQuery('.spinner', obj).show();
+
           jQuery.#{route.fake_http_method}(
             '#{route.path}',
             jQuery.extend(
@@ -101,6 +115,7 @@ module Hammock
               #{forgery_key_json(route.http_method)}
             ),
             function(data, textStatus) {
+              #{status_callback}
               #{(opts[:callback] || '').end_with(';')}
             }
           );
