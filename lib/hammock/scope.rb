@@ -27,10 +27,10 @@ module Hammock
         raise "The verb at #{call_point} must be supplied as a Symbol." unless verb.nil? || verb.is_a?(Symbol)
         route = route_for verb, resource
         if route.safe? && !resource.indexable_by(@current_account)
-          log "#{requester_name} can't index #{resource.name.pluralize}."
+          log "#{requester_name} can't index #{resource.name.pluralize}. #{describe_call_point 4}"
           :not_found
         elsif !route.safe? && !make_createable(resource)
-          log "#{requester_name} can't #{verb} #{resource.name.pluralize}."
+          log "#{requester_name} can't #{verb} #{resource.name.pluralize}. #{describe_call_point 4}"
           :read_only
         else
           # log "#{requester_name} can #{verb} #{resource.name.pluralize}."
@@ -43,17 +43,17 @@ module Hammock
         route = route_for verb, record
         if route.verb.in?(:save, :create) && record.new_record?
           if !record.createable_by?(@current_account)
-            log "#{requester_name} can't create a #{record.class} with #{record.attributes.inspect}."
+            log "#{requester_name} can't create a #{record.class} with #{record.attributes.inspect}. #{describe_call_point 4}"
             :unauthed
           else
             :ok
           end
         else
           if !record.readable_by?(@current_account)
-            log "#{requester_name} can't see #{record.class}<#{record.id}>."
+            log "#{requester_name} can't see #{record.class}<#{record.id}>. #{describe_call_point 4}"
             :not_found
           elsif !route.safe? && !record.writeable_by?(@current_account)
-            log "#{requester_name} can't #{verb} #{record.class}<#{record.id}>."
+            log "#{requester_name} can't #{verb} #{record.class}<#{record.id}>. #{describe_call_point 4}"
             :read_only
           else
             # log "#{requester_name} can #{verb} #{record.class}<#{record.id}>."

@@ -29,6 +29,14 @@ module Hammock
         'SQLite' == connection.adapter_name
       end
 
+      def describe_call_point offset = 0
+        "(called from #{call_point offset + 1})"
+      end
+
+      def call_point offset = 0
+        caller[offset + 1].strip.gsub(rails_root, '').gsub(/\:in\ .*$/, '')
+      end
+
     end
   end
 end
