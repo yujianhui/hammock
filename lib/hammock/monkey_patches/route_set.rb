@@ -82,6 +82,10 @@ module Hammock
           def put?;       :put == http_method end
           def delete?; :delete == http_method end
 
+          def safe?
+            get? && !verb.in?(Hammock::Constants::ImpliedUnsafeActions)
+          end
+
           private
           
           def implied_verb? verb

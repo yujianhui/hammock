@@ -128,15 +128,8 @@ module Hammock
         end
       end
 
-      ImpliedUnsafeActions = [:new, :edit, :destroy]
-
-      def safe_verb_and_implication? verb = nil, record = nil
-        if verb.nil?
-          request.get? && !ImpliedUnsafeActions.include?(action_name.to_s)
-        else
-          route = route_for(verb, record)
-          route.get? && !ImpliedUnsafeActions.include?(route.verb)
-        end
+      def safe_verb_and_implication?
+        request.get? && !action_name.to_s.in?(Hammock::Constants::ImpliedUnsafeActions)
       end
 
       def set_editing
