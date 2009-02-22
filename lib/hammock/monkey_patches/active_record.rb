@@ -150,7 +150,9 @@ module Hammock
         end
       end
 
-      # Updates each given attribute to the current time, expecting that they are all +datetime+ columns.
+      # Updates each given attribute to the current time.
+      #
+      # Assumes that each column can accept a +Time+ instance, i.e. that they're all +datetime+ columns or similar.
       #
       # The updates are done with update_attribute, and as such they are done with callbacks but
       # without validation.
@@ -159,6 +161,16 @@ module Hammock
         attrs.each {|attribute|
           update_attribute attribute, now
         }
+      end
+
+      # Updates each given attribute to the current time, skipping attributes that are already set.
+      #
+      # Assumes that each column can accept a +Time+ instance, i.e. that they're all +datetime+ columns or similar.
+      #
+      # The updates are done with update_attribute, and as such they are done with callbacks but
+      # without validation.
+      def touch_once *attrs
+        touch *attrs.select {|attribute| attributes[attribute.to_s].nil? }
       end
 
       def unsaved_attributes
