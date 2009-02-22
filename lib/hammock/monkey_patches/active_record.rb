@@ -173,6 +173,11 @@ module Hammock
         touch *attrs.select {|attribute| attributes[attribute.to_s].nil? }
       end
 
+      def adjust attrs
+        attrs.each {|k,v| send "#{k}=", v }
+        save false
+      end
+
       def unsaved_attributes
         self.changed.inject({}) {|hsh,k|
           hsh[k] = attributes[k]
@@ -180,8 +185,30 @@ module Hammock
         }
       end
 
+      # Offset +attribute+ by +offset+ atomically in SQL.
+      def offset! attribute, offset
+        if new_record?
+          log "Can't offset! a new record."
+        else
+          # Update the in-memory model
+          send "#{attribute}=", send(attribute) + offset
+          # Update the DB
+          run_updater_sql 'Offset', "#{connection.quote_column_name(attribute)} = #{connection.quote_column_name(attribute)} + #{quote_value(offset)}"
+        end
+      end
+
 
       private
+
+      def run_updater_sql logger_prefix, set_clause
+        connection.update(
+          "UPDATE #{self.class.table_name} " +
+          "SET #{set_clause} " +
+          "WHERE #{connection.quote_column_name(self.class.primary_key)} = #{quote_value(id)}",
+
+          "#{self.class.name} #{logger_prefix}"
+        ) != false
+      end
 
       # TODO Use ambition for association queries.
       # def self.collection_reader_method reflection, association_proxy_class
