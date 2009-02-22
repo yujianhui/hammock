@@ -5,6 +5,11 @@ module Hammock
     def self.included base # :nodoc:
       base.send :include, InstanceMethods
       base.send :extend, ClassMethods # TODO maybe include in the metaclass instead of extending the class?
+
+      %w[before_undestroy after_undestroy].each {|callback_name|
+        MixInto.define_callbacks callback_name
+        # base.send :define_method, callback_name, lambda { }
+      }
     end
 
     module ClassMethods
