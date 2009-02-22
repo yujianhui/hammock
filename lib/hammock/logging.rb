@@ -63,6 +63,11 @@ module Hammock
         end
       end
 
+      def log_fail *args
+        log *(args << opts.merge(:skip => (opts[:skip] || 0) + 1))
+        false
+      end
+
       def log *args
         opts = {
           :skip => 0
