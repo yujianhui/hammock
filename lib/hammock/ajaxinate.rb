@@ -87,7 +87,6 @@ module Hammock
       def status_callback
         %Q{
           if ('success' == textStatus) {
-            obj.replaceWith(data);
             jQuery('.success', jQuery('#' + jQuery(data).attr("id"))).show().fadeOut(4000);
           } else {
             jQuery('.statuses .failure', obj).hide();
@@ -103,7 +102,14 @@ module Hammock
         else
           (opts[:params] || {}).merge(record.base_model => (opts[:record] || {})).to_flattened_json
         end
-        
+
+        response_action = case opts[:format].to_s
+        when 'js'
+          "eval(data);"
+        else
+          "obj.replaceWith(data);"
+        end
+
         %Q{
           jQuery('.spinner', obj).show();
 
@@ -115,6 +121,7 @@ module Hammock
               #{forgery_key_json(route.http_method)}
             ),
             function(data, textStatus) {
+              #{response_action}
               #{status_callback}
               #{(opts[:callback] || '').end_with(';')}
             }
