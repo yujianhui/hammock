@@ -25,6 +25,7 @@ module Hammock
           route = route_for *args.push(opts.dragnet(:nest, :format))
 
           opts[:class] = ['current', opts[:class]].squash.join(' ') if opts[:indicate_current] && (route == controller.current_route)
+          opts[:class] = [link_class_for(route.verb, entity), opts[:class]].squash.join(' ')
 
           text = opts.delete(:text) || opts.delete(:text_or_else)
 
