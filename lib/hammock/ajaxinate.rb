@@ -22,7 +22,6 @@ module Hammock
 
           content_tag :a,
             opts[:text] || route.verb.to_s.capitalize,
-            :id => link_id_for(route.verb, record),
             :class => [opts[:class], link_class_for(route.verb, record)].squash.join(' '),
             :href => route.path,
             :onclick => 'return false;',
@@ -35,7 +34,7 @@ module Hammock
         link_params = {record.base_model => (opts.delete(:record) || {}) }.merge(opts[:params] || {})
         route = route_for verb, record
         attribute = link_params[:attribute]
-        link_id = link_id_for route.verb, record, attribute
+        link_class = link_class_for route.verb, record, attribute
 
         link_params[:_method] = route.http_method
         link_params[:format] = opts[:format].to_s
@@ -45,20 +44,20 @@ module Hammock
         elsif attribute.blank?
           "jQuery('form').serializeHash()"
         else
-          "{ '#{record.base_model}[#{attribute}]': $('##{link_id}').val() }"
+          "{ '#{record.base_model}[#{attribute}]': $('.#{link_class}').val() }"
         end
 
         response_action = case link_params[:format].to_s
         when 'js'
           "eval(response)"
         else
-          "jQuery('##{opts[:target] || link_id + '_target'}').before(response).remove()"
+          "jQuery('.#{opts[:target] || link_class + '_target'}').before(response).remove()"
         end
 
         # TODO check the response code in the callback, and replace :after with :success and :failure.
         js = %Q{
-          jQuery('##{link_id}').#{opts[:on] || 'click'}(function() {
-            /*if (#{attribute.blank? ? 'false' : 'true'} && (jQuery('##{link_id}_target .original_value').html() == jQuery('##{link_id}_target .modify input').val())) {
+          jQuery('.#{link_class}').#{opts[:on] || 'click'}(function() {
+            /*if (#{attribute.blank? ? 'false' : 'true'} && (jQuery('.#{link_class}_target .original_value').html() == jQuery('.#{link_class}_target .modify input').val())) {
               eval("#{clean_snippet opts[:skipped]}");
             } else*/ if (false == eval("#{clean_snippet opts[:before]}")) {
               // before callback failed
@@ -131,12 +130,8 @@ module Hammock
 
       private
 
-      def link_id_for verb, record, attribute = nil
-        [verb, record.base_model, record.id_or_description.to_s.gsub(/[^a-zA-Z0-9\-_]/, ''), attribute].compact.join('_')
-      end
-
       def link_class_for verb, record, attribute = nil
-        [verb, record.base_model, attribute].compact.join('_')
+        [verb, record.base_model, record.id, attribute].compact.join('_')
       end
 
       def clean_snippet snippet
