@@ -30,7 +30,7 @@ module Hammock
       end
 
       def current_route
-        @hammock_cached_current_route ||= route_for(action_name.to_sym, *current_nested_records.concat(@record))
+        @hammock_cached_current_route ||= route_for(action_name.to_sym, *current_nested_records.push(@entity)) unless @entity.nil?
       end
 
       # Returns true if the current action represents an edit on +record+.
