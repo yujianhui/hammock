@@ -101,7 +101,7 @@ module Hammock
         params = if opts[:params].is_a?(String)
           opts[:params].chomp(',').start_with('{').end_with('}')
         else
-          {record.base_model => (opts[:params] || {})}.to_flattened_json
+          (opts[:params] || {}).merge(record.base_model => (opts[:record] || {})).to_flattened_json
         end
         
         %Q{
