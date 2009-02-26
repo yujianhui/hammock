@@ -5,7 +5,7 @@ require 'ambition/adapters/active_record'
 
 Dir.glob("#{File.dirname __FILE__}/hammock/**/*.rb").each {|dep|
   require dep
-}
+} if defined?(RAILS_ROOT) # Loading Hammock components under 'rake package' fails.
 
 module Hammock
   VERSION = '0.2.4'
