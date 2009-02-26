@@ -16,7 +16,7 @@ module Hammock
     }.select {|constant|
       constant.is_a? Module
     }.partition {|mod|
-      mod.constants.include? 'LoadFirst'
+      mod.constants.include?('LoadFirst') && mod::LoadFirst
     }.flatten.each {|mod|
       target = mod.constants.include?('MixInto') ? mod::MixInto : base
       target.send :include, mod
