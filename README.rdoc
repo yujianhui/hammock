@@ -1,9 +1,43 @@
-== Hammock
+= hammock
 
-Hammock is a Rails plugin that eliminates redundant code. Specify how your controllers should behave, instead of repetitively repeating the specifics of REST redundantly. Hammock enforces RESTful resource access by abstracting it away from the controller in favour of a clean, model-like callback system.
+http://github.com/benhoskings/hammock
 
 
-== Now
+== DESCRIPTION:
+
+Hammock is a Rails plugin that eliminates redundant code in a very RESTful manner. It does this in lots in lots of different places, but in one manner: it encourages specification in place of implementation.
+
+
+Hammock enforces RESTful resource access by abstracting actions away from the controller in favour of a clean, model-like callback system.
+
+Hammock tackles the hard and soft sides of security at once with a scoping security system on your models. Specify who can verb what resources under what conditions once, and everything else - the actual security, link generation, index filtering - just happens.
+
+Hammock inspects your routes and resources to generate a routing tree for each resource. Parent resources in a nested route are handled transparently at every point - record retrieval, creation, and linking.
+
+It makes more sense when you see how it works though, so check out the screencast!
+
+
+== REQUIREMENTS:
+
+benhoskings-ambition
+benhoskings-ambitious-activerecord
+
+
+== INSTALL:
+
+sudo gem install benhoskings-hammock --source http://gems.github.com
+
+class ApplicationController
+  include Hammock
+  ...
+
+
+== LICENSE:
+
+Hammock is licensed under the BSD license, which can be found in full in the LICENSE file.
+
+
+== SYNOPSIS
 
 At the moment, you can do this with Hammock:
 
@@ -63,16 +97,9 @@ Hammock uses Beer.read_scope_for on #show, and write_scope_for on #edit, #update
 
 These three uses of the scope, plus another as-yet unimplemented bit, provide the entire security model of the application.
 
-
-== The Master Plan
+== THE MASTER PLAN
 
 Lots of functionality is planned that will take this much further.
 
 
-== Installation
-
-  cd RAILS_ROOT/vendor/plugins
-  git clone git://github.com/benhoskings/hammock.git
-
-... and include Hammock in ApplicationController, or just in specific controllers if you like.
 
