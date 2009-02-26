@@ -1,6 +1,7 @@
 module Hammock
   module Lol
     MixInto = Lol::Lul
+    # LoadFirst = false
     
     def self.included base # :nodoc:
       base.send :include, InstanceMethods
