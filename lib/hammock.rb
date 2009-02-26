@@ -1,8 +1,15 @@
+gem 'benhoskings-ambition'
+gem 'benhoskings-ambitious-activerecord'
+require 'ambition'
+require 'ambition/adapters/active_record'
+
 Dir.glob("#{File.dirname __FILE__}/hammock/**/*.rb").each {|dep|
   require dep
 }
 
 module Hammock
+  VERSION = '0.2.4'
+
   def self.included base # :nodoc:
     Hammock.constants.map {|constant_name|
       Hammock.const_get constant_name
