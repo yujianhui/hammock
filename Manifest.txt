@@ -3,6 +3,7 @@ LICENSE
 Manifest.txt
 README.rdoc
 Rakefile
+hammock.gemspec
 lib/hammock.rb
 lib/hammock/ajaxinate.rb
 lib/hammock/callbacks.rb
