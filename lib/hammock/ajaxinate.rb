@@ -110,7 +110,9 @@ module Hammock
         end
 
         %Q{
-          jQuery('.spinner', obj).show();
+          if (typeof(obj) != 'undefined') {
+            jQuery('.spinner', obj).show();
+          }
 
           jQuery.#{route.fake_http_method}(
             '#{route.path}',
