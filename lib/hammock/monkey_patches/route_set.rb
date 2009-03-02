@@ -131,10 +131,14 @@ module Hammock
           @children = {}
           unless root?
             @mdl = entity if entity.is_a?(Symbol)
-            @resource = Object.const_get mdl.to_s.classify rescue nil
             @routing_parent = determine_routing_parent
             define_routes options
           end
+        end
+
+        def resource
+          # TODO performance
+          Object.const_get mdl.to_s.classify rescue nil
         end
 
         def root?
