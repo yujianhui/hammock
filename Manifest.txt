@@ -34,6 +34,8 @@ lib/hammock/restful_rendering.rb
 lib/hammock/restful_support.rb
 lib/hammock/route_drawing_hooks.rb
 lib/hammock/route_for.rb
+lib/hammock/route_node.rb
+lib/hammock/route_step.rb
 lib/hammock/scope.rb
 lib/hammock/suggest.rb
 lib/hammock/utils.rb
