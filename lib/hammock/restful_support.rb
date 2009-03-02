@@ -138,8 +138,15 @@ module Hammock
         @editing = @record
       end
 
+      # TODO process /^creating_\w+_id$/ as well
       def set_creator_id_if_appropriate
-        @record.creator_id = @current_account.id if @record.respond_to?(:creator_id=)
+        if @record.respond_to?(:creator_id=)
+          if @current_account.nil?
+            log "Warning: @#{@record.base_model}.creator_id isn't being set, since @current_account was nil."
+          else
+            @record.creator_id = @current_account.id
+          end
+        end
       end
 
       def partial_exists? name, extension = nil
