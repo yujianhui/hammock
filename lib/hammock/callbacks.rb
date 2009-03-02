@@ -28,19 +28,6 @@ module Hammock
 
     module ClassMethods
 
-      class HammockCallback < ActiveSupport::Callbacks::Callback
-        private
-
-        def evaluate_method method, *args, &block
-          if method.is_a? Proc
-            # puts "was a HammockCallback proc within #{args.first.class}."
-            method.bind(args.shift).call(*args, &block)
-          else
-            super
-          end
-        end
-      end
-
       def define_hammock_callbacks *callbacks
         callbacks.each do |callback|
           class_eval <<-"end_eval"
@@ -54,7 +41,7 @@ module Hammock
                   raise ArgumentError, "Inline callback definitions require a description as their sole argument."
                 else
                   # logger.info "defining \#{methods.first} on \#{name} with method \#{block.inspect}."
-                  [HammockCallback.new(:#{callback}, block, :identifier => methods.first)]
+                  [Hammock::Callback.new(:#{callback}, block, :identifier => methods.first)]
                 end || []
               end
               # log callbacks

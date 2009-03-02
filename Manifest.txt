@@ -6,6 +6,7 @@ Rakefile
 hammock.gemspec
 lib/hammock.rb
 lib/hammock/ajaxinate.rb
+lib/hammock/callback.rb
 lib/hammock/callbacks.rb
 lib/hammock/canned_scopes.rb
 lib/hammock/constants.rb
