@@ -242,7 +242,7 @@ module Hammock
             puts "valid reflections: #{valid_reflections.keys.inspect}"
 
             if valid_reflections.keys.length < 1
-              raise Hammock::PleaseFileABug
+              raise "The routing table specifies that #{mdl} is nested within #{parent.mdl}, but there is no ActiveRecord association linking #{resource} to #{parent.resource}. Example: 'belongs_to :#{parent.resource.base_model}' in the #{resource} model."
             elsif valid_reflections.keys.length > 1
               raise "#{resource} defines more than one association to #{parent.resource} (#{valid_reflections.keys.map(&:to_s).join(', ')}). That's fine, but you need to use #{resource}.nest_within to specify the one Hammock should nest scopes through. For example, 'nest_within #{valid_reflections.keys.first.inspect}' in the #{resource} model."
             end
