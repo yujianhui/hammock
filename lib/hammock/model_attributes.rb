@@ -29,7 +29,7 @@ module Hammock
       end
 
       def routing_attribute
-        read_inheritable_attribute("routing_attribute")
+        read_inheritable_attribute("routing_attribute") || :id
       end
       def nestable_routing_resources
         read_inheritable_attribute("nestable_routing_resources")
