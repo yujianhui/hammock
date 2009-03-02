@@ -48,7 +48,7 @@ module Hammock
         if (scope = current_scope).nil?
 
         else
-          record = scope.send :find, :first, :conditions => {find_column_name => params[:id]}
+          record = scope.send :find, :first, :conditions => {mdl.routing_attribute => params[:id]}
           record || required_callback(:after_failed_find)
         end
       end
