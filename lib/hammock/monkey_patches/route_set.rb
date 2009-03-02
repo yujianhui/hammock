@@ -64,7 +64,7 @@ module Hammock
             buf << '/' + entity.to_param if entity.record? && !entity.new_record?
             buf << '/' + verb.to_s unless verb.nil? or implied_verb?(verb)
 
-            buf = parent.path + buf unless root?
+            buf = parent.path + buf unless parent.nil?
             buf << param_str(params)
 
             buf
