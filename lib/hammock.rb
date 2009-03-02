@@ -14,7 +14,7 @@ module Hammock
     Hammock.constants.map {|constant_name|
       Hammock.const_get constant_name
     }.select {|constant|
-      constant.is_a? Module
+      constant.is_a?(Module) && !constant.is_a?(Class)
     }.partition {|mod|
       mod.constants.include?('LoadFirst') && mod::LoadFirst
     }.flatten.each {|mod|
