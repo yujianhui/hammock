@@ -133,7 +133,7 @@ module Hammock
       private
 
       def link_class_for verb, record, attribute = nil
-        [verb, record.base_model, record.id, attribute].compact.join('_')
+        [verb, record.description, attribute].compact.join('_')
       end
 
       def clean_snippet snippet

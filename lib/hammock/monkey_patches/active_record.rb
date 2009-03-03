@@ -47,6 +47,10 @@ module Hammock
         base_class.to_s.underscore
       end
 
+      def description
+        base_model
+      end
+
       def record?; false end
       def resource?; true end
 
@@ -126,12 +130,8 @@ module Hammock
         end
       end
 
-      def id_or_description
-        new_record? ? new_record_description : id
-      end
-      
-      def new_record_description
-        attributes.map {|k,v| "#{k}-#{(v.to_s || '')[0..10]}" }.join("_")
+      def description
+        new_record? ? "new_#{base_model}" : "#{base_model}_#{id}"
       end
 
       def base_model
