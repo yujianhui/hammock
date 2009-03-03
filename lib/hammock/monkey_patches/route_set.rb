@@ -64,7 +64,7 @@ module Hammock
             buf << '/' + entity.to_param if entity.record? && !entity.new_record?
             buf << '/' + verb.to_s unless verb.nil? or implied_verb?(verb)
 
-            buf = parent.path + buf unless parent.nil?
+            buf = parent.path + buf unless root?
             buf << param_str(params)
 
             buf
@@ -124,22 +124,29 @@ module Hammock
           :create => :post
         }.freeze
 
-        attr_reader :mdl, :parent, :children, :record_routes, :resource_routes, :build_routes
+        attr_reader :mdl, :resource, :parent, :children, :record_routes, :resource_routes, :build_routes
 
         def initialize entity = nil, options = {}
-          @mdl = entity if entity.is_a?(Symbol)
           @parent = options[:parent]
           @children = {}
-          define_routes options
+          unless root?
+            @mdl = entity if entity.is_a?(Symbol)
+            @resource = Object.const_get mdl.to_s.classify rescue nil
+            define_routes options
+          end
+        end
+
+        def root?
+          parent.nil?
         end
 
         def ancestry
-          parent.nil? ? [] : parent.ancestry.push(self)
+          root? ? [] : parent.ancestry.push(self)
         end
 
         def for verb, entities, options
           raise "HammockResource#for requires an explicitly specified verb as its first argument." unless verb.is_a?(Symbol)
-          raise "You have to supply at least one record or resource." if entities.empty?
+          raise "You have to supply an Array of at least one record or resource." if entities.empty? unless entities.is_a?(Array)
 
           entity = entities.shift
 

@@ -31,15 +31,6 @@ module Hammock
       def find_on_create
         write_inheritable_attribute :find_on_create, true
       end
-
-      # Use +find_column+ to specify the name of an alternate column with which record lookups should be performed.
-      #
-      # This is useful for controllers that are indexed by primary key, but are accessed with URLs containing some other unique attribute of the resource, like a randomly-generated key.
-      #     find_column :key
-      def find_column column_name
-        # TODO define to_param on model.
-        write_inheritable_attribute :find_column, column_name
-      end
     end
 
     module InstanceMethods
@@ -56,10 +47,6 @@ module Hammock
 
       def findable_on_create?
         self.class.read_inheritable_attribute :find_on_create
-      end
-
-      def find_column_name
-        self.class.read_inheritable_attribute(:find_column) || :id
       end
     end
   end

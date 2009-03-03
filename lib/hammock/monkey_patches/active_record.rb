@@ -39,6 +39,10 @@ module Hammock
         base_class.to_s.pluralize.underscore
       end
 
+      def param_key
+        "#{base_model}_id"
+      end
+
       def base_model
         base_class.to_s.underscore
       end
