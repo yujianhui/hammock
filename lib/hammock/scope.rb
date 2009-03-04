@@ -75,9 +75,12 @@ module Hammock
         end
       end
 
+      def nesting_scope_list
+        @hammock_cached_nesting_scope_list = current_hammock_resource.parent.nesting_scope_list_for params.selekt {|k,v| /_id$/ =~ k }
+      end
+
       def current_nest_scope
-        @hammock_nesting_scopes = current_hammock_resource.parent.nesting_scope_list_for params.selekt {|k,v| /_id$/ =~ k }
-        @hammock_nesting_scopes.reverse.inject {|acc,scope| acc.within scope }
+        nesting_scope_list.reverse.inject {|acc,scope| acc.within scope }
       end
 
       def current_scope
