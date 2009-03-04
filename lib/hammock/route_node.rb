@@ -73,17 +73,11 @@ module Hammock
       end
     end
 
-    def nesting_scope_for params
+    def nesting_scope_list_for params
       if root?
-        nil
+        [ ]
       else
-        segment = nesting_scope_segment_for params
-
-        if parent.root?
-          segment
-        else
-          segment.within parent.nesting_scope_for(params), routing_parent
-        end
+        parent.nesting_scope_list_for(params).push nesting_scope_segment_for(params)
       end
     end
 
