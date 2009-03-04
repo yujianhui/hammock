@@ -62,7 +62,7 @@ module Hammock
         end
       end
 
-      def verb_scope
+      def current_verb_scope
         if @current_account && (scope_name = account_verb_scope?)
           # log "got an account_verb_scope #{scope_name}."
           mdl.send scope_name, @current_account
@@ -75,18 +75,20 @@ module Hammock
         end
       end
 
-      def nest_scope
+      def current_nest_scope
         @hammock_nesting_scopes = current_hammock_resource.parent.nesting_scope_list_for params.selekt {|k,v| /_id$/ =~ k }
         @hammock_nesting_scopes.reverse.inject {|acc,scope| acc.within scope }
       end
 
       def current_scope
-        puts "#{current_hammock_resource.mdl}, #{current_hammock_resource.ancestry.map(&:mdl).inspect}"
-        if (resultant_scope = verb_scope.within(nest_scope, current_hammock_resource.routing_parent)).nil?
+        log "#{current_hammock_resource.mdl}, #{current_hammock_resource.ancestry.map(&:mdl).inspect}"
+        if (verb_scope = current_verb_scope).nil?
+          nil
+        elsif (resultant_scope = verb_scope.within(current_nest_scope, current_hammock_resource.routing_parent)).nil?
           nil
         else
-          # puts "nest: #{nest_scope.clauses.inspect}"
-          # puts "verb: #{verb_scope.clauses.inspect}"
+          # puts "nest: #{current_nest_scope.clauses.inspect}"
+          # puts "verb: #{current_verb_scope.clauses.inspect}"
           puts "chained in (#{resultant_scope.owner}) current_scope: #{resultant_scope.clauses.inspect}"
           resultant_scope = resultant_scope.chain(custom_scope) unless custom_scope.nil?
           resultant_scope.sort_by &mdl.sorter

@@ -142,7 +142,7 @@ module Hammock
 
       def find_record_on_create
         if findable_on_create?
-          if record = nest_scope.find(:first, :conditions => params_for(mdl.symbolize))
+          if record = current_nest_scope.find(:first, :conditions => params_for(mdl.symbolize))
             log "suitable record already exists: #{record}"
             assign_entity record
           else
