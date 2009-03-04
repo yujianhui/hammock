@@ -109,7 +109,11 @@ module Hammock
       end
 
       def empty_scope
-        lambda {|record| false }
+        if sqlite?
+          lambda {|record| 0 } # TODO check what this should be
+        else
+          lambda {|record| false }
+        end
       end
 
     end
