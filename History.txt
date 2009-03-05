@@ -1,3 +1,32 @@
+== 0.2.6 2009-03-05
+
+Access current_nested_records in nested_route_for through the method instead of directly.
+Replaced #assign_nestable_resources with #assign_nesting_entities, to separately kick and assign an ivar for each of the current rou
+Added nesting_scope_list to encapsulate what @hammock_nesting_scopes was set to before.
+Updated nested_within? to use methods instead of ivars, removed duping from current_nested_[record,resource]s, and added add_nested_en
+Updated empty_scope for sqlite, to bring it in line with public_scope.
+Updated current_scope to fail gracefully if current_verb_scope (renamed from verb_scope along with [current_]nest_scope) returns nil.
+Replaced RouteNode#nesting_scope_for with nesting_scope_list_for, and changed nest_scope call appropriately. The scopes are returned s
+Replaced AR::Base#id_or_description with #description, added .description, and use in link_class_for for more consistent class names.
+Split Hammock::Callback (previously HammockCallback) out into its own file.
+Split RouteNode and RouteStep (previously HammockResource and HammockRoutePiece) out into their own files.
+Reject Hammock:: classes from hammock load. Classes are modules. Who knew?
+Changed inheritable_attribute keys from strings to symbols.
+Caching the model within HammockResource was causing stale class fails in development mode.
+retrieve_record uses mdl.routing_attribute now instead of the old find_column_name.
+Default routing_attribute to :id.
+Fixed the 'no valid AR reflections' message to be a user error instead of an internal hammock error (they just need to add a reflection)
+HammockRoutePiece erroneously had a root? check instead of a parent.nil? check - fixed.
+Only set creator_id if someone is logged in.
+Updated #nest_scope to use #nesting_scope_for instead of manually recursively selecting within a single context, and updated #curren
+Re-enabled logging of Ambition queries as they are assigned as entities.
+Replaced the questionable #current_route with #current_hammock_resource, which uses HammockResource#base_for.
+Added HammockResource#base_for, #nesting_scope_for and #nesting_scope_segment_for.
+Added HammockResource#determine_routing_parent, to determine which ActiveRecord reflection to use to generate joins for route queryi
+Added Hash#selekt, to sidestep the ruby-1.8/1.9 #select changes.
+Commented current_route-dependent code in hamlink_to until that is sorted out.
+Test if obj is defined before attempting to select .spinner within it.
+
 == 0.2.4 2009-02-25
 
 * Initial gem release
