@@ -1,3 +1,8 @@
+== 0.2.7 2009-03-05
+
+hamlink_to with implied verbs no longer raises in route_for.
+
+
 == 0.2.6 2009-03-05
 
 Access current_nested_records in nested_route_for through the method instead of directly.
