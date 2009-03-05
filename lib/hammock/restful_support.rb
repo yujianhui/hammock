@@ -67,14 +67,24 @@ module Hammock
           raise "Unknown record(s) type #{record_or_records.class}."
         end
 
-        if assign_nestable_resources
-          @entity
-        else
-          escort :not_found
-        end
+        @entity if assign_nesting_entities
       end
 
       private
+
+      def assign_nesting_entities
+        results = nesting_scope_list.map &:kick
+
+        if results.all? {|records| records.length == 1 }
+          results.map {|records|
+            records.first
+          }.all? {|record|
+            log "nested record #{record.concise_inspect} assigned to @#{record.base_model}."
+            add_nested_entity record
+            instance_variable_set "@#{record.base_model}", record
+          }
+        end
+      end
 
       def make_new_record resource = mdl
         resource.new_with(params_for(resource.symbolize))
@@ -92,26 +102,6 @@ module Hammock
         else
           new_record
         end
-      end
-
-      def assign_nestable_resources
-        @current_nested_records, @current_nested_resources = [], []
-        params.symbolize_keys.dragnet(*nestable_resources.keys).all? {|param_name,column_name|
-          constant_name = param_name.to_s.sub(/_id$/, '').camelize
-          constant = Object.const_get constant_name rescue nil
-
-          if constant.nil?
-            log "'#{constant_name}' is not available for #{param_name}."
-          elsif (record = constant.find_by_id(params[param_name])).nil?
-            log "#{constant}<#{params[param_name]}> not found."
-          else
-            @current_nested_records << record
-            @current_nested_resources << record.class
-            @record.send "#{nestable_resources[param_name]}=", params[param_name] unless @record.nil?
-            # log "Assigning @#{constant.name.underscore} with #{record.inspect}."
-            instance_variable_set "@#{constant_name.underscore}", record
-          end
-        }
       end
 
       def current_nested_records
