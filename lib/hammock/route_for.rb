@@ -47,7 +47,7 @@ module Hammock
       def nested_route_for *resources
         resources.delete_if &:nil?
         requested_verb = resources.shift if resources.first.is_a?(Symbol)
-        args = @current_nested_records.dup.concat(resources)
+        args = current_nested_records.concat(resources)
 
         args.unshift(requested_verb) unless requested_verb.nil?
         route_for *args
