@@ -124,7 +124,7 @@ module Hammock
           :create => :post
         }.freeze
 
-        attr_reader :mdl, :resource, :parent, :children, :record_routes, :resource_routes, :build_routes
+        attr_reader :mdl, :resource, :parent, :children, :routing_parent, :record_routes, :resource_routes, :build_routes
 
         def initialize entity = nil, options = {}
           @parent = options[:parent]
@@ -132,6 +132,7 @@ module Hammock
           unless root?
             @mdl = entity if entity.is_a?(Symbol)
             @resource = Object.const_get mdl.to_s.classify rescue nil
+            @routing_parent = determine_routing_parent
             define_routes options
           end
         end
@@ -183,6 +184,29 @@ module Hammock
           @record_routes = DefaultRecordVerbs.dup.update(options[:member] || {})
           @resource_routes = DefaultResourceVerbs.dup.update(options[:collection] || {})
           @build_routes = DefaultBuildVerbs.dup.update(options[:build] || {})
+        end
+
+        def determine_routing_parent
+          puts "\ndetermine_routing_parent: #{mdl}:"
+          if parent.nil? || parent.resource.nil?
+            puts "Resource for #{mdl} has either no parent or no resource - not nestable."
+            nil
+          else
+            puts "reflections: #{resource.reflections.keys.inspect}"
+            puts "nestable_routing_resources: #{resource.nestable_routing_resources.inspect}"
+            scannable_reflections = resource.nestable_routing_resources.nil? ? resource.reflections : resource.reflections.dragnet(*resource.nestable_routing_resources)
+            puts "scannable reflections: #{scannable_reflections.keys.inspect}"
+            valid_reflections = scannable_reflections.selekt {|k,v| puts "#{v.klass}<#{v.object_id}> == #{parent.resource}<#{parent.resource.object_id}> #=> #{v.klass == parent.resource}"; v.klass == parent.resource }
+            puts "valid reflections: #{valid_reflections.keys.inspect}"
+
+            if valid_reflections.keys.length < 1
+              raise Hammock::PleaseFileABug
+            elsif valid_reflections.keys.length > 1
+              raise "#{resource} defines more than one association to #{parent.resource} (#{valid_reflections.keys.map(&:to_s).join(', ')}). That's fine, but you need to use #{resource}.nest_within to specify the one Hammock should nest scopes through. For example, 'nest_within #{valid_reflections.keys.first.inspect}' in the #{resource} model."
+            end
+
+            valid_reflections.keys.first
+          end
         end
 
         def add_child entity, options
