@@ -76,16 +76,17 @@ module Hammock
       end
 
       def nest_scope
-        params.symbolize_keys.dragnet(*nestable_resources.keys).inject(mdl.ambition_context) {|acc,(k,v)|
-          # TODO this would be more ductile if it used AR assocs instead of explicit FK
-          eval "acc.select {|r| r.#{nestable_resources[k]} == v }"
-        }
+        current_hammock_resource.parent.nesting_scope_for params.selekt {|k,v| /_id$/ =~ k }
       end
 
       def current_scope
-        if (resultant_scope = nest_scope.chain(verb_scope)).nil?
+        puts "#{current_hammock_resource.mdl}, #{current_hammock_resource.ancestry.map(&:mdl).inspect}"
+        if (resultant_scope = verb_scope.within(nest_scope, current_hammock_resource.routing_parent)).nil?
           nil
         else
+          # puts "nest: #{nest_scope.clauses.inspect}"
+          # puts "verb: #{verb_scope.clauses.inspect}"
+          puts "chained in (#{resultant_scope.owner}) current_scope: #{resultant_scope.clauses.inspect}"
           resultant_scope = resultant_scope.chain(custom_scope) unless custom_scope.nil?
           resultant_scope.sort_by &mdl.sorter
         end
