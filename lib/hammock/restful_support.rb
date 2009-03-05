@@ -29,8 +29,10 @@ module Hammock
         @hammock_cached_mdl_name ||= self.class.to_s.sub('Controller', '').singularize.underscore
       end
 
-      def current_route
-        @hammock_cached_current_route ||= route_for(action_name.to_sym, *current_nested_records.push(@entity)) unless @entity.nil?
+      # Returns the node in the Hammock routing map corresponding to the (possibly nested) resource handling the current request.
+      def current_hammock_resource
+        nesting_resources = params.keys.select {|k| /_id$/ =~ k }.map {|k| k.gsub(/_id$/, '').pluralize }
+        ActionController::Routing::Routes.route_map.base_for nesting_resources.push(mdl.resource_name).map(&:to_sym)
       end
 
       # Returns true if the current action represents an edit on +record+.
