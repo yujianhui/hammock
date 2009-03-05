@@ -59,7 +59,7 @@ module Hammock
         elsif record_or_records.is_a? ActiveRecord::Base
           instance_variable_set "@#{mdl_name}", (@record = record_or_records)
         elsif record_or_records.is_a? Ambition::Context
-          # log "Unkicked query: #{record_or_records.to_s}"
+          log "Unkicked query: #{record_or_records.to_hash.inspect}"
           instance_variable_set "@#{mdl_name.pluralize}", (@records = record_or_records)
         elsif record_or_records.is_a? Array
           instance_variable_set "@#{mdl_name.pluralize}", (@records = record_or_records)
