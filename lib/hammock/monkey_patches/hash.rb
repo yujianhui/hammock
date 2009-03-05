@@ -21,6 +21,14 @@ module Hammock
         dup.discard! *keys
       end
 
+      def selekt &block
+        hsh = {}
+        each_pair {|k,v|
+          hsh[k] = v if yield(k,v)
+        }
+        hsh
+      end
+
       def dragnet *keys
         dup.dragnet! *keys
       end
