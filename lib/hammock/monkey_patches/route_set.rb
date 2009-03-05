@@ -158,6 +158,48 @@ module Hammock
           end
         end
 
+        def base_for resources
+          # puts "base_for<#{mdl}>: resources=#{resources.inspect}."
+          if resources.empty?
+            self
+          else
+            match = nil
+            children.values.detect {|child|
+              # puts "  Trying #{child.ancestry.map(&:mdl).inspect} for #{resources.inspect}"
+              if !resources.include?(child.mdl)
+                # puts "  Can't match #{resources.inspect} against #{child.mdl}."
+                nil
+              else
+                # puts "  Matched #{child.mdl} from #{resources.inspect}."
+                match = child.base_for resources.discard(child.mdl)
+              end
+            } #|| raise("There is no routing path for #{resources.map(&:inspect).inspect}.")
+            match
+          end
+        end
+
+        def nesting_scope_for params
+          if root?
+            nil
+          else
+            segment = nesting_scope_segment_for params
+
+            if parent.root?
+              segment
+            else
+              segment.within parent.nesting_scope_for(params), routing_parent
+            end
+          end
+        end
+
+        def nesting_scope_segment_for params
+          raise "The root of the route map isn't associated with a resource." if root?
+          puts "is this undefined? #{resource.accessible_attributes_on_create.inspect}"
+          value = params.delete resource.param_key
+          puts "resource.select {|r| r.#{resource.routing_attribute} == value }"
+          eval "resource.select {|r| r.#{resource.routing_attribute} == value }"
+        end
+
         def add entity, options, steps = nil
           if steps.nil?
             add entity, options, (options[:name_prefix] || '').chomp('_').split('_').map {|i| i.pluralize.underscore.to_sym }
