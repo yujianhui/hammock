@@ -9,6 +9,8 @@ module Hammock
         # TODO Investigate the usefulness of this.
         # before_destroy :set_editing
         before_create :set_creator_id_if_appropriate
+        before_create :set_new_or_deleted_before_save
+        before_undestroy :set_new_or_deleted_before_save
         helper_method :mdl, :mdl_name, :editing?, :nested_within?, :partial_exists?
       }
     end
@@ -131,6 +133,10 @@ module Hammock
 
       def set_editing
         @editing = @record
+      end
+
+      def set_new_or_deleted_before_save
+        @record.set_new_or_deleted_before_save
       end
 
       # TODO process /^creating_\w+_id$/ as well

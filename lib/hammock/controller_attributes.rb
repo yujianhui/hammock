@@ -6,16 +6,6 @@ module Hammock
     end
 
     module ClassMethods
-
-      # Specifies parent resources that can appear above this one in the route, and will be applied as an extra scope condition whenever present.
-      #
-      # Supplied as a hash of parameter names to attribute names. For example, given the route <tt>/accounts/7/posts/31</tt>,
-      #     nestable_by :account_id => :creator_id
-      # Would add an extra scope condition requiring that <tt>@post.creator_id</tt> == <tt>params[:account_id]</tt>.
-      def nestable_by resources
-        write_inheritable_attribute :nestable_by, resources
-      end
-
       # When +inline_create+ is specified for a controller, the +index+ page will have the ability to directly create new resources, just as the +new+ page normally can.
       #
       # To use +inline_create+, refactor the relevant contents of your +new+ view into a partial and render it in an appropriate place within the +index+ view.
@@ -36,10 +26,6 @@ module Hammock
     module InstanceMethods
 
       private
-
-      def nestable_resources
-        self.class.read_inheritable_attribute(:nestable_by) || {}
-      end
 
       def inline_createable_resource?
         self.class.read_inheritable_attribute :inline_create
