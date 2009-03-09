@@ -15,10 +15,10 @@ module Hammock
         find_record :find_with_deleted
       end
 
-      def find_record
+      def find_record finder = :find
         result = if !callback(:before_find)
           # callbacks failed
-        elsif (record = retrieve_record).nil?
+        elsif (record = retrieve_record(finder)).nil?
           log "#{mdl}<#{params[:id]}> doesn't exist within #{requester_name.possessive} #{action_name} scope."
           :not_found
         elsif :ok != (verbability = can_verb_record?(action_name.to_sym, record))
@@ -44,11 +44,11 @@ module Hammock
         end
       end
 
-      def retrieve_record
+      def retrieve_record finder
         if (scope = current_scope).nil?
 
         else
-          record = scope.send :find, :first, :conditions => {mdl.routing_attribute => params[:id]}
+          record = scope.send finder, :first, :conditions => {mdl.routing_attribute => params[:id]}
           record || required_callback(:after_failed_find)
         end
       end
