@@ -18,7 +18,7 @@ module Hammock
           request.remote_ip.colorize('green'),
           (@current_site.subdomain unless @current_site.nil?),
           (session.nil? ? 'nil' : ('...' + session.session_id[-8, 8])),
-          (@current_account.nil? ? "unauthed" : "Account<#{@current_account.id}> #{@current_account.name}").colorize('green'),
+          (current_user.nil? ? "unauthed" : "Account<#{current_user.id}> #{current_user.name}").colorize('green'),
           headers['Status'],
           log_hit_request_info,
           log_hit_route_info

@@ -66,7 +66,7 @@ module Hammock
           escort_for_read_only
         elsif :unauthed == reason
           escort_for_403
-        elsif @current_account.nil? && account_verb_scope?
+        elsif current_user.nil? && account_verb_scope?
           escort_for_login
         else
           escort_for_404

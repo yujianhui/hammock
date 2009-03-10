@@ -26,7 +26,7 @@ module Hammock
       def can_verb_resource? verb, resource
         raise "The verb at #{call_point} must be supplied as a Symbol." unless verb.nil? || verb.is_a?(Symbol)
         route = route_for verb, resource
-        if route.safe? && !resource.indexable_by(@current_account)
+        if route.safe? && !resource.indexable_by(current_user)
           log "#{requester_name} can't index #{resource.name.pluralize}. #{describe_call_point 4}"
           :not_found
         elsif !route.safe? && !make_createable(resource)
@@ -42,17 +42,17 @@ module Hammock
         raise "The verb at #{call_point} must be supplied as a Symbol." unless verb.nil? || verb.is_a?(Symbol)
         route = route_for verb, record
         if route.verb.in?(:save, :create) && record.new_record?
-          if !record.createable_by?(@current_account)
+          if !record.createable_by?(current_user)
             log "#{requester_name} can't create a #{record.class} with #{record.attributes.inspect}. #{describe_call_point 4}"
             :unauthed
           else
             :ok
           end
         else
-          if !record.readable_by?(@current_account)
+          if !record.readable_by?(current_user)
             log "#{requester_name} can't see #{record.class}<#{record.id}>. #{describe_call_point 4}"
             :not_found
-          elsif !route.safe? && !record.writeable_by?(@current_account)
+          elsif !route.safe? && !record.writeable_by?(current_user)
             log "#{requester_name} can't #{verb} #{record.class}<#{record.id}>. #{describe_call_point 4}"
             :read_only
           else
@@ -63,11 +63,11 @@ module Hammock
       end
 
       def current_verb_scope
-        if @current_account && (scope_name = account_verb_scope?)
+        if current_user && (scope_name = account_verb_scope?)
           # log "got an account_verb_scope #{scope_name}."
-          mdl.send scope_name, @current_account
+          mdl.send scope_name, current_user
         elsif !(scope_name = public_verb_scope?)
-          log "No #{@current_account.nil? ? 'public' : 'account'} #{scope_name_for_action} scope available for #{mdl}.#{' May be available after login.' if account_verb_scope?}"
+          log "No #{current_user.nil? ? 'public' : 'account'} #{scope_name_for_action} scope available for #{mdl}.#{' May be available after login.' if account_verb_scope?}"
           nil
         else
           # log "got a #{scope_name} public_verb_scope."
@@ -112,7 +112,7 @@ module Hammock
       end
 
       def requester_name
-        @current_account.nil? ? 'Anonymous' : "#{@current_account.class}<#{@current_account.id}>"
+        current_user.nil? ? 'Anonymous' : "#{current_user.class}<#{current_user.id}>"
       end
 
       def account_verb_scope?

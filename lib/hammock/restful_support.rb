@@ -99,7 +99,7 @@ module Hammock
       def make_createable resource = mdl
         if !(new_record = make_new_record(resource))
           log "Couldn't create a new #{resource.base_model} with the given nesting level and parameters."
-        elsif !new_record.createable_by?(@current_account)
+        elsif !new_record.createable_by?(current_user)
           log "#{requester_name} can't create #{new_record.resource_name}."
         else
           new_record
@@ -142,10 +142,10 @@ module Hammock
       # TODO process /^creating_\w+_id$/ as well
       def set_creator_id_if_appropriate
         if @record.respond_to?(:creator_id=)
-          if @current_account.nil?
-            log "Warning: @#{@record.base_model}.creator_id isn't being set, since @current_account was nil."
+          if current_user.nil?
+            log "Warning: @#{@record.base_model}.creator_id isn't being set, since current_user was nil."
           else
-            @record.creator_id = @current_account.id
+            @record.creator_id = current_user.id
           end
         end
       end
