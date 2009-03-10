@@ -1,3 +1,10 @@
+== 0.2.8 2009-03-10
+Renamed @current_account to current_user.
+Removed AC::Base#nestable_by declaration in favour of the new approach involving AC::Base#route_by and #nest_within, along with the corresponding reader.
+Added #set_new_or_deleted_before_save controller method, and before_create and before_undestroy hooks.
+Revert "Removed unneeded param to specify the finder method in retrieve_record." - the param was actually needed for #find_deleted_record.
+
+
 == 0.2.7 2009-03-05
 
 hamlink_to with implied verbs no longer raises in route_for.
