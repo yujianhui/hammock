@@ -6,12 +6,10 @@ Revert "Removed unneeded param to specify the finder method in retrieve_record."
 
 
 == 0.2.7 2009-03-05
-
 hamlink_to with implied verbs no longer raises in route_for.
 
 
 == 0.2.6 2009-03-05
-
 Access current_nested_records in nested_route_for through the method instead of directly.
 Replaced #assign_nestable_resources with #assign_nesting_entities, to separately kick and assign an ivar for each of the current rou
 Added nesting_scope_list to encapsulate what @hammock_nesting_scopes was set to before.
