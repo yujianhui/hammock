@@ -1,3 +1,7 @@
+== 0.2.9 2009-03-13
+Updated partial_exists? to default format to the current request format instead of html, and accept format instead of extension as a parameter.
+
+
 == 0.2.8 2009-03-10
 Renamed @current_account to current_user.
 Removed AC::Base#nestable_by declaration in favour of the new approach involving AC::Base#route_by and #nest_within, along with the corresponding reader.
