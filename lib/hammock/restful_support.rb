@@ -150,13 +150,13 @@ module Hammock
         end
       end
 
-      def partial_exists? name, extension = nil
+      def partial_exists? name, format = nil
         partial_name, ctrler_name = name.split('/', 2).reverse
         !Dir.glob(File.join(
           RAILS_ROOT,
           'app/views',
           ctrler_name || '',
-          "_#{partial_name}.html.#{extension || '*'}"
+          "_#{partial_name}.#{format || request.format.to_sym.to_s}.*"
         )).empty?
       end
 
