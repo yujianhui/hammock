@@ -24,7 +24,7 @@ module Hammock
       end
 
       def route_for *args
-        args.squash!
+        args.compact!
         opts = args.extract_options!
         verb = args.shift if args.first.is_a?(Symbol)
 
