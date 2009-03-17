@@ -104,7 +104,7 @@ module Hammock
     module InstanceMethods
 
       def concise_inspect
-        "#{self.class}<#{self.id || 'new'}>"
+        "#{self.class}<#{self.to_param || 'new'}>"
       end
 
       def resource
