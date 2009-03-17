@@ -141,7 +141,7 @@ module Hammock
 
       # TODO process /^creating_\w+_id$/ as well
       def set_creator_id_if_appropriate
-        if @record.respond_to?(:creator_id=)
+        if @record.respond_to? :creator_id=
           if current_user.nil?
             log "Warning: @#{@record.base_model}.creator_id isn't being set, since current_user was nil."
           else
