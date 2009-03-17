@@ -15,6 +15,10 @@ module Hammock
         nil
       end
 
+      def suggest_scope
+        mdl.readable_by current_user
+      end
+
       def postsave_render result
         nil
       end

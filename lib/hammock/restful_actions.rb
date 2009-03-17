@@ -118,7 +118,9 @@ module Hammock
           fields = params[:fields].split(',')
           @queries = params[:q].downcase.split(/\s+/)
 
-          mdl.suggest fields, @queries
+          mdl.send :with_scope, :find => suggest_scope.to_hash do
+            mdl.suggest fields, @queries
+          end
         end
         
         if @results.nil?
