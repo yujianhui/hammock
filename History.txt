@@ -1,3 +1,10 @@
+== 0.2.10 2009-03-17
+Added AR::Base.suggest_scope for narrowing the scope in the suggest action.
+Changed identifier in AR::Base#concise_inspect from #id to #to_param.
+Fixed raise condition for entities arg to RouteNode#for, and improved exception message.
+Changed squash! to compact! in route_for, to only remove nil elements (and not, say, models with no records that respond true to bla
+
+
 == 0.2.9 2009-03-13
 Updated partial_exists? to default format to the current request format instead of html, and accept format instead of extension as a parameter.
 
