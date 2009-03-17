@@ -42,7 +42,7 @@ module Hammock
 
     def for verb, entities, options
       raise "Hammock::RouteNode#for requires an explicitly specified verb as its first argument." unless verb.is_a?(Symbol)
-      raise "You have to supply an Array of at least one record or resource." if entities.empty? unless entities.is_a?(Array)
+      raise "Hammock::RouteNode#for requires an Array of at least one record or resource." if entities.empty? || !entities.is_a?(Array)
 
       entity = entities.shift
 
