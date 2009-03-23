@@ -1,7 +1,12 @@
+== 0.2.11.1 2009-03-24
+Fixed 'railslol' typo in Rakefile preventing installation. (lol)
+
+
 == 0.2.11 2009-03-23
 Added hammock include hook to hammock.rb, to sidestep changed ApplicationController load behaviour in Rails 2.3.
 Added pagination support to the index route.
 Changed #mdl and #mdl_name implementations to class methods, and re-aliased them as instance methods.
+
 
 == 0.2.10 2009-03-17
 Added AR::Base.suggest_scope for narrowing the scope in the suggest action.
