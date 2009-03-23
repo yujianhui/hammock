@@ -1,4 +1,5 @@
 %w[rubygems rake rake/clean fileutils newgem rubigen].each { |f| require f }
+%w[action_controller].each { |f| require f }
 require File.dirname(__FILE__) + '/lib/hammock'
 
 # Generate all the Rake tasks
@@ -8,7 +9,8 @@ $hoe = Hoe.new('hammock', Hammock::VERSION) do |p|
   p.changes              = p.paragraphs_of("History.txt", 0..1).join("\n\n")
   p.rubyforge_name       = p.name
   p.extra_deps         = [
-    ['benhoskings-ambitious-activerecord','>= 0.1.3.4'],
+    ['rails','~> 2.2.2'],
+    ['benhoskings-ambitious-activerecord','~> 0.1.3.5'],
   ]
   p.extra_dev_deps = [
     ['newgem', ">= #{::Newgem::VERSION}"]
