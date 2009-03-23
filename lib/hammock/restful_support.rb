@@ -17,6 +17,15 @@ module Hammock
 
     module ClassMethods
 
+      # The model this controller operates on. Defined as the singularized controller name. For example, for +GelatinousBlobsController+, this will return the +GelatinousBlob+ class.
+      def mdl
+        @hammock_cached_mdl ||= Object.const_get to_s.sub('Controller', '').classify
+      end
+      # The lowercase name of the model this controller operates on. For example, for +GelatinousBlobsController+, this will return "gelatinous_blob".
+      def mdl_name
+        @hammock_cached_mdl_name ||= to_s.sub('Controller', '').singularize.underscore
+      end
+
     end
 
     module InstanceMethods
@@ -24,11 +33,11 @@ module Hammock
 
       # The model this controller operates on. Defined as the singularized controller name. For example, for +GelatinousBlobsController+, this will return the +GelatinousBlob+ class.
       def mdl
-        @hammock_cached_mdl ||= Object.const_get self.class.to_s.sub('Controller', '').classify
+        self.class.mdl
       end
       # The lowercase name of the model this controller operates on. For example, for +GelatinousBlobsController+, this will return "gelatinous_blob".
       def mdl_name
-        @hammock_cached_mdl_name ||= self.class.to_s.sub('Controller', '').singularize.underscore
+        self.class.mdl_name
       end
 
       # Returns the node in the Hammock routing map corresponding to the (possibly nested) resource handling the current request.
