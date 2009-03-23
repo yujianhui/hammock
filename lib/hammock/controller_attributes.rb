@@ -21,6 +21,15 @@ module Hammock
       def find_on_create
         write_inheritable_attribute :find_on_create, true
       end
+      
+      def paginate_by per_page
+        write_inheritable_attribute :pagination_enabled, true
+        mdl.metaclass.instance_eval do
+          define_method :per_page do
+            per_page
+          end
+        end
+      end
     end
 
     module InstanceMethods
@@ -33,6 +42,10 @@ module Hammock
 
       def findable_on_create?
         self.class.read_inheritable_attribute :find_on_create
+      end
+
+      def pagination_enabled?
+        self.class.read_inheritable_attribute :pagination_enabled
       end
     end
   end

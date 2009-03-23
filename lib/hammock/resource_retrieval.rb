@@ -40,7 +40,11 @@ module Hammock
         if (scope = current_scope).nil?
           escort :unauthed
         else
-          assign_entity scope
+          if pagination_enabled?
+            assign_entity scope.paginate(:page => params[:page])
+          else
+            assign_entity scope
+          end
         end
       end
 
