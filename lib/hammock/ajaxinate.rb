@@ -145,7 +145,7 @@ module Hammock
         if !protect_against_forgery? || (:get == (request_method || request.method))
           '{ }'
         else
-          "{ '#{request_forgery_protection_token}': encodeURIComponent('#{escape_javascript(form_authenticity_token)}') }"
+          "{ '#{request_forgery_protection_token}': '#{escape_javascript(form_authenticity_token)}' }"
         end
       end
 
