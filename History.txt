@@ -1,3 +1,7 @@
+== 0.2.11.4 2009-03-25
+Don't encodeURIComponent() the authenticity_token, as it's not required and breaks non-alphanumeric chars.
+
+
 == 0.2.11.3 2009-03-25
 Updated deprecated session_id references to request.session_options[:id].
 
