@@ -17,7 +17,7 @@ module Hammock
         log_concise [
           request.remote_ip.colorize('green'),
           (@current_site.subdomain unless @current_site.nil?),
-          (session.nil? ? 'nil' : ('...' + session.session_id[-8, 8])),
+          (request.session_options[:id].nil? ? 'nil' : ('...' + request.session_options[:id][-8, 8])),
           (current_user.nil? ? "unauthed" : "Account<#{current_user.id}> #{current_user.name}").colorize('green'),
           headers['Status'],
           log_hit_request_info,
