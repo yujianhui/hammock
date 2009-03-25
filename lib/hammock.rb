@@ -8,7 +8,7 @@ Dir.glob("#{File.dirname __FILE__}/hammock/**/*.rb").each {|dep|
 } if defined?(RAILS_ROOT) # Loading Hammock components under 'rake package' fails.
 
 module Hammock
-  VERSION = '0.2.11.2'
+  VERSION = '0.2.11.3'
 
   def self.included base # :nodoc:
     Hammock.constants.map {|constant_name|

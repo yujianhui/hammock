@@ -1,3 +1,7 @@
+== 0.2.11.3 2009-03-25
+Updated deprecated session_id references to request.session_options[:id].
+
+
 == 0.2.11.2 2009-03-24
 Loosened Rails dependency from ~> 2.2.2 to 2.2.
 
