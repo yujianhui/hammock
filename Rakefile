@@ -6,13 +6,13 @@ require File.dirname(__FILE__) + '/lib/hammock'
 # Run 'rake -T' to see list of generated tasks (from gem root directory)
 $hoe = Hoe.new('hammock', Hammock::VERSION) do |p|
   p.developer('Ben Hoskings', 'ben@hoskings.net')
-  p.changes              = p.paragraphs_of("History.txt", 0..1).join("\n\n")
-  p.rubyforge_name       = p.name
-  p.extra_deps         = [
-    ['rails','~> 2.2'],
-    ['benhoskings-ambitious-activerecord','~> 0.1.3.5'],
+  p.changes         = p.paragraphs_of("History.txt", 0..1).join("\n\n")
+  p.rubyforge_name  = p.name
+  p.extra_deps      = [
+    ['rails', '~> 2.2'],
+    ['benhoskings-ambitious-activerecord', '~> 0.1.3.5'],
   ]
-  p.extra_dev_deps = [
+  p.extra_dev_deps  = [
     ['newgem', ">= #{::Newgem::VERSION}"]
   ]
   
