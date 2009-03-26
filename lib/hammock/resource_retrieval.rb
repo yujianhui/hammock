@@ -69,11 +69,12 @@ module Hammock
         elsif :readonly == reason
           escort_for_read_only
         elsif :unauthed == reason
-          escort_for_403
+          # TODO Write a 403 partial.
+          render_for_status 404
         elsif current_user.nil? && account_verb_scope?
           escort_for_login
         else
-          escort_for_404
+          render_for_status 404
         end
         false
       end
@@ -99,18 +100,15 @@ module Hammock
         # render :partial => 'login/account', :status => 401 # unauthorized
         redirect_to returning_login_path
       end
-      def escort_for_404
-        if partial_exists? 'shared/status_404'
-          render :partial => 'shared/status_404', :layout => true
+
+      def render_for_status code
+        log code
+        if partial_exists? "#{controller_name}/status_#{code}"
+          render :partial => "#{controller_name}/status_#{code}", :layout => true, :status => code
+        elsif partial_exists? "shared/status_#{code}"
+          render :partial => "shared/status_#{code}", :layout => true, :status => code
         else
-          render :file => File.join(RAILS_ROOT, 'public/404.html'), :status => 404
-        end
-      end
-      def escort_for_403
-        if partial_exists? 'shared/status_404'
-          render :partial => 'shared/status_404', :layout => true
-        else
-          render :file => File.join(RAILS_ROOT, 'public/404.html'), :status => 403
+          render :file => File.join(RAILS_ROOT, "public/#{code}.html"), :status => code
         end
       end
 
