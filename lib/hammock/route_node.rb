@@ -118,22 +118,26 @@ module Hammock
     end
 
     def determine_routing_parent
-      puts "\ndetermine_routing_parent: #{mdl}:"
+      # puts "\ndetermine_routing_parent: #{mdl}:"
       if parent.nil? || parent.resource.nil?
-        puts "Resource for #{mdl} has either no parent or no resource - not nestable."
+        # puts "Resource for #{mdl} has either no parent or no resource - not nestable."
         nil
       else
-        puts "reflections: #{resource.reflections.keys.inspect}"
-        puts "nestable_routing_resources: #{resource.nestable_routing_resources.inspect}"
+        # puts "reflections: #{resource.reflections.keys.inspect}"
         scannable_reflections = resource.nestable_routing_resources.nil? ? resource.reflections : resource.reflections.dragnet(*resource.nestable_routing_resources)
-        puts "scannable reflections: #{scannable_reflections.keys.inspect}"
-        valid_reflections = scannable_reflections.selekt {|k,v| puts "#{v.klass}<#{v.object_id}> == #{parent.resource}<#{parent.resource.object_id}> #=> #{v.klass == parent.resource}"; v.klass == parent.resource }
-        puts "valid reflections: #{valid_reflections.keys.inspect}"
+        # puts "scannable reflections: #{scannable_reflections.keys.inspect}"
+        valid_reflections = scannable_reflections.selekt {|k,v|
+          # puts "#{v.klass}<#{v.object_id}> == #{parent.resource}<#{parent.resource.object_id}> #=> #{v.klass == parent.resource}"
+          v.klass == parent.resource
+        }
+        # puts "valid reflections: #{valid_reflections.keys.inspect}"
 
         if valid_reflections.keys.length < 1
           raise "The routing table specifies that #{mdl} is nested within #{parent.mdl}, but there is no ActiveRecord association linking #{resource} to #{parent.resource}. Example: 'belongs_to :#{parent.resource.base_model}' in the #{resource} model."
         elsif valid_reflections.keys.length > 1
           raise "#{resource} defines more than one association to #{parent.resource} (#{valid_reflections.keys.map(&:to_s).join(', ')}). That's fine, but you need to use #{resource}.nest_within to specify the one Hammock should nest scopes through. For example, 'nest_within #{valid_reflections.keys.first.inspect}' in the #{resource} model."
+        # else
+          # puts "Routing #{mdl} within #{valid_reflections.keys.first} (chose from #{scannable_reflections.inspect})"
         end
 
         valid_reflections.keys.first
