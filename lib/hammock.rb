@@ -7,6 +7,8 @@ module Hammock
   VERSION = '0.2.11.4'
 
   def self.included base # :nodoc:
+    puts "Loading Hammock from #{loaded_from_gem? ? 'gem' : 'plugin'}"
+
     Dir.glob("#{File.dirname __FILE__}/hammock/**/*.rb").each {|dep|
       require dep
     }
