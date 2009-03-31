@@ -22,6 +22,11 @@ module Hammock
       target.send :include, mod
     }
   end
+
+  def self.loaded_from_gem?
+    File.dirname(__FILE__)[`gem env gemdir`.chomp]
+  end
 end
 
-ActionController::Base.send :include, Hammock
+# This is done in init.rb when Hammock is loaded as a plugin.
+ActionController::Base.send :include, Hammock if Hammock.loaded_from_gem?
