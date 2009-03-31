@@ -3,14 +3,14 @@ gem 'benhoskings-ambitious-activerecord'
 require 'ambition'
 require 'ambition/adapters/active_record'
 
-Dir.glob("#{File.dirname __FILE__}/hammock/**/*.rb").each {|dep|
-  require dep
-} if defined?(RAILS_ROOT) # Loading Hammock components under 'rake package' fails.
-
 module Hammock
   VERSION = '0.2.11.4'
 
   def self.included base # :nodoc:
+    Dir.glob("#{File.dirname __FILE__}/hammock/**/*.rb").each {|dep|
+      require dep
+    }
+
     Hammock.constants.map {|constant_name|
       Hammock.const_get constant_name
     }.select {|constant|
