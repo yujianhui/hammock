@@ -1,14 +1,6 @@
 module Hammock
   module RestfulActions
-    def self.included base # :nodoc:
-      base.send :include, InstanceMethods
-      base.send :extend, ClassMethods
-    end
-
-    module ClassMethods
-    end
-
-    module InstanceMethods
+    MixInto = ApplicationController
 
       # The +index+ action. (GET, safe, idempotent)
       #
@@ -167,6 +159,5 @@ module Hammock
         @record.save
       end
 
-    end
   end
 end
