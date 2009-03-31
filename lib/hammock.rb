@@ -24,6 +24,4 @@ module Hammock
   end
 end
 
-class ApplicationController < ActionController::Base
-  include Hammock
-end
+ActionController::Base.send :include, Hammock
