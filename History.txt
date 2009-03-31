@@ -1,3 +1,13 @@
+== 0.2.12 2009-03-31
+Added loading message.
+Moved require for hammock components within Hammock.included.
+Commented debugging output in #determine_routing_parent.
+Removed InstanceMethods and ClassMethods internal modules from RestfulActions, to explicitly include it more cleanly in ApplicationController.
+Fix the loading code to achieve the same load whether hammock is installed as a plugin or a gem.
+Send toplevel loading include to ActionController::Base instead of reopening ApplicationController.
+Replaced escort_for_40[34] with render_for_status, which chooses the first available from controller partial, shared partial, static page and uses the correct HTTP status code.
+
+
 == 0.2.11.4 2009-03-25
 Don't encodeURIComponent() the authenticity_token, as it's not required and breaks non-alphanumeric chars.
 
