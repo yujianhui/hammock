@@ -1,3 +1,7 @@
+== 0.2.12.1 2009-04-01
+Changed #log to #dlog for unmatched scope logging and related chatter.
+
+
 == 0.2.12 2009-03-31
 Added loading message.
 Moved require for hammock components within Hammock.included.
