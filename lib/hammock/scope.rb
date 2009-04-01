@@ -27,13 +27,13 @@ module Hammock
         raise "The verb at #{call_point} must be supplied as a Symbol." unless verb.nil? || verb.is_a?(Symbol)
         route = route_for verb, resource
         if route.safe? && !resource.indexable_by(current_user)
-          log "#{requester_name} can't index #{resource.name.pluralize}. #{describe_call_point 4}"
+          dlog "#{requester_name} can't index #{resource.name.pluralize}. #{describe_call_point 4}"
           :not_found
         elsif !route.safe? && !make_createable(resource)
-          log "#{requester_name} can't #{verb} #{resource.name.pluralize}. #{describe_call_point 4}"
+          dlog "#{requester_name} can't #{verb} #{resource.name.pluralize}. #{describe_call_point 4}"
           :read_only
         else
-          # log "#{requester_name} can #{verb} #{resource.name.pluralize}."
+          # dlog "#{requester_name} can #{verb} #{resource.name.pluralize}."
           :ok
         end
       end
@@ -43,20 +43,20 @@ module Hammock
         route = route_for verb, record
         if route.verb.in?(:save, :create) && record.new_record?
           if !record.createable_by?(current_user)
-            log "#{requester_name} can't create a #{record.class} with #{record.attributes.inspect}. #{describe_call_point 4}"
+            dlog "#{requester_name} can't create a #{record.class} with #{record.attributes.inspect}. #{describe_call_point 4}"
             :unauthed
           else
             :ok
           end
         else
           if !record.readable_by?(current_user)
-            log "#{requester_name} can't see #{record.class}<#{record.id}>. #{describe_call_point 4}"
+            dlog "#{requester_name} can't see #{record.class}<#{record.id}>. #{describe_call_point 4}"
             :not_found
           elsif !route.safe? && !record.writeable_by?(current_user)
-            log "#{requester_name} can't #{verb} #{record.class}<#{record.id}>. #{describe_call_point 4}"
+            dlog "#{requester_name} can't #{verb} #{record.class}<#{record.id}>. #{describe_call_point 4}"
             :read_only
           else
-            # log "#{requester_name} can #{verb} #{record.class}<#{record.id}>."
+            # dlog "#{requester_name} can #{verb} #{record.class}<#{record.id}>."
             :ok
           end
         end
@@ -64,13 +64,13 @@ module Hammock
 
       def current_verb_scope
         if current_user && (scope_name = account_verb_scope?)
-          # log "got an account_verb_scope #{scope_name}."
+          # dlog "got an account_verb_scope #{scope_name}."
           mdl.send scope_name, current_user
         elsif !(scope_name = public_verb_scope?)
           log "No #{current_user.nil? ? 'public' : 'account'} #{scope_name_for_action} scope available for #{mdl}.#{' May be available after login.' if account_verb_scope?}"
           nil
         else
-          # log "got a #{scope_name} public_verb_scope."
+          # dlog "got a #{scope_name} public_verb_scope."
           mdl.send scope_name
         end
       end
@@ -84,15 +84,15 @@ module Hammock
       end
 
       def current_scope
-        log "#{current_hammock_resource.mdl}, #{current_hammock_resource.ancestry.map(&:mdl).inspect}"
+        dlog "#{current_hammock_resource.mdl}, #{current_hammock_resource.ancestry.map(&:mdl).inspect}"
         if (verb_scope = current_verb_scope).nil?
           nil
         elsif (resultant_scope = verb_scope.within(current_nest_scope, current_hammock_resource.routing_parent)).nil?
           nil
         else
-          # puts "nest: #{current_nest_scope.clauses.inspect}"
-          # puts "verb: #{current_verb_scope.clauses.inspect}"
-          puts "chained in (#{resultant_scope.owner}) current_scope: #{resultant_scope.clauses.inspect}"
+          # dlog "nest: #{current_nest_scope.clauses.inspect}"
+          # dlog "verb: #{current_verb_scope.clauses.inspect}"
+          dlog "chained in (#{resultant_scope.owner}) current_scope: #{resultant_scope.clauses.inspect}"
           resultant_scope = resultant_scope.chain(custom_scope) unless custom_scope.nil?
           resultant_scope.sort_by &mdl.sorter
         end
