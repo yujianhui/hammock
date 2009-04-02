@@ -57,6 +57,13 @@ module Hammock
         # TODO check the response code in the callback, and replace :after with :success and :failure.
         js = %Q{
           jQuery('.#{link_class}').#{opts[:on] || 'click'}(function() {
+            var obj = null;
+
+            if (#{opts[:spinner] ? 'true' : 'false'}) {
+              obj = jQuery(this).parents('.#{record.base_model}:first').find('.statuses');
+              obj.find('.spinner').animate({opacity: 'show'}, 100);
+            }
+
             /*if (#{attribute.blank? ? 'false' : 'true'} && (jQuery('.#{link_class}_target .original_value').html() == jQuery('.#{link_class}_target .modify input').val())) {
               eval("#{clean_snippet opts[:skipped]}");
             } else*/ if (false == eval("#{clean_snippet opts[:before]}")) {
@@ -70,8 +77,14 @@ module Hammock
                   #{link_params.to_flattened_json},
                   #{forgery_key_json(route.http_method)}
                 ),
-                function(response) {
+                function(response, textStatus) {
                   #{response_action}
+                  if ('success' == textStatus) {
+                    if (obj) {
+                      obj.children('.spinner').hide()
+                        .siblings('.success').show().fadeOut(4000);
+                    }
+                  }
                   eval("#{clean_snippet opts[:after]}");
                 }
               );
