@@ -49,9 +49,9 @@ module Hammock
 
         response_action = case link_params[:format].to_s
         when 'js'
-          "eval(response)"
+          "eval(response);"
         else
-          "jQuery('.#{opts[:target] || link_class + '_target'}').before(response).remove()"
+          "jQuery('.#{opts[:target] || link_class + '_target'}').before(response).remove();"
         end
 
         # TODO check the response code in the callback, and replace :after with :success and :failure.
@@ -71,7 +71,7 @@ module Hammock
                   #{forgery_key_json(route.http_method)}
                 ),
                 function(response) {
-                  #{response_action};
+                  #{response_action}
                   eval("#{clean_snippet opts[:after]}");
                 }
               );
