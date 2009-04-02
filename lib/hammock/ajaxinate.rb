@@ -37,7 +37,7 @@ module Hammock
         link_class = link_class_for route.verb, record, attribute
 
         link_params[:_method] = route.http_method
-        link_params[:format] = opts[:format].to_s
+        link_params[:format] = opts[:format].to_s unless opts[:format].blank?
 
         form_elements_hash = if route.get?
           '{ }'
