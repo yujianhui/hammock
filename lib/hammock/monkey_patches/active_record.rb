@@ -89,7 +89,7 @@ module Hammock
       def find_or_create_with(find_attributes, create_attributes = {}, adjust_attributes = false)
         if record = find_or_new_with(find_attributes, create_attributes)
           log "Create failed. #{record.errors.inspect}", :skip => 1 if record.new_record? && !record.save
-          log "Adjust failed. #{record.errors.inspect}", :skip => 1 if adjust_attributes && !record.adjust(create_attributes)
+          log "Adjust failed. #{record.errors.inspect}", :skip => 1 if adjust_attributes && !record.update_attributes(create_attributes)
           record
         end
       end
