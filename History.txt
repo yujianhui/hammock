@@ -1,3 +1,10 @@
+== 0.2.13 2009-04-07
+Use update_attributes instead of adjust in #find_or_create_with.
+Added optional statuses handling to #ajaxinate.
+Moved semicolons from call to declaration of response_action in #ajaxinate.
+Avoid specifying the request format as an empty string.
+
+
 == 0.2.12.1 2009-04-01
 Changed #log to #dlog for unmatched scope logging and related chatter.
 

@@ -4,7 +4,7 @@ require 'ambition'
 require 'ambition/adapters/active_record'
 
 module Hammock
-  VERSION = '0.2.12.1'
+  VERSION = '0.2.13'
 
   def self.included base # :nodoc:
     puts "Loading Hammock from #{loaded_from_gem? ? 'gem' : 'plugin'}"

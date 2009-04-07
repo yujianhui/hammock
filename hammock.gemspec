@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{hammock}
-  s.version = "0.2.12.1"
+  s.version = "0.2.13"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ben Hoskings"]
-  s.date = %q{2009-04-01}
+  s.date = %q{2009-04-07}
   s.description = %q{Hammock is a Rails plugin that eliminates redundant code in a very RESTful manner. It does this in lots in lots of different places, but in one manner: it encourages specification in place of implementation.   Hammock enforces RESTful resource access by abstracting actions away from the controller in favour of a clean, model-like callback system.  Hammock tackles the hard and soft sides of security at once with a scoping security system on your models. Specify who can verb what resources under what conditions once, and everything else - the actual security, link generation, index filtering - just happens.  Hammock inspects your routes and resources to generate a routing tree for each resource. Parent resources in a nested route are handled transparently at every point - record retrieval, creation, and linking.  It makes more sense when you see how it works though, so check out the screencast!}
   s.email = ["ben@hoskings.net"]
   s.extra_rdoc_files = ["History.txt", "Manifest.txt", "README.rdoc", "misc/scaffold.txt"]
